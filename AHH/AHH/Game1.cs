@@ -6,7 +6,10 @@ using System.Threading.Tasks;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+using AHH.Extensions;
 using AHH.Base;
+using AHH.UI;
+using AHH.User;
 namespace AHH
 {
 	/// <summary>
@@ -14,6 +17,8 @@ namespace AHH
 	/// </summary>
 	public class Game1 : Game
 	{
+        Player player;
+		Cursor cursor;
 		Random rng;
 		GraphicsDeviceManager graphics;
 		SpriteBatch spriteBatch;
@@ -21,7 +26,7 @@ namespace AHH
 		MovingSprite test_ms;
 		StaticSprite test_ss;
 		Grid grid;
-		Point gridSize = new Point(50, 25);
+		Point gridSize = new Point((1920/64), (1080/64) - 3);
 		Vector2[] points = new Vector2[100];
 		Point tileSize;
 		int num = 0;
@@ -29,11 +34,8 @@ namespace AHH
 		{
 			graphics = new GraphicsDeviceManager(this);
 			Content.RootDirectory = "Content";
-
-			graphics.PreferredBackBufferWidth = 1280;
-			graphics.PreferredBackBufferHeight = 720;
-
-			graphics.IsFullScreen = true;
+			//graphics.IsFullScreen = true;
+			Resolution.Init(ref graphics);
 
 		}
 
@@ -46,11 +48,12 @@ namespace AHH
 		protected override void Initialize()
 		{
 			// TODO: Add your initialization logic here
-			IsMouseVisible = true;
+			tileSize.X = 64;//graphics.PreferredBackBufferWidth / (gridSize.X);
+			tileSize.Y = 64;//graphics.PreferredBackBufferWidth / (gridSize.X);
 
-			
-			tileSize.X = graphics.PreferredBackBufferWidth / (gridSize.X);
-			tileSize.Y = graphics.PreferredBackBufferWidth / (gridSize.X);
+			Resolution.SetVirtualResolution(1920, 1080);
+			Resolution.SetResolution(graphics.GraphicsDevice.Viewport.Width, graphics.GraphicsDevice.Viewport.Height, graphics.IsFullScreen);
+
 			base.Initialize();
 		}
 
@@ -61,8 +64,8 @@ namespace AHH
 		protected override void LoadContent()
 		{
 			// Create a new SpriteBatch, which can be used to draw textures.
+			BaseObject.DebugFont = Content.Load<SpriteFont>(@"fonts/debug");
 			spriteBatch = new SpriteBatch(GraphicsDevice);
-
 			Texture2D t_r = new Texture2D(GraphicsDevice, 1, 1);
 			Texture2D t_g = new Texture2D(GraphicsDevice, 1, 1);
 			Texture2D t_b = new Texture2D(GraphicsDevice, 1, 1);
@@ -94,8 +97,11 @@ namespace AHH
 				points[i] = new Vector2(rng.Next(0, 600), rng.Next(0, 600));
 			}
 
-			grid = new Grid(gridSize, new Vector2(20, 20), t_r, t_b, t_g, tileSize);
+			grid = new Grid(gridSize, new Vector2(0, 100), t_r, t_b, t_g, tileSize, @"Content/buildings/buildings.txt", Content);
 
+			cursor = new Cursor(t_b);
+            player = new Player();
+            
 		}
 
 		/// <summary>
@@ -117,8 +123,9 @@ namespace AHH
 			if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
 				Exit();
 
-			// TODO: Add your update logic here
-			MouseState mouse = Mouse.GetState();
+            // TODO: Add your update logic here
+            player.Input.KB = Keyboard.GetState();
+			cursor.Update(Mouse.GetState());
 
 			if(test_ms.MoveTo(points[num]))
 			{
@@ -127,10 +134,12 @@ namespace AHH
 				MathHelper.Clamp(num, 0, 99);
 			}
 
-			test_is.Update(mouse);
+			test_is.Update(cursor);
 
-			grid.Update(mouse);
+			grid.Update(cursor, player);
 
+
+            player.Input.KBP = player.Input.KB;
 			base.Update(gameTime);
 		}
 
@@ -140,13 +149,20 @@ namespace AHH
 		/// <param name="gameTime">Provides a snapshot of timing values.</param>
 		protected override void Draw(GameTime gameTime)
 		{
-			GraphicsDevice.Clear(Color.CornflowerBlue);
+			//GraphicsDevice.Clear(Color.Black);
 
-			spriteBatch.Begin();
+			Resolution.BeginDraw();
+
+			spriteBatch.Begin(SpriteSortMode.Immediate,
+								   BlendState.AlphaBlend,
+								   SamplerState.PointClamp, null, null, null,
+								   Resolution.getTransformationMatrix());
+
 			test_ms.Draw(spriteBatch);
 			test_ss.Draw(spriteBatch);
 			test_is.Draw(spriteBatch);
 			grid.Draw(spriteBatch);
+			cursor.Draw(spriteBatch);
 			spriteBatch.End();
 
 			base.Draw(gameTime);

@@ -45,11 +45,15 @@
     <Compile Include="Base\Grid.cs" />
     <Compile Include="Base\NavMesh.cs" />
     <Compile Include="Extensions\Extensions.cs" />
+    <Compile Include="Extensions\Resolution.cs" />
     <Compile Include="Game1.cs" />
     <Compile Include="Interactable\Building.cs" />
+    <Compile Include="Parsers\Parsers.cs" />
+    <Compile Include="User\Player.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="UI\Control.cs" />
+    <Compile Include="UI\ControlMapper.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="MonoGame.Framework">

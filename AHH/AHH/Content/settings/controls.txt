@@ -1,0 +1,6 @@
+##set controls for each function here,
+##each control is remappable to anything within XNA.INPUT.KEYS 
+##format as [function name] tabspace [Key]
+
+HotKey_BuildMode	B
+HotKey_Build	P

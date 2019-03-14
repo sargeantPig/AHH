@@ -1,0 +1,9 @@
+##Buildings
+##Details Building stats and attributes
+
+name	Test
+cost	500
+size	128, 128
+texture	texture/buildings/TEST
+H_texture	texture/buildings/TEST_H
+C_texture	texture/buildings/TEST_C

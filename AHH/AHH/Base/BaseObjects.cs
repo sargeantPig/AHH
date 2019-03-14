@@ -7,20 +7,20 @@ using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
 using AHH.Extensions;
-
+using AHH.UI;
 namespace AHH.Base
 {
 	class BaseObject
 	{
 		static SpriteFont debugFont { get; set; }
-		Guid id { get; }
+		Guid id { get; set; }
 		Vector2 position { get; set; }
 
 		public BaseObject() { this.id = new Guid(); }
 
 		public BaseObject(Vector2 position) { this.id = new Guid(); this.position = position; }
 
-		public SpriteFont DebugFont
+		static public SpriteFont DebugFont
 		{
 			set { debugFont = value; }
 			get { return debugFont;  }
@@ -31,11 +31,24 @@ namespace AHH.Base
 			get { return id; }
 		}
 
+        protected Guid SetID
+        {
+            set { id = value; }
+        }
+
 		public Vector2 Position
 		{
 			set { position = value; }
 			get { return position; }
 		}
+
+        public BaseObject DeepCopy()
+        {
+            BaseObject b = (BaseObject)this.MemberwiseClone();
+            b.id = new Guid();
+            b.position = new Vector2(position.X, position.Y);
+            return b;
+        }
 	}
 
 	class StaticSprite : BaseObject
@@ -43,8 +56,11 @@ namespace AHH.Base
 		Texture2D texture { get; set; }
 		Rectangle box { get; set; }
 
+        protected Point size;
+
 		public StaticSprite(Vector2 position, Texture2D texture, Point size) 
 			: base(position) {
+            this.size = size;
 			this.texture = texture;
 			this.box = new Rectangle((int)position.X, (int)position.Y, size.X, size.Y);
 		}
@@ -66,6 +82,22 @@ namespace AHH.Base
 		{
 			sb.Draw(texture, base.Position, Color.White);
 		}
+
+        public Point GetSize()
+        {
+            return size;
+        }
+
+        new public StaticSprite DeepCopy()
+        {
+            BaseObject b = base.DeepCopy();
+            StaticSprite s = (StaticSprite)this.MemberwiseClone();
+            s.Box = new Rectangle((int)b.Position.X, (int)b.Position.Y, size.X, size.Y);
+            s.size = new Point(size.X, size.Y);
+            s.SetID = b.ID;
+            s.Position = new Vector2(b.Position.X, b.Position.Y);
+            return s;
+        }
 	}
 
 	class AnimatedSprite : StaticSprite
@@ -248,12 +280,12 @@ namespace AHH.Base
 			this.t_clicked = t_clicked;
 		}
 
-		public void Update(MouseState mouse)
+		public void Update(Cursor mouse)
 		{
-			if (Box.Contains(mouse.Position))
+			if (Box.Contains(mouse.GetRealPosition))
 			{
 				isHighlighted = true;
-				if (mouse.LeftButton == ButtonState.Pressed)
+				if (mouse.GetState.LeftButton == ButtonState.Pressed)
 					isClicked = true;
 			}
 			else { isHighlighted = false; isClicked = false; } 
@@ -274,11 +306,11 @@ namespace AHH.Base
 
 	class InteractableStaticSprite : StaticSprite
 	{
-		bool isHighlighted;
-		bool isClicked;
+		bool isHighlighted { get; set; }
+		bool isClicked { get; set; }
 
-		Texture2D t_highlighted;
-		Texture2D t_clicked;
+		protected Texture2D t_highlighted;
+		protected Texture2D t_clicked;
 
 		public InteractableStaticSprite(Vector2 position, Point size, Texture2D texture, Texture2D t_highlighted, Texture2D t_clicked)
 			: base(position, texture, size)
@@ -290,12 +322,12 @@ namespace AHH.Base
 			this.t_clicked = t_clicked;
 		}
 
-		public void Update(MouseState mouse)
+		public void Update(Cursor mouse)
 		{
-			if (Box.Contains(mouse.Position))
+			if (Box.Contains(mouse.GetRealPosition))
 			{
 				isHighlighted = true;
-				if (mouse.LeftButton == ButtonState.Pressed)
+				if (mouse.GetState.LeftButton == ButtonState.Pressed)
 					isClicked = true;
 			}
 			else { isHighlighted = false; isClicked = false; }
@@ -305,15 +337,33 @@ namespace AHH.Base
 
 		new public void Draw(SpriteBatch sb)
 		{
-			sb.Draw(Texture, Position, Box, Color.White);
+			sb.Draw(Texture, Box, Color.White);
 
 			if (isHighlighted)
-				sb.Draw(t_highlighted, Position, Box, Color.White);
+				sb.Draw(t_highlighted, Box, Color.White);
 			if (isClicked)
-				sb.Draw(t_clicked, Position, Box, Color.White); 
+				sb.Draw(t_clicked, Box, Color.White); 
 		}
 
+        new public InteractableStaticSprite DeepCopy()
+        {
+            StaticSprite s = base.DeepCopy();
+            InteractableStaticSprite iss = (InteractableStaticSprite)this.MemberwiseClone();
+            iss.Box = new Rectangle(s.Box.X, s.Box.Y, s.Box.Width, s.Box.Height);
+            iss.SetID = s.ID;
+            iss.size = new Point(size.X, size.Y);
+            return iss;
+        }
 
+		public bool IsHighlighted
+		{
+			get { return isHighlighted; }
+		}
+
+		public bool IsClicked
+		{
+			get { return isClicked; }
+		}
 	}
 
 }
