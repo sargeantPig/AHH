@@ -71,6 +71,7 @@ namespace AHH.AI
 		void Draw(SpriteBatch sb);
 		Vector2 Position { get; set; }
 		bool IsZombie { get; set; }
+		Ai_States Ai_States { get; set; }
 	}
 
 	struct Stats
@@ -84,6 +85,19 @@ namespace AHH.AI
 		int baseDamage { get; set; }
 		int range { get; set; }
 		float hitDelay { get; set; }
+
+		public Stats(Stats stats)
+		{
+			this.name = stats.name;
+			this.ai_type = stats.ai_type;
+			this.armourType = stats.armourType;
+			this.baseDamage = stats.baseDamage;
+			this.health = stats.health;
+			this.hitDelay = stats.hitDelay;
+			this.luck = stats.luck;
+			this.range = stats.range;
+			this.weaponType = stats.weaponType;
+		}
 
 		public string Name
 		{
@@ -150,6 +164,16 @@ namespace AHH.AI
 		Texture2D projectile { get; set; }
 		Dictionary<string, Vector3> animations { get; set; }
 
+		public Unit_Types(Unit_Types ut)
+		{
+			this.type = ut.Type;
+			this.texture = ut.texture;
+			this.h_texture = ut.h_texture;
+			this.c_texture = ut.c_texture;
+			this.projectile = ut.projectile;
+			this.animations = ut.animations;
+		}
+
 		public Ai_Type Type
 		{
 			get { return type; }
@@ -164,13 +188,13 @@ namespace AHH.AI
 
 		public Texture2D H_texture
 		{
-			get { return H_texture; }
-			set { H_texture = value; }
+			get { return h_texture; }
+			set { h_texture = value; }
 		}
 		public Texture2D C_texture
 		{
-			get { return C_texture; }
-			set { C_texture = value; }
+			get { return c_texture; }
+			set { c_texture = value; }
 		}
 		public Texture2D Projectile
 		{
@@ -191,12 +215,13 @@ namespace AHH.AI
 		Building defender;
 		Stats stats = new Stats();
 		Ai_States ai_State { get; set; }
-		Thread th_pathfinder { get; set; }
+		ThreadStart th_pathfinder { get; set; }
+		Thread th_pathchild { get; set; }
 		bool isZombie { get; set; }
 		List<Vector2> waypoints { get; set; }
 
-		public AiUnit(Vector2 position, Point rectExtends, float frameTime, float speed, Dictionary<string, Vector3> states, Stats stats, string name,  Texture2D texture, Texture2D texture_h, Texture2D texture_c)
-			:base(position, rectExtends, texture, texture_h, texture_c, frameTime, speed, states)
+		public AiUnit(Vector2 position, Point rectExtends, float speed, Dictionary<string, Vector3> states, Stats stats,  Texture2D texture, Texture2D texture_h, Texture2D texture_c)
+			:base(position, rectExtends, texture, texture_h, texture_c, speed, states)
 		{
 			this.stats = stats;
 			waypoints = new List<Vector2>();
@@ -228,18 +253,23 @@ namespace AHH.AI
 			{
 				Vector2 next = new Vector2();
 				bool found = false;
-				for (int x = current.X - 1 < 0 ? 0 : current.X - 1; current.X + 1 > _grid.GetLength(0) ? x < _grid.GetLength(0) : x < current.X + 1; x++)
+				int maxx = _grid.GetLength(0);
+				int maxy = _grid.GetLength(1);
+
+				for (int x = current.X - 1 < 0 ? 0 : current.X - 1; current.X + 1 > maxx ? x < maxx : x < current.X + 2; x++)
 				{
 					if (found)
 						break;
 
-					for (int y = current.Y - 1 < 0 ? 0 : current.Y - 1; current.Y + 1 > _grid.GetLength(1)  ? y < _grid.GetLength(1) : y < current.Y +1  ; y++)
+					for (int y = current.Y - 1 < 0 ? 0 : current.Y - 1; current.Y + 1 > maxy  ? y < maxy : y < current.Y + 2  ; y++)
 					{
 						if (x != current.X || y != current.Y)
 						{
 							if (_grid[x, y].Item3 < _grid[current.X, current.Y].Item3)
 							{
 								next = new Vector2(_grid[x, y].Item1.X, _grid[x, y].Item1.Y);
+								current = new Point(x, y);
+								points.Add(next);
 								found = true;
 								break;
 							}
@@ -250,7 +280,7 @@ namespace AHH.AI
 					}
 				}
 
-				points.Add(next);
+			
 			}
 
 			return points;
@@ -294,10 +324,16 @@ namespace AHH.AI
 			set { ai_State = value; }
 		}
 
-		public Thread Th_Pathfinder
+		public ThreadStart Th_Pathfinder
 		{
 			get { return th_pathfinder; }
 			set { th_pathfinder = value; }
+		}
+
+		public Thread Th_PathChild
+		{
+			get { return th_pathchild; }
+			set { th_pathchild = value; }
 		}
 
 		public List<Vector2> WayPoints
@@ -310,8 +346,8 @@ namespace AHH.AI
 	class Mounted : AiUnit
 	{
 
-		public Mounted(Vector2 position, Point rectExtends, float frameTime, float speed, string name, Dictionary<string, Vector3> states, Stats stats, Texture2D texture, Texture2D texture_h, Texture2D texture_c)
-			: base(position, rectExtends, frameTime, speed, states, stats, name, texture, texture_h, texture_c)
+		public Mounted(Vector2 position, Point rectExtends, float speed, Dictionary<string, Vector3> states, Stats stats, Texture2D texture, Texture2D texture_h, Texture2D texture_c)
+			: base(position, rectExtends, speed, states, stats, texture, texture_h, texture_c)
 		{
 
 		}
@@ -334,21 +370,27 @@ namespace AHH.AI
 		object pf_result = new object();
 		bool th_wait = false;
 
-		public Grounded(Vector2 position, Point rectExtends, float frameTime, float speed, string name, Unit_Types types, Stats stats)
-			: base(position, rectExtends, frameTime, speed, types.Animations, stats, name, types.Texture, types.H_texture, types.C_texture)
+		public Grounded(Vector2 position, Point rectExtends, float speed, Unit_Types types, Stats stats, Grid grid)
+			: base(position, rectExtends, speed, types.Animations, stats, types.Texture, types.H_texture, types.C_texture)
 		{
+			Th_Pathfinder = new ThreadStart(() => {
+				pf_result = grid.Pathfinder(Grid.ToWorldPosition(new Point(15, 6), Grid.GetTileSize), Position);
+			});
 
+			Th_PathChild = new Thread(Th_Pathfinder);
 		}
 
-		public void Update(Cursor ms, Grid grid)
+		public void Update(Cursor ms, GameTime gt, Grid grid)
 		{
 			switch (Ai_States)
 			{
-				case Ai_States.Thinking: Think(grid); break;
+				case Ai_States.Thinking: CurrentState = "Think"; Think(grid); break;
 				case Ai_States.Resurrecting: Ressurect(); break;
-				case Ai_States.Moving: Moving(); break;
-				case Ai_States.Attacking: Attacking(); break;
+				case Ai_States.Moving: CurrentState = "Move"; Moving(); break;
+				case Ai_States.Attacking: CurrentState = "Attack"; Attacking(); break;
 			}
+
+			base.Update(gt);
 		}
 
 		void Attacking()
@@ -368,12 +410,13 @@ namespace AHH.AI
 
 		void Think(Grid grid)
 		{
+			WayPoints.Clear();
 			//check if can move forward
 			Vector2 a_nextLocation = Position;
 			Vector2 closestBuildingPos = new Vector2();
-			if (!Th_Pathfinder.IsAlive && !th_wait)
+			if (!Th_PathChild.IsAlive && !th_wait)
 			{
-				Point gridLocation = Grid.ToGridPosition(Position, grid.GetSize());
+				Point gridLocation = Grid.ToGridPosition(Position, Grid.GetTileSize);
 				Tile nextTile = grid.GetTile(new Point(gridLocation.X + 1, gridLocation.Y));
 				
 				if (nextTile != null)
@@ -404,20 +447,20 @@ namespace AHH.AI
 			}
 
 			//attempt to find a path to main objective
-			if (!Th_Pathfinder.IsAlive && !th_wait)
+			if (!Th_PathChild.IsAlive && !th_wait)
 			{
 				th_wait = true;
-				Th_Pathfinder = new Thread(() =>  {
-					pf_result = grid.Pathfinder(Grid.ToWorldPosition(new Point(15, 6), grid.GetSize()), Position);
-				});
+
+				Th_PathChild = new Thread(Th_Pathfinder);
+				Th_PathChild.Start();
 			}
 			
-			if (!Th_Pathfinder.IsAlive && th_wait)
+			if (!Th_PathChild.IsAlive && th_wait)
 			{
 				th_wait = false;
 				if (pf_result != null)
 				{
-					CalculateWayPoints(pf_result);
+					WayPoints = CalculateWayPoints(pf_result);
 					Ai_States = Ai_States.Moving;
 				}
 				//pathing failed resort to continuing forward

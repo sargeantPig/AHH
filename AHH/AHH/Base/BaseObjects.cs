@@ -104,7 +104,6 @@ namespace AHH.Base
 	{
 		private Rectangle Source { get; set; }
 		private int Frame { get; set; }
-		private float FrameTime { get; set; }
 
 		private float elasped = 0;
 
@@ -115,22 +114,21 @@ namespace AHH.Base
 		bool Active { get; set; }
 		bool active_mode = false;
 
-		public AnimatedSprite(Vector2 position, Point RectExtents, Texture2D texture, float frameTime, Dictionary<string, Vector3> states = null, bool active_mode = false)
+		public AnimatedSprite(Vector2 position, Point RectExtents, Texture2D texture, Dictionary<string, Vector3> states = null, bool active_mode = false)
 			: base(position, texture, RectExtents)
 		{
 			this.Source = new Rectangle(0, 0, RectExtents.X, RectExtents.Y);
-			this.FrameTime = frameTime;
 			this.Active = false;
 			this.active_mode = active_mode;
 			if (states == null)
 			{
 				this.States = new Dictionary<string, Vector3>();
-				this.States.Add("default", new Vector3(0f, (texture.Width / Source.Width), frameTime));//sets a default state of going through the entire sheet
+				this.States.Add("default", new Vector3(0f, (texture.Width / Source.Width), 100));//sets a default state of going through the entire sheet
 			}
 			else
 			{
 				this.States = new Dictionary<string, Vector3>(states);
-				this.States.Add("default", new Vector3(0f, (texture.Width / Source.Width), frameTime));//sets a default state of going through the entire sheet
+				this.States.Add("default", new Vector3(0f, (texture.Width / Source.Width), 100));//sets a default state of going through the entire sheet
 
 			}
 			currentState = "default";
@@ -219,8 +217,8 @@ namespace AHH.Base
 		Vector2 Velocity { get; }
 		float speed { get; set; }
 
-		public MovingSprite(Vector2 position, Point RectExtents, Texture2D texture, float frameTime, float speed, Dictionary<string, Vector3> states = null, bool active_mode = false)
-			: base(position, RectExtents, texture, frameTime, states, active_mode)
+		public MovingSprite(Vector2 position, Point RectExtents, Texture2D texture, float speed, Dictionary<string, Vector3> states = null, bool active_mode = false)
+			: base(position, RectExtents, texture, states, active_mode)
 		{
 			this.speed = speed;
 			this.Velocity = new Vector2(1, 1);
@@ -276,8 +274,8 @@ namespace AHH.Base
 		Texture2D t_highlighted;
 		Texture2D t_clicked;
 
-		public InteractableMovingSprite(Vector2 position, Point RectExtents, Texture2D texture, Texture2D t_highlighted, Texture2D t_clicked, float frameTime, float speed, Dictionary<string, Vector3> states = null, bool active_mode = false)
-			: base(position, RectExtents, texture, frameTime, speed, states, active_mode)
+		public InteractableMovingSprite(Vector2 position, Point RectExtents, Texture2D texture, Texture2D t_highlighted, Texture2D t_clicked, float speed, Dictionary<string, Vector3> states = null, bool active_mode = false)
+			: base(position, RectExtents, texture, speed, states, active_mode)
 		{
 			isHighlighted = false;
 			isClicked = false;

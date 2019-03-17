@@ -1,12 +1,12 @@
 ##Unit textures and animations
 ##############################
-#Type	{internal type}
-#Sound	{sound_file}
-#Texture	{texture path}
-#H_Texture {highlightTexture}
-#C_Texture	{ClickTexture}
-#Projectile	{projectile texture}
-#Animation
-#{
-#	{name, startFrame, FinishFrame, FrameTime}
-#}
+Type	Knight
+Sound	{sound_file}
+Texture	texture/unit/test_ai_spritesheet
+H_Texture	texture/unit/test_ai_spritesheet
+C_Texture	texture/unit/test_ai_spritesheet
+Projectile	texture/unit/test_ai_spritesheet
+Animation
+Move, 0, 0, 100
+Attack, 1, 1, 100
+Think, 2, 2, 100

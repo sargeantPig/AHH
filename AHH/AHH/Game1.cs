@@ -10,6 +10,7 @@ using AHH.Extensions;
 using AHH.Base;
 using AHH.UI;
 using AHH.User;
+using AHH.AI;
 namespace AHH
 {
 	/// <summary>
@@ -22,13 +23,11 @@ namespace AHH
 		Random rng;
 		GraphicsDeviceManager graphics;
 		SpriteBatch spriteBatch;
-		InteractableMovingSprite test_is;
-		MovingSprite test_ms;
-		StaticSprite test_ss;
 		Grid grid;
 		Point gridSize = new Point((1920/64), (1080/64) - 3);
 		Vector2[] points = new Vector2[100];
 		Point tileSize;
+		Overseer os;
 		int num = 0;
 		public Game1()
 		{
@@ -85,10 +84,6 @@ namespace AHH
 			t_g.SetData<Color>(green);
 			t_b.SetData<Color>(blue);
 
-			test_ms = new MovingSprite(new Vector2(10, 10), new Point(10, 10), t_r, 0, 1);
-			test_ss = new StaticSprite(new Vector2(300, 300), t_r, new Point(10, 10));
-			test_is = new InteractableMovingSprite(new Vector2(10, 10), new Point(10, 10), t_r, t_g, t_b, 0, 1);
-
 
 			rng = new Random();
 
@@ -101,7 +96,7 @@ namespace AHH
 
 			cursor = new Cursor(t_b);
             player = new Player();
-            
+			os = new Overseer(Content);
 		}
 
 		/// <summary>
@@ -127,18 +122,10 @@ namespace AHH
             player.Input.KB = Keyboard.GetState();
 			cursor.Update(Mouse.GetState());
 
-			if(test_ms.MoveTo(points[num]))
-			{
-				num++;
-
-				MathHelper.Clamp(num, 0, 99);
-			}
-
-			test_is.Update(cursor);
 
 			player.Update();
 			grid.Update(cursor, player);
-
+			os.Update(gameTime, cursor, grid);
 
             player.Input.KBP = player.Input.KB;
 			base.Update(gameTime);
@@ -159,11 +146,10 @@ namespace AHH
 								   SamplerState.PointClamp, null, null, null,
 								   Resolution.getTransformationMatrix());
 
-			test_ms.Draw(spriteBatch);
-			test_ss.Draw(spriteBatch);
-			test_is.Draw(spriteBatch);
 			grid.Draw(spriteBatch, player.SelectedBuilding);
+			os.Draw(spriteBatch);
 			cursor.Draw(spriteBatch);
+
 			spriteBatch.End();
 
 			base.Draw(gameTime);

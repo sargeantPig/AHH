@@ -1,4 +1,8 @@
 ##Units
-Name	{unit_name}
-Type	{unit_internal_type}
-Stats	{health, weaponType, armourType, baseDmg, range, hitDelay, luck}
+#Name	Swordsman
+#Type	Knight
+#Stats	{health, weaponType, armourType, baseDmg, range, hitDelay, luck}
+
+Name	Swordsman
+Type	Knight
+Stats	2, Sword, Heavy, 2, 32, 1, Trained

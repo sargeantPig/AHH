@@ -180,18 +180,17 @@ namespace AHH.Parsers
 			StreamReader sr = new StreamReader(filepath);
 			string line = "";
 
-
 			Stats temp_stats = new Stats();
 
 			while ((line = sr.ReadLine()) != null)
 			{
-				if (!line.StartsWith("Name"))
+				if (line.StartsWith("Name"))
 				{
 					string[] split = line.Split('\t');
 					temp_stats.Name = split[1];
 				}
 
-				if (!line.StartsWith("Type"))
+				if (line.StartsWith("Type"))
 				{
 					string[] split = line.Split('\t');
 					temp_stats.AiType = (Ai_Type)Enum.Parse(typeof(Ai_Type), split[1]);
@@ -199,7 +198,7 @@ namespace AHH.Parsers
 						stats.Add(temp_stats.AiType, new List<Stats>());
 				}
 
-				if (!line.StartsWith("Stats"))
+				if (line.StartsWith("Stats"))
 				{
 					string[] split = line.Split('\t', ',');
 					temp_stats.Health = Convert.ToInt32(split[1]);
@@ -209,9 +208,11 @@ namespace AHH.Parsers
 					temp_stats.Range = Convert.ToInt32(split[5]);
 					temp_stats.HitDelay = (float)Convert.ToDouble(split[6]);
 					temp_stats.Luck = (Luck)Enum.Parse(typeof(Luck), split[7]);
+
+					stats[temp_stats.AiType].Add(temp_stats);
 				}
 
-				stats[temp_stats.AiType].Add(temp_stats);
+				
 
 			}
 
@@ -232,7 +233,7 @@ namespace AHH.Parsers
 
 			while ((line = sr.ReadLine()) != null)
 			{
-				if (!line.StartsWith("Type"))
+				if (line.StartsWith("Type"))
 				{
 					string[] split = line.Split('\t');
 					temp_types.Type = (Ai_Type)Enum.Parse(typeof(Ai_Type), split[1]);
@@ -240,31 +241,31 @@ namespace AHH.Parsers
 						unit_types.Add(temp_types.Type, new Unit_Types());
 				}
 
-				if (!line.StartsWith("Texture"))
+				if (line.StartsWith("Texture"))
 				{
 					string[] split = line.Split('\t');
 					temp_types.Texture = cm.Load<Texture2D>(split[1]);
 				}
 
-				if (!line.StartsWith("H_Texture"))
+				if (line.StartsWith("H_Texture"))
 				{
 					string[] split = line.Split('\t');
 					temp_types.H_texture = cm.Load<Texture2D>(split[1]);
 				}
 
-				if (!line.StartsWith("C_Texture"))
+				if (line.StartsWith("C_Texture"))
 				{
 					string[] split = line.Split('\t');
 					temp_types.C_texture = cm.Load<Texture2D>(split[1]);
 				}
 
-				if (!line.StartsWith("Projectile"))
+				if (line.StartsWith("Projectile"))
 				{
 					string[] split = line.Split('\t');
 					temp_types.Projectile = cm.Load<Texture2D>(split[1]);
 				}
 
-				if (line.StartsWith("Animations"))
+				if (line.StartsWith("Animation"))
 				{
 					Dictionary<string, Vector3> temp_animations = new Dictionary<string, Vector3>();
 					while ((line = sr.ReadLine()) != null)

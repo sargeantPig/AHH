@@ -123,6 +123,7 @@ namespace AHH.Base
 		ObservableCollection<Point> selectedTiles;
 		DropMenu menu;
 		Thread pathfinder_test; 
+		bool buildingPlaced { get; set; }
 		bool drawBuildingGhost = false;
 		bool open_menu = false;
 		public Grid(Point dimensions, Vector2 position, Texture2D texture, Texture2D t_highlighted, Texture2D t_clicked, Point tileSize, string buildingFilePath, string gridUiFilePath, ContentManager cm) 
@@ -134,7 +135,7 @@ namespace AHH.Base
 			selectedTiles.CollectionChanged += new System.Collections.Specialized.NotifyCollectionChangedEventHandler(this.CollectionChanged);
 			tiles = new Tile[dimensions.X, dimensions.Y];
 			this.dimensions = dimensions;
-
+			buildingPlaced = false;
 			for (int y = 0; y < dimensions.Y; y++)
 			{
 				for (int x = 0; x < dimensions.X; x++)
@@ -196,6 +197,8 @@ namespace AHH.Base
 		public void Update(Cursor ms, Player player)
 		{
 			base.Update(ms);
+
+			buildingPlaced = false;
 
 			if ((IsClicked || IsHighlighted || ms.isRightPressed) && !open_menu)
 			{
@@ -271,10 +274,9 @@ namespace AHH.Base
 
 				if (p != selectedTiles[0])
 					tiles[selectedTiles[0].X, selectedTiles[0].Y].AddChild(p);
-
             }
 
-			
+			buildingPlaced = true;
         }
 
 		public Tile GetTile(Point point)
@@ -379,7 +381,7 @@ namespace AHH.Base
 			}
 
 #if DEBUG
-			for (int y = 0; y < dimensions.Y; y++)
+			/*for (int y = 0; y < dimensions.Y; y++)
 			{
 				for (int x = 0; x < dimensions.X; x++)
 				{
@@ -387,7 +389,7 @@ namespace AHH.Base
 				}
 
 				Console.Write('\n');
-			}
+			}*/
 #endif
 			done.Clear();
 
@@ -407,6 +409,11 @@ namespace AHH.Base
 		static public Point GetTileSize
 		{
 			get { return tileSize; }
+		}
+
+		public bool BuildingPlaced
+		{
+			get { return buildingPlaced; }
 		}
 
         new public void Draw(SpriteBatch sb, string buildingID)
