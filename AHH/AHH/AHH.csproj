@@ -43,21 +43,40 @@
     <ApplicationManifest>app.manifest</ApplicationManifest>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="AI\AiUnits.cs" />
+    <Compile Include="AI\AiData.cs" />
+    <Compile Include="AI\AiUnit.cs" />
+    <Compile Include="AI\Grounded.cs" />
+    <Compile Include="AI\Mounted.cs" />
     <Compile Include="AI\Overseer.cs" />
-    <Compile Include="Base\BaseObjects.cs" />
-    <Compile Include="Base\Grid.cs" />
-    <Compile Include="Base\NavMesh.cs" />
+    <Compile Include="AI\PathFinder.cs" />
+    <Compile Include="Base\Objects\AnimatedSprite.cs" />
+    <Compile Include="Base\Objects\BaseObject.cs" />
+    <Compile Include="Base\Grid\Grid.cs" />
+    <Compile Include="Base\Objects\InteractableMovingSprite.cs" />
+    <Compile Include="Base\Objects\InteractableStaticSprite.cs" />
+    <Compile Include="Base\Objects\MovingSprite.cs" />
+    <Compile Include="Base\Objects\StaticSprite.cs" />
+    <Compile Include="Base\Grid\Tile.cs" />
+    <Compile Include="Base\Grid\TileStates.cs" />
     <Compile Include="Extensions\Extensions.cs" />
     <Compile Include="Extensions\Resolution.cs" />
     <Compile Include="Game1.cs" />
     <Compile Include="Interactable\Building.cs" />
-    <Compile Include="Parsers\Parsers.cs" />
+    <Compile Include="Parsers\Parse_UnitStats.cs" />
+    <Compile Include="Parsers\Parse_Buildings.cs" />
+    <Compile Include="Parsers\Parse_InternalGridMenu.cs" />
+    <Compile Include="Parsers\Parse_UiElements.cs" />
+    <Compile Include="Parsers\Parse_UnitTypes.cs" />
+    <Compile Include="UI\Elements\Button\Button.cs" />
+    <Compile Include="UI\Elements\Button\ButtonFunctions.cs" />
+    <Compile Include="UI\Controls\Cursor.cs" />
+    <Compile Include="UI\Elements\DropMenu.cs" />
+    <Compile Include="UI\Elements\IElement.cs" />
+    <Compile Include="UI\Elements\Text.cs" />
     <Compile Include="User\Player.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="UI\Control.cs" />
-    <Compile Include="UI\ControlMapper.cs" />
+    <Compile Include="UI\Controls\ControlMapper.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="MonoGame.Framework">

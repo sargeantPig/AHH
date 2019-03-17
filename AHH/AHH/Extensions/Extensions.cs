@@ -16,10 +16,35 @@ namespace AHH.Extensions
 			direction.Normalize();
 			return -direction;
 		}
+		public static float PercentAofB(this float a, float b)
+		{
+			return (a / b) * 100;
+		}
+		public static float PercentDecrease(this float current, float original)
+		{
+			float decrease = original - current;
+			return (decrease / original) * 100;
+		}
 
-		
+		public static T RandomFlag<T>(Random rnd)
+		{
+			Array flags = Enum.GetValues(typeof(T));
+			var a = (T)flags.GetValue(rnd.Next(flags.Length));
+
+			return a;
+		}
+
+		public static T RandomFlag<T>(Random rnd, int min, int max)
+		{
+			Array flags = Enum.GetValues(typeof(T));
+			var a = (T)flags.GetValue(rnd.Next(min, max));
+
+			return a;
+		}
 
 	}
+
+
 
 	public class WTuple<t1, t2, t3>
 	{

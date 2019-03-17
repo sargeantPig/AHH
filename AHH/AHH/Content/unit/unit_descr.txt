@@ -1,8 +1,20 @@
 ##Units
 #Name	Swordsman
 #Type	Knight
-#Stats	{health, weaponType, armourType, baseDmg, range, hitDelay, luck}
+#Stats	{health, weaponType, armourType, baseDmg, range, hitDelay, luck, focus}
 
 Name	Swordsman
 Type	Knight
-Stats	2, Sword, Heavy, 2, 32, 1, Trained
+Stats	2, Sword, Heavy, 2, 32, 1, Trained, Aggressive
+
+Name	Squire
+Type	Priest
+Stats	2, Spear, Heavy, 2, 32, 1, Trained, Focused
+
+Name	Bow
+Type	Archer
+Stats	2, Bow, Heavy, 2, 32, 1, Trained, Hyper
+
+Name	pl
+Type	Horseman
+Stats	2, Bone, Heavy, 2, 32, 1, Trained, Focused

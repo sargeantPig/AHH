@@ -18,9 +18,9 @@ namespace AHH
 	/// </summary>
 	public class Game1 : Game
 	{
+		Random rng;
         Player player;
 		Cursor cursor;
-		Random rng;
 		GraphicsDeviceManager graphics;
 		SpriteBatch spriteBatch;
 		Grid grid;
@@ -35,7 +35,9 @@ namespace AHH
 			Content.RootDirectory = "Content";
 			//graphics.IsFullScreen = true;
 			Resolution.Init(ref graphics);
-
+			
+			rng = new Random(int.Parse(Guid.NewGuid().ToString().Substring(0, 8), System.Globalization.NumberStyles.HexNumber));
+			
 		}
 
 		/// <summary>
@@ -84,9 +86,6 @@ namespace AHH
 			t_g.SetData<Color>(green);
 			t_b.SetData<Color>(blue);
 
-
-			rng = new Random();
-
 			for (int i = 0; i < points.Count(); i++)
 			{
 				points[i] = new Vector2(rng.Next(0, 600), rng.Next(0, 600));
@@ -125,7 +124,7 @@ namespace AHH
 
 			player.Update();
 			grid.Update(cursor, player);
-			os.Update(gameTime, cursor, grid);
+			os.Update(gameTime, cursor, grid, rng);
 
             player.Input.KBP = player.Input.KB;
 			base.Update(gameTime);
@@ -148,6 +147,7 @@ namespace AHH
 
 			grid.Draw(spriteBatch, player.SelectedBuilding);
 			os.Draw(spriteBatch);
+			grid.Ui_Draw(spriteBatch, player.SelectedBuilding);
 			cursor.Draw(spriteBatch);
 
 			spriteBatch.End();
