@@ -1,0 +1,12 @@
+##Unit textures and animations
+##############################
+#Type	{internal type}
+#Sound	{sound_file}
+#Texture	{texture path}
+#H_Texture {highlightTexture}
+#C_Texture	{ClickTexture}
+#Projectile	{projectile texture}
+#Animation
+#{
+#	{name, startFrame, FinishFrame, FrameTime}
+#}

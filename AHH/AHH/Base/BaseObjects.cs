@@ -217,12 +217,12 @@ namespace AHH.Base
 	class MovingSprite : AnimatedSprite
 	{
 		Vector2 Velocity { get; }
-		float Speed { get; }
+		float speed { get; set; }
 
 		public MovingSprite(Vector2 position, Point RectExtents, Texture2D texture, float frameTime, float speed, Dictionary<string, Vector3> states = null, bool active_mode = false)
 			: base(position, RectExtents, texture, frameTime, states, active_mode)
 		{
-			this.Speed = speed;
+			this.speed = speed;
 			this.Velocity = new Vector2(1, 1);
 		}
 
@@ -249,6 +249,12 @@ namespace AHH.Base
 
 
 			return true;
+		}
+
+		public float Speed
+		{
+			get { return speed; }
+			set { speed = value; }
 		}
 
 		public Vector2 UpdateBox
@@ -363,6 +369,7 @@ namespace AHH.Base
 		public bool IsClicked
 		{
 			get { return isClicked; }
+			set { isClicked = value; }
 		}
 	}
 

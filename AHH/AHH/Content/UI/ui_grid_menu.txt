@@ -1,0 +1,27 @@
+##Set Ui Elements for grid menu here
+##Type internal type of element (Button, DropMenu)
+##Name name of the element 
+##Value string value of the element
+##texture base texture path
+
+
+Type	Button
+Name	Build
+Value	Build
+Size	256, 128
+H_texture	texture/ui/button_test_h
+Texture	texture/ui/button_test
+
+
+Type	Button
+Name	Dismantle
+Value	Dismantle
+Size	256, 128
+Texture	texture/ui/button_test
+
+
+Type	Button
+Name	Examine
+Value	Examine
+Size	256, 128
+Texture	texture/ui/button_test

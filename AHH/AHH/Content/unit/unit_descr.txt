@@ -1,0 +1,4 @@
+##Units
+Name	{unit_name}
+Type	{unit_internal_type}
+Stats	{health, weaponType, armourType, baseDmg, range, hitDelay, luck}

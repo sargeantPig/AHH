@@ -1,0 +1,5 @@
+##internal_ui_grid_menu.txt
+##{internal action, button name from ui_grid_menu.txt}
+Build	Build
+Dismantle	Dismantle
+Examine	Examine

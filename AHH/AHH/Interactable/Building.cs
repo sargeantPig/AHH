@@ -7,7 +7,7 @@ using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
 using AHH.Base;
-
+using AHH.UI;
 namespace AHH.Interactable
 {
 	class Building : InteractableStaticSprite
@@ -21,7 +21,12 @@ namespace AHH.Interactable
 
 		}
 
-        public Building DeepCopy()
+		new public void Update(Cursor ms)
+		{
+			base.Update(ms);
+		}
+
+        new public Building DeepCopy()
         {
             InteractableStaticSprite iss = base.DeepCopy();
             Building b = (Building)this.MemberwiseClone();

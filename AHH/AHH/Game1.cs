@@ -97,7 +97,7 @@ namespace AHH
 				points[i] = new Vector2(rng.Next(0, 600), rng.Next(0, 600));
 			}
 
-			grid = new Grid(gridSize, new Vector2(0, 100), t_r, t_b, t_g, tileSize, @"Content/buildings/buildings.txt", Content);
+			grid = new Grid(gridSize, new Vector2(0, 100), t_r, t_b, t_g, tileSize, @"Content/buildings/buildings.txt", @"Content/UI/ui_grid_menu.txt", Content);
 
 			cursor = new Cursor(t_b);
             player = new Player();
@@ -136,6 +136,7 @@ namespace AHH
 
 			test_is.Update(cursor);
 
+			player.Update();
 			grid.Update(cursor, player);
 
 
@@ -161,7 +162,7 @@ namespace AHH
 			test_ms.Draw(spriteBatch);
 			test_ss.Draw(spriteBatch);
 			test_is.Draw(spriteBatch);
-			grid.Draw(spriteBatch);
+			grid.Draw(spriteBatch, player.SelectedBuilding);
 			cursor.Draw(spriteBatch);
 			spriteBatch.End();
 
