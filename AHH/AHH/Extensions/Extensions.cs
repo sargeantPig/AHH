@@ -25,7 +25,55 @@ namespace AHH.Extensions
 			float decrease = original - current;
 			return (decrease / original) * 100;
 		}
+		public static Vector2 ClosestVector(this Vector2 to, List<Vector2> vecs)
+		{
+			if (vecs.Count == 0)
+				return Vector2.Zero;
+			float distance = 9999;
+			Vector2 closest = new Vector2();
+			foreach (Vector2 v in vecs)
+			{
+				float t_dis = Vector2.Distance(to, v);
+				if (t_dis < distance)
+				{
+					closest = v;
+					distance = t_dis;
+				}
+			}
 
+			return closest;
+		}
+		public static List<Vector2> GetEdges(this Vector2[,] shape)
+		{
+			List<Vector2> edges = new List<Vector2>();
+
+			//top
+			for (int x = 0; x < shape.GetLength(0); x++)
+			{
+				if(edges.FindIndex(z => z == shape[x, 0]) == -1)
+					edges.Add(shape[x, 0]);
+			}
+			//left side
+			for (int y = 0; y < shape.GetLength(1); y++)
+			{
+				if (edges.FindIndex(z => z == shape[0, y]) == -1)
+					edges.Add(shape[0, y]);
+			}
+			//bottom side
+			for (int x = 0; x < shape.GetLength(0); x++)
+			{
+				if (edges.FindIndex(z => z == shape[x, shape.GetLength(1)-1]) == -1)
+					edges.Add(shape[x, shape.GetLength(1) - 1]);
+			}
+			//right side
+			for (int y = 0; y < shape.GetLength(1); y++)
+			{
+				if (edges.FindIndex(z => z == shape[shape.GetLength(0) - 1, y]) == -1)
+					edges.Add(shape[shape.GetLength(0) - 1, y]);
+			}
+
+			return edges;
+		}
 		public static T RandomFlag<T>(Random rnd)
 		{
 			Array flags = Enum.GetValues(typeof(T));
@@ -42,10 +90,20 @@ namespace AHH.Extensions
 			return a;
 		}
 
+		public static Matrix_ ToMatrix(this Vector2 vec)
+		{
+			Matrix_ m = new Matrix_(new Vector2[,] {
+				{ new Vector2(vec.X, 0)},
+				{ new Vector2(0, vec.Y)} 
+			});
+			return m;
+		}
+
+		public static float Midpoint(float a, float b)
+		{
+			return (a + b) / 2;
+		}
 	}
-
-
-
 	public class WTuple<t1, t2, t3>
 	{
 		t1 Item_1 { get; set; }
@@ -79,6 +137,152 @@ namespace AHH.Extensions
 		}
 
 
+
+	}
+
+	public class Matrix_
+	{
+		Vector2[,] matrix { get; set; }
+		Point order { get; }
+
+		public Matrix_(Point size)
+		{
+			matrix = new Vector2[size.X, size.Y];
+			order = size;
+		}
+
+		public Matrix_(Vector2[,] points)
+		{
+			matrix = new Vector2[points.GetLength(0), points.GetLength(1)];
+			order = new Point(points.GetLength(0), points.GetLength(1));
+
+			for (int x = 0; x < order.X; x++)
+			{
+				for (int y = 0; y < order.Y; y++)
+				{
+					matrix[x, y] = points[x, y];
+				}
+			}
+		}
+
+		public static Matrix_ Add(Matrix_ a, Matrix_ b)
+		{
+			if (a.Order != b.Order)
+				return null;
+
+			Matrix_ r = new Matrix_(a.order);
+
+			for (int x = 0; x < a.matrix.GetLength(0); x++)
+			{
+				for (int y = 0; y < a.matrix.GetLength(1); y++)
+				{
+					r.matrix[x, y] = a.matrix[x, y] + b.matrix[x, y]; 
+				}
+			}
+
+			return r;
+		}
+
+		public static Matrix_ Minus(Matrix_ a, Matrix_ b)
+		{
+			if (a.Order != b.Order)
+				return null;
+
+			Matrix_ r = new Matrix_(a.order);
+
+			for (int x = 0; x < a.matrix.GetLength(0); x++)
+			{
+				for (int y = 0; y < a.matrix.GetLength(1); y++)
+				{
+					r.matrix[x, y] = a.matrix[x, y] - b.matrix[x, y];
+				}
+			}
+
+			return r;
+		}
+
+		public static Matrix_ Scaler(Matrix_ a, float scaler)
+		{
+			for (int x = 0; x < a.matrix.GetLength(0); x++)
+			{
+				for (int y = 0; y < a.matrix.GetLength(1); y++)
+				{
+					a.matrix[x, y] *= scaler;
+				}
+			}
+
+			return a;
+		}
+
+		public static Matrix_ Translate(Matrix_ a, Matrix_ translation)
+		{
+			if (a.order != translation.order)
+				return null;
+
+			Matrix_ r = new Matrix_(a.order);
+
+			for (int x = 0; x < a.order.X; x++)
+			{
+				for (int y = 0; y < a.order.Y; y++)
+				{
+					r.matrix[x, y] = new Vector2(a.matrix[x, y].X + translation.matrix[x, y].X,
+					a.matrix[x, y].Y + translation.matrix[x, y].Y);
+				}
+			}
+
+			return r;
+		}
+
+		public static Matrix_ Multiply(Matrix_ a, Matrix_ b)
+		{
+			Matrix_ m = new Matrix_(new Vector2[,] {
+				{new Vector2((a.matrix[0, 0].X * b.matrix[0,0].X) + (a.matrix[0,0].Y * b.matrix[1, 0].X), 
+				(a.matrix[0,0].X * b.matrix[0,0].Y) + (a.matrix[0, 0].Y * b.matrix[1,0].Y))},
+				{new Vector2((a.matrix[1, 0].X * b.matrix[0,0].X) + (a.matrix[1,0].Y * b.matrix[1, 0].X),
+				(a.matrix[1,0].X * b.matrix[0,0].Y) + (a.matrix[1, 0].Y * b.matrix[1,0].Y))}
+			});
+
+			return m;
+
+		}
+
+
+
+		public Matrix_ Inverse()
+		{
+			//2x2
+			float ad = matrix[0, 0].X * matrix[1, 0].Y;
+			float bc = matrix[0, 0].Y * matrix[1, 0].X;
+			float det =  1/ (ad - bc);
+
+			//new matrix 
+			Matrix_ a = new Matrix_(new Vector2[,] {
+				{ new Vector2(matrix[1,0].Y, -matrix[0,0].Y)},
+				{ new Vector2(-matrix[1,0].X, matrix[0,0].X)}
+
+			});
+
+			Matrix_ inverse = Scaler(a, det);
+
+			return inverse;
+
+		}
+
+		public Vector2[,] _Matrix
+		{
+			get { return matrix; }
+			set { matrix = value; }
+		}
+
+		public Point Order
+		{
+			get { return order; }
+		}
+
+		public Vector2 ReturnVector()
+		{
+			return new Vector2(matrix[0,0].X, matrix[1, 0].Y);
+		}
 
 	}
 }

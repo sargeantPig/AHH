@@ -48,7 +48,7 @@
     <Compile Include="AI\Grounded.cs" />
     <Compile Include="AI\Mounted.cs" />
     <Compile Include="AI\Overseer.cs" />
-    <Compile Include="AI\PathFinder.cs" />
+    <Compile Include="Base\PathFinder.cs" />
     <Compile Include="Base\Objects\AnimatedSprite.cs" />
     <Compile Include="Base\Objects\BaseObject.cs" />
     <Compile Include="Base\Grid\Grid.cs" />
@@ -61,7 +61,8 @@
     <Compile Include="Extensions\Extensions.cs" />
     <Compile Include="Extensions\Resolution.cs" />
     <Compile Include="Game1.cs" />
-    <Compile Include="Interactable\Building.cs" />
+    <Compile Include="Interactable\Building\Building.cs" />
+    <Compile Include="Interactable\Building\ECorner.cs" />
     <Compile Include="Parsers\Parse_UnitStats.cs" />
     <Compile Include="Parsers\Parse_Buildings.cs" />
     <Compile Include="Parsers\Parse_InternalGridMenu.cs" />

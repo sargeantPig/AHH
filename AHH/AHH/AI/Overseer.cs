@@ -20,7 +20,7 @@ namespace AHH.AI
 		Dictionary<Ai_Type, List<Stats>> ai_stats { get; }
 		Dictionary<Ai_Type, Unit_Types> unit_types { get; }
 		float s_elasped = 100000;
-		float s_target = 500;
+		float s_target = 10000;
 		public Overseer(ContentManager cm)
 		{
 			ais = new HashSet<Ai>();
@@ -35,11 +35,11 @@ namespace AHH.AI
 			{
 				if (AiUnit.Pathfinder_ != null)
 				{
-					if (!AiUnit.Pathfinder_.Th_PathChild.IsAlive)
+					if (!AiUnit.Pathfinder_.Th_Child.IsAlive)
 						AiUnit.Pathfinder_ = null;
 					else
 					{
-						AiUnit.Pathfinder_.Th_PathChild.Abort();
+						AiUnit.Pathfinder_.Th_Child.Abort();
 						AiUnit.Pathfinder_ = null;
 					}
 				}
@@ -69,12 +69,31 @@ namespace AHH.AI
 
 		public void Draw(SpriteBatch sb)
 		{
+			int think = 0;
+			int attack = 0;
+			int moving = 0;
 			foreach (Ai ai in ais)
 			{
 				ai.Draw(sb);
+				switch (ai.Ai_States)
+				{
+					case Ai_States.Moving:
+						moving++;
+						break;
+					case Ai_States.Attacking:
+						attack++;
+						break;
+					case Ai_States.Thinking:
+						think++;
+						break;
+
+				}
 			}
 
-			sb.DrawString(DebugFont, ais.Count().ToString(), Position, Color.Black);
+			sb.DrawString(DebugFont, "Total: " + ais.Count().ToString(), Position, Color.Black);
+			sb.DrawString(DebugFont, "Moving: " + moving.ToString(), Position + new Vector2(300, 0), Color.Black);
+			sb.DrawString(DebugFont, "Attacking: " + attack.ToString(), Position + new Vector2(600, 0), Color.Black);
+			sb.DrawString(DebugFont, "Thinking: " + think.ToString(), Position + new Vector2(900, 0), Color.Black);
 		}
 
 		void Spawn(Grid grid, Random rng)

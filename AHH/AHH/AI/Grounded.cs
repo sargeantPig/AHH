@@ -4,23 +4,33 @@ using AHH.Base;
 using AHH.UI;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using AHH.Interactable;
+using AHH.Interactable.Building;
 using AHH.Extensions;
+
 namespace AHH.AI
 {
 	class Grounded : AiUnit
 	{
 		int pathAttempts = 0;
 		bool wait = false;
+		Point destination = new Point(0, 0);
+
 		public Grounded(Vector2 position, Point rectExtends, float speed, Unit_Types types, Stats stats, Grid grid)
 			: base(position, rectExtends, speed, types.Animations, stats, types, grid)
 		{
-
+           
 		}
 
 		public void Update(Cursor ms, GameTime gt, Grid grid, Random rng)
 		{
 			base.Update(gt);
+
+			if (grid.CheckPositions(new List<Vector2>() { Position }).Count == 0)
+			{
+				Ai_States = Ai_States.Thinking;
+			}
+
+            //destination = new Point(rng.Next(0 ,grid.GetGridDimensions.X), rng.Next(0, grid.GetGridDimensions.Y));
 
 			if (wait)
 			{
@@ -41,17 +51,21 @@ namespace AHH.AI
 
 		void Attacking()
 		{
-			Ai_States = Ai_States.Thinking;
 
 		}
 
-		void Moving()
+		void Moving( )
 		{
+			if (WayPoints.Count == 0)
+			{
+				Ai_States = Ai_States.Thinking;
+				return;
+			}
+
 			bool reached = MoveTo(WayPoints[0]);
 			if (reached)
 				WayPoints.RemoveAt(0);
-			if (WayPoints.Count == 0)
-				Ai_States = Ai_States.Thinking;
+
 		}
 
 		void Think(Grid grid, Random rng)
@@ -82,13 +96,13 @@ namespace AHH.AI
 					PFResult = null; Think(grid, rng);
 					break;
 				case Focus.Violent:
-					PFResult = null; Think_Violence(grid);
+					PFResult = null; Think_Violence(grid,rng);
 					break;
 
 			}
 		}
 
-		void Think_Violence(Grid grid)
+		void Think_Violence(Grid grid, Random rng)
 		{
 
 			WayPoints.Clear();
@@ -103,24 +117,41 @@ namespace AHH.AI
 				return;
 			}
 
+			Building temp = new Building();
+
 			foreach (Building b in near)
 			{
 				float dis = Vector2.Distance(Position, b.Position);
 
-				if (dis < min)
+				if (dis < min && b.AdjacentTiles != null)
 				{
 					min = dis;
+					temp = b.DeepCopy();
 					closestBuildingPos = b.Position;
 				}
 			}
 
 			if (closestBuildingPos.X != int.MaxValue)
 			{
-				WayPoints.Add(closestBuildingPos);
-				Ai_States = Ai_States.Moving;
+				//get adjacent points
+				List<Vector2> edges = temp.AdjacentTiles;
+
+                edges = grid.CheckPositions(edges);
+
+				if (edges == null)
+				{
+					Ai_States = Ai_States.Thinking;
+					return;
+				}
+				if (edges.Count == 0)
+				{
+					Ai_States = Ai_States.Thinking;
+					return;
+				}
+				Vector2 closestEdge = Position.ClosestVector(edges);
+				destination = Grid.ToGridPosition(edges[rng.Next(0, edges.Count-1)], Grid.GetTileSize);
+				Think_Pathing(grid);
 			}
-
-
 		}
 
 		void Think_Pathing(Grid grid)
@@ -131,12 +162,19 @@ namespace AHH.AI
 			{
 				wait = false;
 				WayPoints = CalculateWayPoints(PFResult);
-				Ai_States = Ai_States.Moving;
-				Pathfinder = null;
+
+                if (grid.CheckPositions(WayPoints).Count != WayPoints.Count) //theres a break in a waypoint
+                {
+                    Ai_States = Ai_States.Thinking;
+                    WayPoints.Clear();
+                }
+                 
+                else Ai_States = Ai_States.Moving;
+                Pathfinder = null;
 			}
 			else
 			{
-				if (!GetPath(grid, Position))
+				if (!GetPath(grid, Position, destination))
 				{
 					CheckActivity();
 					pathAttempts++;

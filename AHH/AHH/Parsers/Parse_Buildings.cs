@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using Microsoft.Xna.Framework;
-using AHH.Interactable;
+using AHH.Interactable.Building;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using AHH.UI;
@@ -17,7 +17,7 @@ namespace AHH.Parsers
 			StreamReader sr = new StreamReader(filepath);
 			string line = "";
 			Dictionary<string, Building> buildings = new Dictionary<string, Building>();
-
+     
 			string temp_name = "";
 			int temp_cost = 0;
 			Point temp_size = new Point();

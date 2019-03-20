@@ -1,9 +1,10 @@
 ﻿using System.Collections.Generic;
+using System;
 using AHH.Base;
 using AHH.UI;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using AHH.Interactable;
+using AHH.Interactable.Building;
 using System.Threading;
 using AHH.Extensions;
 
@@ -16,7 +17,7 @@ namespace AHH.AI
 		Stats stats;
 		float real_health { get; set; }
 		Ai_States ai_State { get; set; }
-		static Pathfinder pathfinder { get; set; }
+		static OffloadThread pathfinder { get; set; }
 		bool isZombie { get; set; }
 		List<Vector2> waypoints { get; set; }
 		object pf_result { get; set; }
@@ -27,21 +28,20 @@ namespace AHH.AI
 			real_health = this.stats.Health;
 			waypoints = new List<Vector2>();
 			ai_State = Ai_States.Thinking;
-
-
 		}
 
-		public bool GetPath(Grid grid, Vector2 position)
+		public bool GetPath(Grid grid, Vector2 position, Point destination)
 		{
 			if (pathfinder == null)
 			{
-				pathfinder = new Pathfinder(grid, position);
-				Pathfinder.Th_Pathfinder = new ThreadStart(() => {
-					this.pf_result = grid.Pathfinder(Grid.ToWorldPosition(new Point(15, 6), Grid.GetTileSize), Position);
+				pathfinder = new OffloadThread();
+				Pathfinder.Th_Offload = new ThreadStart(() => {
+					this.pf_result = grid.Pathfinder(Grid.ToWorldPosition(destination, Grid.GetTileSize), Position);
 				});
 
-				Pathfinder.Th_PathChild = new Thread(Pathfinder.Th_Pathfinder);
-				pathfinder.Th_PathChild.Start();
+                Pathfinder.Th_Child = new Thread(Pathfinder.Th_Offload);
+                Console.WriteLine("Pathfinder Starting " + DateTime.Now.ToString("h:mm:ss"));
+				pathfinder.Th_Child.Start();
 				return true;
 			}
 
@@ -103,6 +103,9 @@ namespace AHH.AI
 
 			}
 
+
+
+
 			return points;
 		}
 
@@ -110,7 +113,7 @@ namespace AHH.AI
 		{
 			if (pathfinder != null)
 			{
-				if (!pathfinder.Th_PathChild.IsAlive)
+				if (!pathfinder.Th_Child.IsAlive)
 				{
 					Pathfinder_ = null;
 				}
@@ -155,13 +158,13 @@ namespace AHH.AI
 			set { ai_State = value; }
 		}
 
-		public Pathfinder Pathfinder
+		public OffloadThread Pathfinder
 		{
 			get { return pathfinder; }
 			set { pathfinder = value; }
 		}
 
-		static public Pathfinder Pathfinder_
+		static public OffloadThread Pathfinder_
 		{
 			get { return pathfinder; }
 			set { pathfinder = value; }

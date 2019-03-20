@@ -1,9 +1,8 @@
 ﻿using System.Collections.Generic;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework;
-using AHH.Interactable;
 using AHH.UI;
-
+using AHH.Interactable.Building;
 namespace AHH.Base
 {
 	class Tile : InteractableStaticSprite
@@ -38,11 +37,20 @@ namespace AHH.Base
 			}
 		}
 
-		public void PlaceBuilding(Building b)
+		public void PlaceBuilding(Building b, Grid grid)
 		{
 			b.Position = Position;
 			b.Box = new Rectangle((int)Position.X, (int)Position.Y, b.Box.Width, b.Box.Height);
+			b.CalculateCorners();
+			b.InitAdjacent(grid);
 			Building = b;
+		}
+
+		public void Draw_Debug(SpriteBatch sb)
+		{
+			sb.DrawString(DebugFont, state == TileStates.Active ? "A" : "B", Position, Color.White);
+
+
 		}
 
 		public void AddChild(Point child)

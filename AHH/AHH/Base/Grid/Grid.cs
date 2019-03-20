@@ -14,7 +14,7 @@ using AHH.User;
 using AHH.Parsers;
 using AHH.Extensions;
 using System.Threading;
-
+using AHH.Interactable.Building;
 namespace AHH.Base
 {
 	class Grid : InteractableStaticSprite
@@ -98,6 +98,26 @@ namespace AHH.Base
 
 		}
 
+        public List<Vector2> CheckPositions(List<Vector2> positions) // sanitize 
+        {
+            List<Vector2> sanitized = new List<Vector2>();
+            foreach (Vector2 p in positions)
+            {
+                Point a = ToGridPosition(p, GetTileSize);
+				try
+				{
+					if (tiles[a.X, a.Y].State == TileStates.Active)
+					{
+						sanitized.Add(p);
+					}
+
+				}
+
+				catch { }
+            }
+            return sanitized;
+        }
+
 		public void Update(Cursor ms, Player player)
 		{
 			base.Update(ms);
@@ -166,11 +186,21 @@ namespace AHH.Base
 
 			foreach (Point p in selectedTiles)
             {
-               if(tiles[p.X, p.Y].State == TileStates.Blocked)
-                    return; //cannot build as one of the selected tiles is blocked
+				try
+				{
+					if (tiles[p.X, p.Y].State == TileStates.Blocked)
+						return; //cannot build as one of the selected tiles is blocked
+
+				}
+
+				catch
+				{
+					return;
+
+				}
             }
 
-            tiles[selectedTiles[0].X, selectedTiles[0].Y].PlaceBuilding(BuildingData[buildingID].DeepCopy());
+            tiles[selectedTiles[0].X, selectedTiles[0].Y].PlaceBuilding(BuildingData[buildingID].DeepCopy(), this);
             foreach (Point p in selectedTiles)
             {
                 tiles[p.X, p.Y].State = TileStates.Blocked;
@@ -189,6 +219,11 @@ namespace AHH.Base
 				return tiles[point.X, point.Y];
 			else return null;
 		}
+
+        public Point GetGridDimensions
+        {
+            get { return new Point(tiles.GetLength(0), tiles.GetLength(1)); }
+        }
 
 		public List<Building> NearBuildings(Vector2 position)
 		{
@@ -284,17 +319,6 @@ namespace AHH.Base
 				//counter++;
 			}
 
-#if DEBUG
-			/*for (int y = 0; y < dimensions.Y; y++)
-			{
-				for (int x = 0; x < dimensions.X; x++)
-				{
-					Console.Write(grid[x, y].Item3 + ",");
-				}
-
-				Console.Write('\n');
-			}*/
-#endif
 			done.Clear();
 
 			return null;
@@ -302,7 +326,20 @@ namespace AHH.Base
 
 		static public Point ToGridPosition(Vector2 position, Point size)
 		{
-			return new Point((int)position.X / size.X, (int)position.Y / size.Y);
+			Point p = new Point();
+			if (position.X == 0)
+				p.X = 0;
+			else p.X = (int)position.X / size.X;
+			if (position.Y == 0)
+				p.Y = 0;
+			else p.Y = (int)position.Y / size.Y;
+			if (position.X % size.X != 0)
+				p.X++;
+			if (position.Y % size.X != 0)
+				p.Y--;
+
+
+			return p;
 		}
 
 		static public Vector2 ToWorldPosition(Point gridPos, Point size)
@@ -327,9 +364,7 @@ namespace AHH.Base
                 for (int x = 0; x < dimensions.X; x++)
                 {
                     tiles[x, y].Draw(sb);
-#if DEBUG
-                    sb.DrawString(DebugFont, x.ToString(), new Vector2(x * 64, (y * 64) + Position.Y), Color.Black);
-#endif
+					tiles[x, y].Draw_Debug(sb);
                 }
             }
 
@@ -338,7 +373,10 @@ namespace AHH.Base
                 for (int x = 0; x < dimensions.X; x++)
                 {
                     if (tiles[x, y].Building != null)
+                    {
                         tiles[x, y].Building.Draw(sb);
+                        tiles[x, y].Building.Draw_Debug(sb);
+                    }
                 }
             }
 	

@@ -3,6 +3,7 @@ using AHH.UI;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using AHH.Interactable;
+using AHH.Interactable.Building;
 
 namespace AHH.AI
 {
