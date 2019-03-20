@@ -1,10 +1,11 @@
-##Set Ui Elements for grid menu here
+##Set Ui Elements here (creates links between buttons and internal actions)
 ##Type internal type of element (Button, DropMenu)
 ##Name name of the element 
 ##Value string value of the element
 ##texture base texture path
-
-
+######################################
+##Actions
+######################################
 Type	Button
 Name	Build
 Value	Build
@@ -25,3 +26,4 @@ Name	Examine
 Value	Examine
 Size	256, 128
 Texture	texture/ui/button_test
+

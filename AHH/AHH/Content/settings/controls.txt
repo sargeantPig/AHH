@@ -4,3 +4,6 @@
 
 HotKey_BuildMode	B
 HotKey_Build	P
+HotKey_Research	R
+HotKey_Spells	S
+HotKey_Neutral	N

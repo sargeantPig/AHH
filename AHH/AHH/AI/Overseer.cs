@@ -18,19 +18,19 @@ namespace AHH.AI
 		HashSet<Ai> ais { get; }
 		 
 		Dictionary<Ai_Type, List<Stats>> ai_stats { get; }
-		Dictionary<Ai_Type, Unit_Types> unit_types { get; }
+		Dictionary<Ai_Type, Unit_Type> unit_types { get; }
 		float s_elasped = 100000;
-		float s_target = 10000;
+		float s_target = 1000;
 		public Overseer(ContentManager cm)
 		{
 			ais = new HashSet<Ai>();
-			ai_stats = Parsers.Parsers.Parse_UnitStats(@"Content\unit\unit_descr.txt");
-			unit_types = Parsers.Parsers.Parse_UnitTypes(@"Content\unit\unit_types.txt", cm);
+			ai_stats = Parsers.Parsers.Parse_Stats(@"Content\unit\unit_descr.txt");
+			unit_types = Parsers.Parsers.Parse_Types<Ai_Type, Unit_Type>(@"Content\unit\unit_types.txt", cm);
 		}
 
 		public void Update(GameTime gt, Cursor ms, Grid grid, Random rng)
 		{
-
+     
 			if (grid.BuildingPlaced)
 			{
 				if (AiUnit.Pathfinder_ != null)
@@ -100,7 +100,7 @@ namespace AHH.AI
 		{
 			Ai_Type t = Extensions.Extensions.RandomFlag<Ai_Type>(rng, 0, 4);
 			Stats stats = new Stats(ai_stats[t][0]);
-			Unit_Types ut = new Unit_Types(unit_types[t]) ;
+			Unit_Type ut = new Unit_Type(unit_types[t]) ;
 
 			ais.Add(new Grounded(new Vector2(100, 100), new Point(64, 64), 1, ut, stats, grid));
 		}

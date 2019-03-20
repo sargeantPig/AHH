@@ -4,6 +4,11 @@
 	{
 		Build,
 		Examine,
-		Dismantle
-	}
+		Dismantle,
+        Wall,
+        NTower,
+        EnergyConduit,
+        NecroticOrrery,
+        Grave
+    }
 }

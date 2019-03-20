@@ -9,7 +9,7 @@ namespace AHH.AI
 	class Mounted : AiUnit
 	{
 
-		public Mounted(Vector2 position, Point rectExtends, float speed, Dictionary<string, Vector3> states, Stats stats, Unit_Types types, Grid grid)
+		public Mounted(Vector2 position, Point rectExtends, float speed, Dictionary<string, Vector3> states, Stats stats, Unit_Type types, Grid grid)
 			: base(position, rectExtends, speed, states, stats, types, grid)
 		{
 

@@ -15,7 +15,7 @@ namespace AHH.AI
 		bool wait = false;
 		Point destination = new Point(0, 0);
 
-		public Grounded(Vector2 position, Point rectExtends, float speed, Unit_Types types, Stats stats, Grid grid)
+		public Grounded(Vector2 position, Point rectExtends, float speed, Unit_Type types, Stats stats, Grid grid)
 			: base(position, rectExtends, speed, types.Animations, stats, types, grid)
 		{
            
@@ -149,8 +149,11 @@ namespace AHH.AI
 					return;
 				}
 				Vector2 closestEdge = Position.ClosestVector(edges);
-				destination = Grid.ToGridPosition(edges[rng.Next(0, edges.Count-1)], Grid.GetTileSize);
-				Think_Pathing(grid);
+                if (closestEdge.Y % Grid.GetTileSize.Y != 0)
+                    closestEdge.Y = (float)Math.Round(closestEdge.Y);
+                //destination = Grid.ToGridPosition(edges[rng.Next(0, edges.Count-1)], Grid.GetTileSize);
+                destination = Grid.ToGridPosition(closestEdge, Grid.GetTileSize);
+                Think_Pathing(grid);
 			}
 		}
 

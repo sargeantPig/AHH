@@ -1,0 +1,11 @@
+##Building Textures and animations##
+####################################
+Type	Wall
+Sound	{sound_file}
+Texture	texture/unit/test_ai_spritesheet
+H_Texture	texture/unit/test_ai_spritesheet
+C_Texture	texture/unit/test_ai_spritesheet
+Animation
+Idle, 0, 0, 100
+Production, 1, 1, 100
+Building, 2, 2, 100

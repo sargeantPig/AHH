@@ -1,0 +1,9 @@
+##Buildings
+###########
+#Name	Wall
+#Type	Wall
+#Stats	{health, production, armourType, sx, sy}
+
+Name	Wall
+Type	Wall
+Stats	100, 0, Reinforced, 128, 128

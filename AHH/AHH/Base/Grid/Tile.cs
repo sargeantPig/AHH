@@ -8,11 +8,9 @@ namespace AHH.Base
 	class Tile : InteractableStaticSprite
 	{
 		Point order { get; }
-		Building building { get; set; }
 		TileStates state { get; set; }
 		Point parent { get; set; }
 		List<Point> children { get; set; }
-
 
 		public Tile(Vector2 position, Texture2D texture, Texture2D t_highlighted, Texture2D t_clicked, Point size, Point order)
 			: base(position, size, texture, t_highlighted, t_clicked)
@@ -21,20 +19,11 @@ namespace AHH.Base
 			this.order = order;
 			parent = order;
 			state = TileStates.Active;
-			building = null;
 		}
 
 		new public void Update(Cursor ms)
 		{
 			base.Update(ms);
-		}
-
-		public void UpdateBuilding(Cursor ms)
-		{
-			if (building != null)
-			{
-				building.Update(ms);
-			}
 		}
 
 		public void PlaceBuilding(Building b, Grid grid)

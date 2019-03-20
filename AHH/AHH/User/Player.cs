@@ -12,6 +12,8 @@ namespace AHH.User
     {
         Building,
         Dismantle,
+        Research,
+        Spells,
         Neutral
     }
 
@@ -35,7 +37,7 @@ namespace AHH.User
             controls = new ControlMapper("Content/settings/controls.txt");
         }
 
-        public void Update()
+        public void Update(UiMaster master)
         {
 			if (controls.IsPressed(Ctrls.HotKey_BuildMode))
 				mode = Player_Modes.Building;

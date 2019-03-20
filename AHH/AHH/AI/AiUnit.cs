@@ -21,7 +21,7 @@ namespace AHH.AI
 		bool isZombie { get; set; }
 		List<Vector2> waypoints { get; set; }
 		object pf_result { get; set; }
-		public AiUnit(Vector2 position, Point rectExtends, float speed, Dictionary<string, Vector3> states, Stats stats, Unit_Types unit_types, Grid grid)
+		public AiUnit(Vector2 position, Point rectExtends, float speed, Dictionary<string, Vector3> states, Stats stats, Unit_Type unit_types, Grid grid)
 			: base(position, rectExtends, unit_types.Texture, unit_types.H_texture, unit_types.C_texture, speed, states)
 		{
 			this.stats = stats;

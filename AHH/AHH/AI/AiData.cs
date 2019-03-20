@@ -34,6 +34,7 @@ namespace AHH.AI
 		Light,
 		Medium,
 		Heavy,
+        Reinforced,
 		None
 	}
 
@@ -79,7 +80,7 @@ namespace AHH.AI
 	struct Stats
 	{
 		string name { get; set; }
-		Ai_Type ai_type { get; set; }
+		Ai_Type type { get; set; }
 		int health { get; set; }
 		WeaponType weaponType { get; set; }
 		ArmourType armourType { get; set; }
@@ -92,7 +93,7 @@ namespace AHH.AI
 		public Stats(Stats stats)
 		{
 			this.name = stats.name;
-			this.ai_type = stats.ai_type;
+			this.type = stats.type;
 			this.armourType = stats.armourType;
 			this.baseDamage = stats.baseDamage;
 			this.health = stats.health;
@@ -109,10 +110,10 @@ namespace AHH.AI
 			set { name = value; }
 		}
 
-		public Ai_Type AiType
+		public Ai_Type Type
 		{
-			get { return ai_type; }
-			set { ai_type = value; }
+			get { return type; }
+			set { type = value; }
 		}
 
 		public int Health
@@ -165,7 +166,7 @@ namespace AHH.AI
 
 	}
 
-	struct Unit_Types
+	struct Unit_Type
 	{
 		Ai_Type type { get; set; }
 		Texture2D texture { get; set; }
@@ -174,7 +175,7 @@ namespace AHH.AI
 		Texture2D projectile { get; set; }
 		Dictionary<string, Vector3> animations { get; set; }
 
-		public Unit_Types(Unit_Types ut)
+		public Unit_Type(Unit_Type ut)
 		{
 			this.type = ut.Type;
 			this.texture = ut.texture;

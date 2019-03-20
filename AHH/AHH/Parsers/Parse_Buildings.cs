@@ -20,6 +20,7 @@ namespace AHH.Parsers
      
 			string temp_name = "";
 			int temp_cost = 0;
+            float temp_dura = 0;
 			Point temp_size = new Point();
 			string[] temp_texturePath = new string[3];
 
@@ -37,7 +38,14 @@ namespace AHH.Parsers
 					temp_cost = Convert.ToInt16(split[1].Trim());
 				}
 
-				if (line.StartsWith("size"))
+                if (line.StartsWith("dura"))
+                {
+                    string[] split = line.Split('\t');
+                    temp_dura = Convert.ToInt16(split[1].Trim());
+                }
+
+
+                if (line.StartsWith("size"))
 				{
 					string[] split = line.Split('\t', ',');
 					temp_size.X = Convert.ToInt16(split[1].Trim());

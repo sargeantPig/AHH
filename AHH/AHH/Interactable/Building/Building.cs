@@ -15,16 +15,16 @@ namespace AHH.Interactable.Building
 	class Building : InteractableStaticSprite
 	{
 		
-		int cost;
-		Point size;
+		int cost { get; set; }
 		Dictionary<Corner, Vector2> corners { get; set; }
 		List<Vector2> adjacentTiles { get; set; }
 		OffloadThread adjThread;
 
-		public Building(Vector2 position, Texture2D texture, Texture2D t_highlighted, Texture2D t_clicked, Point size)
-			: base(position, size, texture, t_highlighted, t_clicked)
+        List<Point> children { get; set; } //tiles that the building encompasses
+
+		public Building(Vector2 position, BuildingData bd, Building_Type bt)
+			: base(position, bd.Size, bt.Texture, bt.H_texture, bt.C_texture)
 		{
-			this.size = size;
 			corners = new Dictionary<Corner, Vector2>();
             CalculateCorners();
 		}
@@ -189,5 +189,10 @@ namespace AHH.Interactable.Building
             }
         }
 
+        public List<Point> GetChildren
+        {
+            get { return children; }
+            set { children = value; }
+        }
 	}
 }

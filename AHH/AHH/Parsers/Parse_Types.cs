@@ -7,30 +7,38 @@ using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using AHH.UI;
 using AHH.AI;
+using AHH.Interactable.Building;
 namespace AHH.Parsers
 {
 	static partial class Parsers
 	{
-
-		public static Dictionary<Ai_Type, Unit_Types> Parse_UnitTypes(string filepath, ContentManager cm)
+		public static Dictionary<T, Y> Parse_Types<T, Y>(string filepath, ContentManager cm)
 		{
 			if (!File.Exists(filepath))
 				return null;
 
-			Dictionary<Ai_Type, Unit_Types> unit_types = new Dictionary<Ai_Type, Unit_Types>();
+			Dictionary<T, Y> types = new Dictionary<T, Y>();
 			StreamReader sr = new StreamReader(filepath);
 			string line = "";
 
-			Unit_Types temp_types = new Unit_Types();
+            dynamic temp_types = new Unit_Type(); //assign def
+
+            if (typeof(Y) == typeof(Building_Type))
+                temp_types = new Building_Type();
+            else if (typeof(Y) == typeof(Unit_Type))
+                temp_types = new Unit_Type();
+
+            Type y = typeof(Y);
+
 
 			while ((line = sr.ReadLine()) != null)
 			{
 				if (line.StartsWith("Type"))
 				{
 					string[] split = line.Split('\t');
-					temp_types.Type = (Ai_Type)Enum.Parse(typeof(Ai_Type), split[1]);
-					if (!unit_types.ContainsKey(temp_types.Type))
-						unit_types.Add(temp_types.Type, new Unit_Types());
+					temp_types.Type = (T)Enum.Parse(typeof(T), split[1]);
+					if (!types.ContainsKey(temp_types.Type))
+						types.Add(temp_types.Type, temp_types);
 				}
 
 				if (line.StartsWith("Texture"))
@@ -72,13 +80,13 @@ namespace AHH.Parsers
 					}
 
 					temp_types.Animations = temp_animations;
-					unit_types[temp_types.Type] = temp_types;
+					types[temp_types.Type] = temp_types;
 				}
 
 
 			}
 
-			return unit_types;
+			return types;
 
 		}
 	}

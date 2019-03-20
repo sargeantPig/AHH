@@ -3,3 +3,7 @@
 Build	Build
 Dismantle	Dismantle
 Examine	Examine
+Wall	Build_Wall
+EnergyConduit	Build_EC
+NecroticOrrery	Build_NO
+Grave	Build_Grave
