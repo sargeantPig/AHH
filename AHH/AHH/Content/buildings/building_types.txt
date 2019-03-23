@@ -2,9 +2,9 @@
 ####################################
 Type	Wall
 Sound	{sound_file}
-Texture	texture/unit/test_ai_spritesheet
-H_Texture	texture/unit/test_ai_spritesheet
-C_Texture	texture/unit/test_ai_spritesheet
+Texture	texture/buildings/Test
+H_Texture	texture/buildings/Test_H
+C_Texture	texture/buildings/Test_C
 Animation
 Idle, 0, 0, 100
 Production, 1, 1, 100

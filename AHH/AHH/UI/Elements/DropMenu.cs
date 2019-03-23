@@ -4,13 +4,13 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 namespace AHH.UI
 {
-	class DropMenu : BaseObject, IElement
+	class DropMenu : BaseElement, IElement
 	{
 		Dictionary<string, IElement> controls;
 		KeyValuePair<string, IElement> clickedControl { get; set; }
 		Point elementSize;
-		public DropMenu(Vector2 position, Dictionary<string, IElement> controls, Point elementSize)
-			: base(position)
+		public DropMenu(Vector2 position, bool active, Dictionary<string, IElement> controls, Point elementSize)
+			: base(position, active)
 		{
 			this.elementSize = elementSize;
 			this.controls = new Dictionary<string, IElement>(controls);

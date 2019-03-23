@@ -10,8 +10,9 @@ namespace AHH.UI
 
     enum Ctrls
     {
-        HotKey_BuildMode,
         HotKey_Build,
+		HotKey_Research,
+		HotKey_Spells,
     }
 
     class ControlMapper

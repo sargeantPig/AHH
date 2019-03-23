@@ -72,7 +72,7 @@ namespace AHH.Parsers
 					temp_texturePath[0] = split[1];
 					Texture2D texture = cm.Load<Texture2D>(temp_texturePath[0]);
 					Texture2D texture_h = cm.Load<Texture2D>(temp_texturePath[1]);
-					elements.Add(temp_name, new Button(new Vector2(0, 0), temp_size, texture, texture_h, texture, temp_value));
+					elements.Add(temp_name, new Button(new Vector2(0, 0), temp_size, true, texture, texture_h, texture, temp_value));
 				}
 
 			}

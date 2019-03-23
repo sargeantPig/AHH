@@ -18,6 +18,7 @@ Type	Button
 Name	Dismantle
 Value	Dismantle
 Size	256, 128
+H_texture	texture/ui/button_test_h
 Texture	texture/ui/button_test
 
 
@@ -25,5 +26,6 @@ Type	Button
 Name	Examine
 Value	Examine
 Size	256, 128
+H_texture	texture/ui/button_test_h
 Texture	texture/ui/button_test
 

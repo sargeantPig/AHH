@@ -32,7 +32,6 @@ namespace AHH.Base
 			b.Box = new Rectangle((int)Position.X, (int)Position.Y, b.Box.Width, b.Box.Height);
 			b.CalculateCorners();
 			b.InitAdjacent(grid);
-			Building = b;
 		}
 
 		public void Draw_Debug(SpriteBatch sb)
@@ -62,12 +61,6 @@ namespace AHH.Base
 			get { return children; }
 		}
 
-		public Building Building
-		{
-			get { return building; }
-			set { building = value; }
-		}
-
 		public TileStates State
 		{
 			get { return state; }
@@ -83,11 +76,6 @@ namespace AHH.Base
 		{
 			get { return parent; }
 			set { parent = value; }
-		}
-
-		public void RemoveBuilding()
-		{
-			building = null;
 		}
 
 	}

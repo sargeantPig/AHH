@@ -5,16 +5,16 @@
 
 Name	Swordsman
 Type	Knight
-Stats	2, Sword, Heavy, 2, 32, 1, Trained, Aggressive
+Stats	2, Sword, Heavy, 4, 1, 1000, Trained, Aggressive
 
 Name	Squire
 Type	Priest
-Stats	2, Spear, Heavy, 2, 32, 1, Trained, Focused
+Stats	2, Spear, Heavy, 1, 2, 2000, Trained, Focused
 
 Name	Bow
 Type	Archer
-Stats	2, Bow, Heavy, 2, 32, 1, Trained, Hyper
+Stats	2, Bow, Heavy, 4, 3, 2000, Trained, Hyper
 
 Name	pl
 Type	Horseman
-Stats	2, Bone, Heavy, 2, 32, 1, Trained, Focused
+Stats	2, Bone, Heavy, 5, 1, 1500, Trained, Focused

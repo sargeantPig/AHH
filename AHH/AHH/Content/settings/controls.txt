@@ -2,8 +2,6 @@
 ##each control is remappable to anything within XNA.INPUT.KEYS 
 ##format as [function name] tabspace [Key]
 
-HotKey_BuildMode	B
-HotKey_Build	P
+HotKey_Build	B
 HotKey_Research	R
 HotKey_Spells	S
-HotKey_Neutral	N

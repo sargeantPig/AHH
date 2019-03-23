@@ -12,95 +12,152 @@ using Microsoft.Xna.Framework.Graphics;
 
 namespace AHH.Interactable.Building
 {
-    class Architech : BaseObject
-    {
-        Dictionary<Point, Building> buildings { get; set; }
-        Dictionary<BuildingTypes, List<BuildingData>> building_data { get; }
-        Dictionary<BuildingTypes, Building_Type> building_types { get; }
-        public Architech(ContentManager cm)
-        {
-            
-            building_data = Parsers.Parsers.Parse_Stats<BuildingTypes, BuildingData>(@"Content\unit\unit_descr.txt");
-            building_types = Parsers.Parsers.Parse_Types<BuildingTypes, Building_Type>(@"Content\unit\unit_types.txt", cm);
-        }
+	class Architech : BaseObject
+	{
+		Dictionary<Point, Building> buildings { get; set; }
+		Dictionary<BuildingTypes, List<BuildingData>> building_data { get; }
+		Dictionary<BuildingTypes, Type_Data<BuildingTypes>> building_types { get; }
+		List<Point> remove_queue = new List<Point>();
+		string selectedBuilding;
+		bool buildingPlaced { get; set; }
 
-        public List<Building> NearBuildings(Vector2 position)
-        {
-            List<Building> nearBuildings = new List<Building>();
-            foreach (Building b in buildings.Values)
-            {
-                float distanceTo = Vector2.Distance(position, t.Position);
+		public Architech(ContentManager cm)
+		{
+			selectedBuilding = "";
+			buildings = new Dictionary<Point, Building>();
+			building_data = Parsers.Parsers.Parse_Stats<BuildingTypes, BuildingData>(@"Content\buildings\building_descr.txt");
+			building_types = Parsers.Parsers.Parse_Types<BuildingTypes, Type_Data<BuildingTypes>>(@"Content\buildings\building_types.txt", cm);
+		}
 
-                if (distanceTo < (64 * 5))
-                {
-                    nearBuildings.Add(b);
-                }
-                
-            }
+		public Dictionary<Point, Building> NearBuildings(Vector2 position, float range)
+		{
+			Dictionary<Point, Building> nearBuildings = new Dictionary<Point, Building>();
+			foreach (KeyValuePair<Point, Building> kv in buildings)
+			{
+				float distanceTo = Vector2.Distance(position, kv.Value.Position);
 
-            return nearBuildings;
-        }
+				if (distanceTo < (64 * range))
+				{
+					nearBuildings.Add(kv.Key, kv.Value);
+				}
 
-        public bool PlaceBuilding(Grid grid, BuildingTypes buildingID)
-        {
-            //get tiles the building will encompass
-            grid.SelectTiles(grid.SelectedTiles[0], new Point(building_data[buildingID][0].Size.X / 64, building_data[buildingID][0].Size.Y / 64));
-            //check no tile is blocked return if true
-            if (grid.CheckBlocked())
-            {
-                //set tiles found to blocked
-                grid.ChangeSelectedTilesState(TileStates.Blocked);
-                //add building to list
-                Building newBuilding = new Building(new Building(grid.GetTile(grid.SelectedTiles[0]).Position, building_data[buildingID][0], building_types[buildingID]));
-                newBuilding.CalculateCorners();
-                newBuilding.InitAdjacent(grid);
-                buildings.Add(grid.GetTile(grid.SelectedTiles[0]).Order, newBuilding);
-                return true; //success
-            }
-            else return false; // cannot build
+			}
 
-            
-        }
+			return nearBuildings;
+		}
 
-        public void Examine()
-        {
+		public bool IsInRange(Dictionary<Corner, Vector2> corners, Point bID, float range)
+		{
 
+			if (Vector2.Distance(corners[Corner.TopLeft], buildings[bID].Corners[Corner.TopLeft]) <= range * 64)
+				return true;
+			if (Vector2.Distance(corners[Corner.TopRight], buildings[bID].Corners[Corner.TopRight]) <= range * 64)
+				return true;
+			if (Vector2.Distance(corners[Corner.BottomLeft], buildings[bID].Corners[Corner.BottomLeft]) <= range * 64)
+				return true;
+			if (Vector2.Distance(corners[Corner.BottomRight], buildings[bID].Corners[Corner.BottomRight]) <= range * 64)
+				return true;
+			return false;
+		}
 
-        }
+		public bool PlaceBuilding(Grid grid, BuildingTypes buildingID)
+		{
+			//get tiles the building will encompass
+			grid.SelectTiles(grid.SelectedTiles[0], new Point(building_data[buildingID][0].Size.X / 64, building_data[buildingID][0].Size.Y / 64));
+			//check no tile is blocked return if true
+			if (grid.CheckBlocked())
+			{
+				//set tiles found to blocked
+				grid.ChangeSelectedTilesState(TileStates.Blocked);
+				//add building to list
+				Building newBuilding = new Building(grid.GetTile(grid.SelectedTiles[0]).Position, building_data[buildingID][0], building_types[buildingID]);
+				newBuilding.InitAdjacent(grid);
+				newBuilding.GetChildren = new List<Point>(grid.SelectedTiles);
+				buildings.Add(grid.GetTile(grid.SelectedTiles[0]).Order, newBuilding);
+				buildingPlaced = true;
+				return true; //success
+			}
+			else return false; // cannot build
+		}
 
-        public bool Dismantle(Grid grid, Building b)
-        {
-            grid.SelectedTiles = b.GetChildren;
+		public bool Dismantle(Grid grid, Building b)
+		{
+			grid.SelectedTiles = b.GetChildren;
 
-            bool done = false;
+			
+			grid.ChangeSelectedTilesState(TileStates.Active);
 
-            foreach (Point p in grid.SelectedTiles)
-            {
-                if (buildings.ContainsKey(p))
-                {
-                    buildings.Remove(p);
-                    done = true;
-                }
-            }
+			return true;
+		}
 
-            if(done)
-                grid.ChangeSelectedTilesState(TileStates.Active);
+		public void Update(Grid grid, UiMaster master, Player player)
+		{
+			buildingPlaced = false;
 
-            return done;
-        }
+			foreach (KeyValuePair<Point, Building> kv in buildings)
+			{
+				kv.Value.Update(player.Cursor);
+				if (kv.Value.GetBuildingData().Health <= 0)
+				{
+					remove_queue.Add(kv.Key);
+				}
+			}
 
-        public void Update(Grid grid, Cursor ms, UiMaster ui)
-        {
-            foreach (Building b in buildings)
-                b.Update(ms);
-        }
+			foreach (Point id in remove_queue)
+			{
+				Dismantle(grid, GetBuilding(id));
+				buildings.Remove(id);
+			}
+			remove_queue.Clear();
 
-        public void Draw(SpriteBatch sb)
-        {
-            foreach (Building b in buildings)
-                b.Draw(sb);
+			if (master.NextAction != ButtonFunction.Nan)
+			{
+				switch (master.NextAction)
+				{
+					case ButtonFunction.Wall:
+						master.Pop_Action();
+						selectedBuilding = ButtonFunction.Wall.ToString();
+						break;
+				}
 
-        }
+			}
+
+			if (player.Cursor.isLeftPressed && grid.IsHighlighted && selectedBuilding != "")
+			{
+				PlaceBuilding(grid, (BuildingTypes)Enum.Parse(typeof(BuildingTypes), selectedBuilding));
+			}
+		}
+
+		public void Draw(SpriteBatch sb, Player player, Grid grid)
+		{
+			foreach (Building b in buildings.Values)
+				b.Draw(sb);
+
+			//draw ghost of building if in buildmode 
+			if (player.Mode == Player_Modes.Building)
+			{
+				if (selectedBuilding != "")
+				{
+					if (grid.GetHighlightedTile() != null)
+					{
+						Vector2 pos = grid.GetHighlightedTile().Position;
+						sb.Draw(building_types[(BuildingTypes)Enum.Parse(typeof(BuildingTypes), selectedBuilding)].Texture, pos, Color.White);
+					}
+				}
+			}
+		}
+
+		public bool BuildingPlaced
+		{
+			get { return buildingPlaced; }
+		}
+
+		public Building GetBuilding(Point id)
+		{
+			if (buildings.ContainsKey(id))
+				return buildings[id];
+			else return null;
+		}
 
     }
 }

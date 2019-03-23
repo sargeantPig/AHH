@@ -7,5 +7,6 @@ namespace AHH.UI
 		void Draw(SpriteBatch sb);
 		void Update(Cursor ms);
 		Vector2 Position { get; set; }
+		bool IsActive { get; set; }
 	}
 }

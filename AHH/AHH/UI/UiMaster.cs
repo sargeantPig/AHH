@@ -7,40 +7,62 @@ using AHH.Base;
 using AHH.UI.Elements;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
-
+using AHH.User;
 namespace AHH.UI
 {
     class UiMaster : BaseObject, IElement
     {
-        List<IElement> elements { get; set; }
+        Dictionary<Player_Modes, List<IElement>> elements { get; set; }
         Dictionary<ButtonFunction, string> functions { get; }
+		List<ButtonFunction> action_queue { get; set; }
 
+		bool isActive { get; set; }
 
         public UiMaster(ContentManager cm)
         {
             functions = Parsers.Parsers.Parse_InternalGridMenu(@"Content/UI/internal_ui.txt");
+			elements = Parsers.Parsers.Parse_Ui_Master(@"Content/UI/ui_master.txt", cm);
+			action_queue = new List<ButtonFunction>();
+			isActive = true;
         }
 
-        public void Update(Cursor ms)
+        public void Update(Player p)
         {
-            foreach (IElement e in elements)
+            foreach (KeyValuePair<Player_Modes, List<IElement>> kv in elements)
             {
-                e.Update(ms);
-                if (e is Strip)
-                {
-                    string action = ((Strip)e).GetClicked();
-                    if (action != null)
-                        ParseAction(action);
-
-                }
+				foreach (IElement ie in kv.Value)
+				{
+					if (ie.IsActive && p.Mode == kv.Key)
+					{
+						ie.Update(p.Cursor);
+						if (ie is Strip)
+						{
+							string action = ((Strip)ie).GetClicked();
+							if (action != null)
+								ParseAction(action);
+						}
+					}
+				}
             }
         }
 
-        public void Draw(SpriteBatch sb)
+		public void Update(Cursor ms)
+		{ }
+
+        public void Draw(SpriteBatch sb, Player p)
         {
-            foreach (IElement e in elements)
-                e.Draw(sb);
+			foreach (KeyValuePair<Player_Modes, List<IElement>> kv in elements)
+			{
+				foreach (IElement ie in kv.Value)
+				{
+					if (ie.IsActive && p.Mode == kv.Key)
+						ie.Draw(sb);
+				}
+			}
         }
+
+		public void Draw(SpriteBatch sb)
+		{ }
 
         void ParseAction(string action)
         {
@@ -62,17 +84,41 @@ namespace AHH.UI
             switch (func)
             {
                 case ButtonFunction.Build:
-                    PlaceBuilding(player.SelectedBuilding, player);
+					action_queue.Add(ButtonFunction.Build);
                     break;
                 case ButtonFunction.Dismantle:
-                    Dismantle();
+					action_queue.Add(ButtonFunction.Dismantle);
                     break;
                 case ButtonFunction.Examine:
-                    Examine();
+					action_queue.Add(ButtonFunction.Examine);
                     break;
-
+				case ButtonFunction.Wall:
+					action_queue.Add(ButtonFunction.Wall);
+					break;
             }
-
         }
+
+		public void Pop_Action()
+		{
+			action_queue.RemoveAt(0);
+		}
+
+		public ButtonFunction NextAction
+		{
+			get {
+
+				if (action_queue.Count != 0)
+					return action_queue[0];
+				else return ButtonFunction.Nan;
+
+			}
+		}
+
+		public bool IsActive
+		{
+			get { return isActive; }
+			set { isActive = value; }
+
+		}
     }
 }

@@ -1,0 +1,28 @@
+##internal Mode - denotes when to display this ui element
+##parse type - single or multi. Single passes each element in file singularly, multi puts the elements into a strip bar
+##file for elements parser
+##      Building,
+##        Research,
+##        Spells,
+
+Mode	Building
+ParseType	multi
+Location	0, 928
+Size	256, 128
+Align	Horizontal
+File	Content/UI/ui_buildings.txt
+
+Mode	Research
+ParseType	multi
+Location	0, 928
+Size	256, 128
+Align	Horizontal
+File	Content/UI/ui_research.txt
+
+Mode	Spells
+ParseType	multi
+Location	0, 928
+Size	256, 128
+Align	Horizontal
+File	Content/UI/ui_spells.txt
+	

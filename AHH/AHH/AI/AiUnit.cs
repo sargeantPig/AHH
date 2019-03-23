@@ -21,13 +21,14 @@ namespace AHH.AI
 		bool isZombie { get; set; }
 		List<Vector2> waypoints { get; set; }
 		object pf_result { get; set; }
-		public AiUnit(Vector2 position, Point rectExtends, float speed, Dictionary<string, Vector3> states, Stats stats, Unit_Type unit_types, Grid grid)
+		public AiUnit(Vector2 position, Point rectExtends, float speed, Dictionary<string, Vector3> states, Stats stats, Type_Data<Ai_Type> unit_types, Grid grid)
 			: base(position, rectExtends, unit_types.Texture, unit_types.H_texture, unit_types.C_texture, speed, states)
 		{
 			this.stats = stats;
 			real_health = this.stats.Health;
 			waypoints = new List<Vector2>();
 			ai_State = Ai_States.Thinking;
+			pf_result = null;
 		}
 
 		public bool GetPath(Grid grid, Vector2 position, Point destination)
@@ -73,15 +74,34 @@ namespace AHH.AI
 			{
 				Vector2 next = new Vector2();
 				bool found = false;
+
+
+				//check all around the tile and assign a counter
+				Vector2 max = new Vector2(current.X + 1, current.Y + 1);
+				Vector2 min = new Vector2(current.X - 1, current.Y - 1);
 				int maxx = _grid.GetLength(0);
 				int maxy = _grid.GetLength(1);
+				if (current.X + 1 >= maxx)
+					max.X = maxx - 1;
+				if (current.Y + 1 >= maxy)
+					max.Y = maxy - 1;
+				if (current.X - 1 < 0)
+					min.X = 0;
+				if (current.Y - 1 < 0)
+					min.Y = 0;
 
-				for (int x = MathHelper.Clamp(current.X - 1, 0, maxx); x < maxx; x++)
+
+				
+				int trueMaxX =	MathHelper.Clamp(current.X + 1, current.X, maxx);
+				
+				int trueMaxY = MathHelper.Clamp(current.Y + 1, current.Y, maxy);
+
+				for (int x = (int)min.X; x <= max.X; x++)
 				{
 					if (found)
 						break;
 
-					for (int y = MathHelper.Clamp(current.Y - 1, 0, maxy); y < maxy; y++)
+					for (int y = (int)min.Y; y <= max.Y; y++)
 					{
 						if (x != current.X || y != current.Y)
 						{
@@ -96,15 +116,9 @@ namespace AHH.AI
 						}
 						if (found)
 							break;
-
 					}
 				}
-
-
 			}
-
-
-
 
 			return points;
 		}

@@ -39,9 +39,9 @@ namespace AHH.Parsers
 				if (line.StartsWith("Type"))
 				{
 					string[] split = line.Split('\t');
-					temp_stats.AiType = (T)Enum.Parse(typeof(T), split[1]);
-					if (!stats.ContainsKey(temp_stats.AiType))
-						stats.Add(temp_stats.AiType, new List<Y>());
+					temp_stats.Type = (T)Enum.Parse(typeof(T), split[1]);
+					if (!stats.ContainsKey(temp_stats.Type))
+						stats.Add(temp_stats.Type, new List<Y>());
 				}
 
 				if (line.StartsWith("Stats"))
@@ -54,19 +54,19 @@ namespace AHH.Parsers
                     if (typeof(Y) == typeof(BuildingData))
                     {
                         temp_stats.Production = Convert.ToInt32(split[2]);
-
+						temp_stats.Size = new Point(Convert.ToInt32(split[4]), Convert.ToInt32(split[5]));
                     }
 
                     if (typeof(Y) == typeof(Stats))
                     {
                         temp_stats.WeaponType = (WeaponType)Enum.Parse(typeof(WeaponType), split[2]);
                         temp_stats.BaseDamage = Convert.ToInt32(split[4]);
-                        temp_stats.Range = Convert.ToInt32(split[5]);
+                        temp_stats.Range = Convert.ToDouble(split[5]);
                         temp_stats.HitDelay = (float)Convert.ToDouble(split[6]);
                         temp_stats.Luck = (Luck)Enum.Parse(typeof(Luck), split[7]);
                         temp_stats.Focus = (Focus)Enum.Parse(typeof(Focus), split[8]);
                     }
-					stats[temp_stats.AiType].Add(temp_stats);
+					stats[temp_stats.Type].Add(temp_stats);
 				}
 
 			}

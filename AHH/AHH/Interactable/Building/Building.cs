@@ -19,12 +19,15 @@ namespace AHH.Interactable.Building
 		Dictionary<Corner, Vector2> corners { get; set; }
 		List<Vector2> adjacentTiles { get; set; }
 		OffloadThread adjThread;
-
         List<Point> children { get; set; } //tiles that the building encompasses
 
-		public Building(Vector2 position, BuildingData bd, Building_Type bt)
+		BuildingData data;
+		Type_Data<BuildingTypes> type;
+		public Building(Vector2 position, BuildingData bd, Type_Data<BuildingTypes> bt)
 			: base(position, bd.Size, bt.Texture, bt.H_texture, bt.C_texture)
 		{
+			data = bd;
+			type = bt;
 			corners = new Dictionary<Corner, Vector2>();
             CalculateCorners();
 		}
@@ -32,6 +35,7 @@ namespace AHH.Interactable.Building
 		public Building(Building b)
 			: base(b.Position, b.size, b.Texture, b.Texture, b.Texture)
 		{
+			corners = new Dictionary<Corner, Vector2>();
 			CalculateCorners();
 		}
 
@@ -194,5 +198,11 @@ namespace AHH.Interactable.Building
             get { return children; }
             set { children = value; }
         }
+
+		public ref BuildingData GetBuildingData()
+		{
+			return ref data;
+		}
+
 	}
 }

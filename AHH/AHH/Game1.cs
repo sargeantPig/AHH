@@ -11,6 +11,8 @@ using AHH.Base;
 using AHH.UI;
 using AHH.User;
 using AHH.AI;
+using AHH.Interactable.Building;
+
 namespace AHH
 {
 	/// <summary>
@@ -20,7 +22,6 @@ namespace AHH
 	{
 		Random rng;
         Player player;
-		Cursor cursor;
 		GraphicsDeviceManager graphics;
 		SpriteBatch spriteBatch;
 		Grid grid;
@@ -28,6 +29,8 @@ namespace AHH
 		Vector2[] points = new Vector2[100];
 		Point tileSize;
 		Overseer os;
+		UiMaster uiMaster;
+		Architech architech;
 		int num = 0;
 		public Game1()
 		{
@@ -91,11 +94,11 @@ namespace AHH
 				points[i] = new Vector2(rng.Next(0, 600), rng.Next(0, 600));
 			}
 
-			grid = new Grid(gridSize, new Vector2(0, 100), t_r, t_b, t_g, tileSize, @"Content/buildings/buildings.txt", @"Content/UI/ui_grid_menu.txt", Content);
-
-			cursor = new Cursor(t_b);
-            player = new Player();
+			grid = new Grid(gridSize, new Vector2(0, 0), t_r, t_b, t_g, tileSize, @"Content/buildings/buildings.txt", @"Content/UI/ui_grid_menu.txt", Content);
+            player = new Player(t_b);
 			os = new Overseer(Content);
+			architech = new Architech(Content);
+			uiMaster = new UiMaster(Content);
 		}
 
 		/// <summary>
@@ -119,12 +122,13 @@ namespace AHH
 
             // TODO: Add your update logic here
             player.Input.KB = Keyboard.GetState();
-			cursor.Update(Mouse.GetState());
 
-
-			player.Update();
-			grid.Update(cursor, player);
-			os.Update(gameTime, cursor, grid, rng);
+			player.Update(uiMaster, Mouse.GetState());
+			uiMaster.Update(player);
+			
+			grid.Update(player);
+			architech.Update(grid, uiMaster, player);
+			os.Update(gameTime, player.Cursor, architech, grid, rng);
 
             player.Input.KBP = player.Input.KB;
 			base.Update(gameTime);
@@ -146,10 +150,10 @@ namespace AHH
 								   Resolution.getTransformationMatrix());
 
 			grid.Draw(spriteBatch, player.SelectedBuilding);
+			architech.Draw(spriteBatch, player, grid);
 			os.Draw(spriteBatch);
-			grid.Ui_Draw(spriteBatch, player.SelectedBuilding);
-			cursor.Draw(spriteBatch);
-
+			uiMaster.Draw(spriteBatch, player);
+			player.Draw(spriteBatch);
 			spriteBatch.End();
 
 			base.Draw(gameTime);

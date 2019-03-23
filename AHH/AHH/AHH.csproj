@@ -58,6 +58,7 @@
     <Compile Include="Base\Objects\StaticSprite.cs" />
     <Compile Include="Base\Grid\Tile.cs" />
     <Compile Include="Base\Grid\TileStates.cs" />
+    <Compile Include="Base\Type_Data.cs" />
     <Compile Include="Extensions\Extensions.cs" />
     <Compile Include="Extensions\Resolution.cs" />
     <Compile Include="Game1.cs" />
@@ -65,15 +66,19 @@
     <Compile Include="Interactable\Building\Building.cs" />
     <Compile Include="Interactable\Building\BuildingData.cs" />
     <Compile Include="Interactable\Building\ECorner.cs" />
+    <Compile Include="Interactable\Spells\Spell.cs" />
+    <Compile Include="Interactable\Spells\SpellData.cs" />
     <Compile Include="Parsers\Parse_Stats.cs" />
-    <Compile Include="Parsers\Parse_Buildings.cs" />
     <Compile Include="Parsers\Parse_InternalGridMenu.cs" />
     <Compile Include="Parsers\Parse_UiElements.cs" />
     <Compile Include="Parsers\Parse_Types.cs" />
+    <Compile Include="Parsers\Parse_Ui_Master.cs" />
+    <Compile Include="UI\BaseElement.cs" />
     <Compile Include="UI\Elements\Button\Button.cs" />
     <Compile Include="UI\Elements\Button\ButtonFunctions.cs" />
     <Compile Include="UI\Controls\Cursor.cs" />
     <Compile Include="UI\Elements\DropMenu.cs" />
+    <Compile Include="UI\Elements\EAlign.cs" />
     <Compile Include="UI\Elements\IElement.cs" />
     <Compile Include="UI\Elements\Strip.cs" />
     <Compile Include="UI\Elements\Text.cs" />
@@ -84,6 +89,7 @@
     <Compile Include="UI\Controls\ControlMapper.cs" />
   </ItemGroup>
   <ItemGroup>
+    <Reference Include="Microsoft.CSharp" />
     <Reference Include="MonoGame.Framework">
       <HintPath>$(MonoGameInstallDirectory)\MonoGame\v3.0\Assemblies\Windows\MonoGame.Framework.dll</HintPath>
     </Reference>

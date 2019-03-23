@@ -10,14 +10,17 @@ using System.Threading.Tasks;
 
 namespace AHH.UI.Elements
 {
-    class Strip : BaseObject, IElement
+    class Strip : BaseElement, IElement
     {
         Dictionary<string, IElement> elements { get; set; }
+		Align align;
 
-        public Strip(Vector2 position, string filepath, ContentManager cm)
-            :base(position)
+        public Strip(Vector2 position, bool active, Point size, Align align, Dictionary<string, IElement> elements)
+            :base(position, active)
         {
-            elements = Parsers.Parsers.Parse_UiElements(filepath, cm);
+			this.elements = elements;
+			this.align = align;
+			OrganiseCtrl(size);
         }
 
         public string GetClicked()
@@ -37,7 +40,27 @@ namespace AHH.UI.Elements
 
         }
 
-        public void Update(Cursor ms)
+		void OrganiseCtrl(Point size)
+		{
+			int x = 0;
+			int y = 0;
+
+			foreach (IElement ctrl in elements.Values)
+			{
+				ctrl.Position = new Vector2(Position.X + (size.X * x), Position.Y + (size.Y * y));
+				if (ctrl is InteractableStaticSprite)
+				{
+					((InteractableStaticSprite)ctrl).Box = new Rectangle((int)ctrl.Position.X, (int)ctrl.Position.Y, ((InteractableStaticSprite)ctrl).Box.Width, ((InteractableStaticSprite)ctrl).Box.Height);
+				}
+
+				if (align == Align.Vertical)
+					y++;
+				else if (align == Align.Horizontal)
+					x++;
+			}
+		}
+
+		public void Update(Cursor ms)
         {
             foreach (IElement e in elements.Values)
                 e.Update(ms);

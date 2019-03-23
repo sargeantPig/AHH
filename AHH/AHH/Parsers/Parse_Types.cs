@@ -8,6 +8,7 @@ using Microsoft.Xna.Framework.Graphics;
 using AHH.UI;
 using AHH.AI;
 using AHH.Interactable.Building;
+using AHH.Base;
 namespace AHH.Parsers
 {
 	static partial class Parsers
@@ -21,12 +22,7 @@ namespace AHH.Parsers
 			StreamReader sr = new StreamReader(filepath);
 			string line = "";
 
-            dynamic temp_types = new Unit_Type(); //assign def
-
-            if (typeof(Y) == typeof(Building_Type))
-                temp_types = new Building_Type();
-            else if (typeof(Y) == typeof(Unit_Type))
-                temp_types = new Unit_Type();
+            dynamic temp_types = new Type_Data<T>(); //assign def
 
             Type y = typeof(Y);
 

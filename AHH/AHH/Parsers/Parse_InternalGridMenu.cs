@@ -25,7 +25,7 @@ namespace AHH.Parsers
 				if (!line.StartsWith("#"))
 				{
 					string[] split = line.Split('\t');
-					actions.Add((ButtonFunction)Enum.Parse(typeof(ButtonFunction), split[1]), split[0]);
+					actions.Add((ButtonFunction)Enum.Parse(typeof(ButtonFunction), split[0]), split[1]);
 				}
 
 			}

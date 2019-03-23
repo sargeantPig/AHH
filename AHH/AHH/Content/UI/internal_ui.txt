@@ -7,3 +7,9 @@ Wall	Build_Wall
 EnergyConduit	Build_EC
 NecroticOrrery	Build_NO
 Grave	Build_Grave
+R1	Research1
+R2	Research2
+R3	Research3
+S1	Spell1
+S2	Spell2
+S3	Spell3
