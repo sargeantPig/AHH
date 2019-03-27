@@ -68,6 +68,7 @@
     <Compile Include="Interactable\Building\ECorner.cs" />
     <Compile Include="Interactable\Spells\Spell.cs" />
     <Compile Include="Interactable\Spells\SpellData.cs" />
+    <Compile Include="Interactable\Spells\Wizard.cs" />
     <Compile Include="Parsers\Parse_Stats.cs" />
     <Compile Include="Parsers\Parse_InternalGridMenu.cs" />
     <Compile Include="Parsers\Parse_UiElements.cs" />

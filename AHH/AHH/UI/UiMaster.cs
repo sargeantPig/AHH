@@ -81,21 +81,8 @@ namespace AHH.UI
             if (!match)
                 return;
 
-            switch (func)
-            {
-                case ButtonFunction.Build:
-					action_queue.Add(ButtonFunction.Build);
-                    break;
-                case ButtonFunction.Dismantle:
-					action_queue.Add(ButtonFunction.Dismantle);
-                    break;
-                case ButtonFunction.Examine:
-					action_queue.Add(ButtonFunction.Examine);
-                    break;
-				case ButtonFunction.Wall:
-					action_queue.Add(ButtonFunction.Wall);
-					break;
-            }
+			action_queue.Add(func);
+
         }
 
 		public void Pop_Action()

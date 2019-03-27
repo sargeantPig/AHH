@@ -156,6 +156,12 @@ namespace AHH.AI
 			set { isZombie = value; }
 		}
 
+		public void Ressurect(Overseer os)
+		{
+			stats = os.GetStats[stats.Type][0];
+			
+		}
+
 		public Building GetDefender()
 		{
 			return defender;
@@ -207,5 +213,16 @@ namespace AHH.AI
 			get { return pf_result; }
 			set { pf_result = value; }
 		}
+
+		public ref Stats GetStats()
+		{
+			return ref stats;
+		}
+
+		public Guid AID
+		{
+			get { return ID; }
+		}
+
 	}
 }

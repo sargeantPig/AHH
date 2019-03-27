@@ -79,7 +79,7 @@ namespace AHH.Base
 			{
 				try
 				{
-					if (tiles[p.X, p.Y].State == TileStates.Blocked)
+					if (tiles[p.X, p.Y].State == TileStates.Blocked || tiles[p.X, p.Y].State == TileStates.Limbo)
 						return false;
 				}
 
@@ -201,7 +201,7 @@ namespace AHH.Base
 
 
 							}
-							else if (tiles[x, y].State == TileStates.Active)
+							else if (tiles[x, y].State == TileStates.Active || tiles[x, y].State == TileStates.Limbo)
 							{
 								grid[x, y].Item2 = TileStates.Active;
 								grid[x, y].Item3 = grid[check[0].X, check[0].Y].Item3 + 1;

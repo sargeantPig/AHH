@@ -3,9 +3,9 @@
 Type	Wall
 Sound	{sound_file}
 Texture	texture/buildings/Test
-H_Texture	texture/buildings/Test_H
-C_Texture	texture/buildings/Test_C
+H_Texture	texture/buildings/Test
+C_Texture	texture/buildings/Test
 Animation
-Idle, 0, 0, 100
+Disables, 2, 2, 100
 Production, 1, 1, 100
-Building, 2, 2, 100
+Building, 0, 0, 100

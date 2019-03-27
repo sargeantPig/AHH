@@ -1,0 +1,17 @@
+##spell Textures and animations##
+####################################
+Type	Ressurect
+Sound	{sound_file}
+Texture	texture/spells/Resurrect
+H_Texture	texture/spells/Resurrect
+C_Texture	texture/spells/Resurrect
+Animation
+Main, 0, 3, 50
+
+Type	DrainEssence
+Sound	{sound_file}
+Texture	texture/spells/DrainEssence
+H_Texture	texture/spells/DrainEssence
+C_Texture	texture/spells/DrainEssence
+Animation
+Main, 0, 3, 50

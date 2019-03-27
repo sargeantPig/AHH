@@ -2,22 +2,22 @@
 ##Spell
 #########################################
 Type	Button
-Name	S1
-Value	Spell1
+Name	Ressurect
+Value	Ressurect
 Size	256, 128
 H_texture	texture/ui/button_test_h
 Texture	texture/ui/button_test
 
 Type	Button
-Name	S2
-Value	Spell2
+Name	DrainEssence
+Value	Drain Essence
 Size	256, 128
 H_texture	texture/ui/button_test_h
 Texture	texture/ui/button_test
 
 Type	Button
-Name	S3
-Value	Spell3
+Name	RestoreEssence
+Value	Restore Essence
 Size	256, 128
 H_texture	texture/ui/button_test_h
 Texture	texture/ui/button_test

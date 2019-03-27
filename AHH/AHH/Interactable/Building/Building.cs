@@ -12,9 +12,8 @@ using AHH.Extensions;
 using System.Threading;
 namespace AHH.Interactable.Building
 {
-	class Building : InteractableStaticSprite
+	class Building : InteractableMovingSprite
 	{
-		
 		int cost { get; set; }
 		Dictionary<Corner, Vector2> corners { get; set; }
 		List<Vector2> adjacentTiles { get; set; }
@@ -23,24 +22,24 @@ namespace AHH.Interactable.Building
 
 		BuildingData data;
 		Type_Data<BuildingTypes> type;
+        BuildingData stats;
+        BuildingStates state { get; set; }
+
+        float b_elasped = 0;
 		public Building(Vector2 position, BuildingData bd, Type_Data<BuildingTypes> bt)
-			: base(position, bd.Size, bt.Texture, bt.H_texture, bt.C_texture)
+			: base(position, bd.Size, bt.Texture, bt.H_texture, bt.C_texture, 0, bt.Animations)
 		{
 			data = bd;
 			type = bt;
 			corners = new Dictionary<Corner, Vector2>();
+            state = BuildingStates.Building;
+            this.stats = bd;
+            base.CurrentState = "Building";
             CalculateCorners();
 		}
 
-		public Building(Building b)
-			: base(b.Position, b.size, b.Texture, b.Texture, b.Texture)
-		{
-			corners = new Dictionary<Corner, Vector2>();
-			CalculateCorners();
-		}
-
 		public Building()
-			: base(new Vector2(), new Point(), null, null, null)
+			: base(new Vector2(), new Point(), null, null, null, 0)
 		{ }
 
 		public void InitAdjacent(Grid grid)
@@ -54,10 +53,45 @@ namespace AHH.Interactable.Building
 			adjThread.Th_Child.Start();
 		}
 
-		new public void Update(Cursor ms)
+		public void Update(Cursor ms, GameTime gt, Architech arch, Grid grid)
 		{
-			base.Update(ms);
+			base.Update(ms, gt);
+
+            switch (state)
+            {
+                case BuildingStates.Building:
+                    Build(gt, arch, grid);
+                    break;
+                case BuildingStates.Disabled:
+                    break;
+                case BuildingStates.Production:
+                    Produce();
+                    break;
+            }
+
 		}
+
+        void Build(GameTime gt, Architech arch, Grid grid)
+        { 
+            b_elasped += gt.ElapsedGameTime.Milliseconds;
+            if (b_elasped >= stats.BuildTime)
+            {
+                //finish building
+                state = BuildingStates.Production; //start producing 
+                arch.BuildComplete(this, grid);
+                base.CurrentState = "Production";
+            }
+
+            else
+            {
+                //minus resources from pool while building
+            }
+
+        }
+
+        void Produce()
+        { }
+
 
 		public void CalculateCorners()
 		{
@@ -68,18 +102,6 @@ namespace AHH.Interactable.Building
 			corners.Add(Corner.BottomRight, new Vector2(Position.X + size.X, Position.Y + size.Y));
 		}
 
-		new public Building DeepCopy()
-		{
-			InteractableStaticSprite iss = base.DeepCopy();
-			Building b = (Building)this.MemberwiseClone();
-			b.Box = new Rectangle((int)Position.X, (int)Position.Y, iss.Box.Width, iss.Box.Height);
-			b.cost = cost;
-			b.SetID = iss.ID;
-			b.Position = new Vector2(Position.X, Position.Y);
-			b.CalculateCorners();
-			return b;
-
-		}
 
 		public List<Vector2> AdjacentTiles
 		{

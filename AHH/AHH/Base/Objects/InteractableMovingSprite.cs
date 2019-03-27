@@ -24,7 +24,7 @@ namespace AHH.Base
 			this.t_clicked = t_clicked;
 		}
 
-		public void Update(Cursor mouse)
+		public void Update(Cursor mouse, GameTime gt)
 		{
 			if (Box.Contains(mouse.GetRealPosition))
 			{
@@ -34,7 +34,7 @@ namespace AHH.Base
 			}
 			else { isHighlighted = false; isClicked = false; }
 
-
+            base.Update(gt);
 		}
 
 		new public void Draw(SpriteBatch sb)

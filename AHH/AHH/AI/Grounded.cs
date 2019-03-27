@@ -50,6 +50,10 @@ namespace AHH.AI
 		{
 			base.Update(gt);
 			CalculateCorners();
+
+			if (Ai_States == Ai_States.Dead)
+				return;
+
 			if (grid.CheckPositions(new List<Vector2>() { Position }).Count == 0)
 			{
 				Position = prevPos;
@@ -161,6 +165,8 @@ namespace AHH.AI
 					break;
 
 			}
+
+            bag.Clear();
 		}
 
 		void Think_Violence(Architech arch, Grid grid, Random rng)
@@ -387,9 +393,13 @@ namespace AHH.AI
 					break;
 			}
 
-			// decrease focus based on percent of health lost
-			float decrease = (int)Health.PercentDecrease(Stats.Health);
-			focusPoints[Focus.Focused] -= (int)(focusPoints[Focus.Focused] * (decrease / 100));
+            // decrease focus based on percent of health lost
+            if (Stats.Health >= 1)
+            {
+                float decrease = (int)Health.PercentDecrease(Stats.Health);
+                focusPoints[Focus.Focused] -= (int)(focusPoints[Focus.Focused] * (decrease / 100));
+
+            }
 
 			return focusPoints;
 		}
@@ -411,5 +421,6 @@ namespace AHH.AI
 			set { wait = value; }
 		}
 
+		
 	}
 }

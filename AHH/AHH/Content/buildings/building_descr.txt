@@ -2,8 +2,8 @@
 ###########
 #Name	Wall
 #Type	Wall
-#Stats	{health, production, armourType, sx, sy}
+#Stats	{health, production, armourType, buildTime, cost, sx, sy}
 
 Name	Wall
 Type	Wall
-Stats	100, 0, Reinforced, 128, 128
+Stats	100, 0, Reinforced, 10000, 100, 128, 128

@@ -4,6 +4,7 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using AHH.Interactable;
 using AHH.Interactable.Building;
+using System;
 
 namespace AHH.AI
 {
@@ -70,18 +71,20 @@ namespace AHH.AI
 		AiUnit GetAttacker();
 		void SetDefender(ref Building defender);
 		Building GetDefender();
-		void Update(Cursor ms);
+		void Update(Cursor ms, GameTime gt);
 		void Draw(SpriteBatch sb);
 		Vector2 Position { get; set; }
 		bool IsZombie { get; set; }
 		Ai_States Ai_States { get; set; }
+		Guid AID { get; }
+		ref Stats GetStats();
 	}
 
 	struct Stats
 	{
 		string name { get; set; }
 		Ai_Type type { get; set; }
-		int health { get; set; }
+		float health { get; set; }
 		WeaponType weaponType { get; set; }
 		ArmourType armourType { get; set; }
 		Luck luck { get; set; }
@@ -116,7 +119,7 @@ namespace AHH.AI
 			set { type = value; }
 		}
 
-		public int Health
+		public float Health
 		{
 			get { return health; }
 			set { health = value; }

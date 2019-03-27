@@ -11,5 +11,6 @@ namespace AHH.Base
 		Active,
 		Blocked,
 		Immpassable,
+        Limbo
 	}
 }

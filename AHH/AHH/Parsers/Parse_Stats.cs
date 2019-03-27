@@ -7,6 +7,7 @@ using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using AHH.UI;
 using AHH.AI;
+using AHH.Interactable.Spells;
 namespace AHH.Parsers
 {
 
@@ -27,8 +28,10 @@ namespace AHH.Parsers
                 temp_stats = new BuildingData();
             else if (typeof(Y) == typeof(Stats))
                 temp_stats = new Stats();
+			else if (typeof(Y) == typeof(Spell_Stats))
+				temp_stats = new Spell_Stats();
 
-            while ((line = sr.ReadLine()) != null)
+			while ((line = sr.ReadLine()) != null)
 			{
 				if (line.StartsWith("Name"))
 				{
@@ -48,13 +51,30 @@ namespace AHH.Parsers
 				{
 					string[] split = line.Split('\t', ',');
 
-                    temp_stats.Health = Convert.ToInt32(split[1]);
-                    temp_stats.ArmourType = (ArmourType)Enum.Parse(typeof(ArmourType), split[3]);
+					if (typeof(Y) == typeof(Spell_Stats))
+					{
+						temp_stats.Cost = (float)Convert.ToDouble(split[1]);
+						temp_stats.Range = (float)Convert.ToDouble(split[2]);
+						temp_stats.Duration = (float)Convert.ToDouble(split[3]);
+						temp_stats.Tick = (float)Convert.ToDouble(split[4]);
+						temp_stats.Speed = (float)Convert.ToDouble(split[5]);
+						temp_stats.Damage = (float)Convert.ToDouble(split[6]);
+						temp_stats.Size = new Point(Convert.ToInt32(split[7]), Convert.ToInt32(split[8]));
+
+					}
+
+					if (typeof(Y) == typeof(BuildingData) || typeof(Y) == typeof(Stats))
+					{
+						temp_stats.Health = (float)Convert.ToDouble(split[1]);
+						temp_stats.ArmourType = (ArmourType)Enum.Parse(typeof(ArmourType), split[3]);
+					}
 
                     if (typeof(Y) == typeof(BuildingData))
                     {
                         temp_stats.Production = Convert.ToInt32(split[2]);
-						temp_stats.Size = new Point(Convert.ToInt32(split[4]), Convert.ToInt32(split[5]));
+						temp_stats.Size = new Point(Convert.ToInt32(split[6]), Convert.ToInt32(split[7]));
+                        temp_stats.Cost = (float)Convert.ToDouble(split[5]);
+                        temp_stats.BuildTime = (float)Convert.ToDouble(split[4]);
                     }
 
                     if (typeof(Y) == typeof(Stats))

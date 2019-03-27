@@ -12,7 +12,7 @@ using AHH.UI;
 using AHH.User;
 using AHH.AI;
 using AHH.Interactable.Building;
-
+using AHH.Interactable.Spells;
 namespace AHH
 {
 	/// <summary>
@@ -31,12 +31,13 @@ namespace AHH
 		Overseer os;
 		UiMaster uiMaster;
 		Architech architech;
+		Wizard wizard;
 		int num = 0;
 		public Game1()
 		{
 			graphics = new GraphicsDeviceManager(this);
 			Content.RootDirectory = "Content";
-			//graphics.IsFullScreen = true;
+			graphics.IsFullScreen = true;
 			Resolution.Init(ref graphics);
 			
 			rng = new Random(int.Parse(Guid.NewGuid().ToString().Substring(0, 8), System.Globalization.NumberStyles.HexNumber));
@@ -99,6 +100,7 @@ namespace AHH
 			os = new Overseer(Content);
 			architech = new Architech(Content);
 			uiMaster = new UiMaster(Content);
+			wizard = new Wizard(Content);
 		}
 
 		/// <summary>
@@ -127,10 +129,12 @@ namespace AHH
 			uiMaster.Update(player);
 			
 			grid.Update(player);
-			architech.Update(grid, uiMaster, player);
+			architech.Update(grid, uiMaster, player, gameTime);
 			os.Update(gameTime, player.Cursor, architech, grid, rng);
+			wizard.Update(gameTime, architech, os, uiMaster, grid, player);
 
             player.Input.KBP = player.Input.KB;
+			player.Cursor.prevState = player.Cursor.GetState;
 			base.Update(gameTime);
 		}
 
@@ -152,6 +156,7 @@ namespace AHH
 			grid.Draw(spriteBatch, player.SelectedBuilding);
 			architech.Draw(spriteBatch, player, grid);
 			os.Draw(spriteBatch);
+			wizard.Draw(spriteBatch);
 			uiMaster.Draw(spriteBatch, player);
 			player.Draw(spriteBatch);
 			spriteBatch.End();

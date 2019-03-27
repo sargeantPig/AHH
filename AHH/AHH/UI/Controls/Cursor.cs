@@ -9,7 +9,7 @@ namespace AHH.UI
 		Texture2D texture;
 		Vector2 real_position { get; set; }
 		MouseState ms { get; set; }
-
+		MouseState prev_ms { get; set; }
 		public Cursor(Texture2D texture)
 		{
 			this.texture = texture;
@@ -62,6 +62,12 @@ namespace AHH.UI
 		public MouseState GetState
 		{
 			get { return ms; }
+		}
+
+		public MouseState prevState
+		{
+			get { return prev_ms; }
+			set { prev_ms = value; }
 		}
 
 	}

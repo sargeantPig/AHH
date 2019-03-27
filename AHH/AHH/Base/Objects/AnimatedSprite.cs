@@ -26,12 +26,12 @@ namespace AHH.Base
 			this.Source = new Rectangle(0, 0, RectExtents.X, RectExtents.Y);
 			this.Active = false;
 			this.active_mode = active_mode;
-			if (states == null)
+			if (states == null && texture != null)
 			{
 				this.States = new Dictionary<string, Vector3>();
 				this.States.Add("default", new Vector3(0f, (texture.Width / Source.Width), 100));//sets a default state of going through the entire sheet
 			}
-			else
+			else if (states != null)
 			{
 				this.States = new Dictionary<string, Vector3>(states);
 				this.States.Add("default", new Vector3(0f, (texture.Width / Source.Width), 100));//sets a default state of going through the entire sheet
