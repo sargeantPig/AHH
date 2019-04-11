@@ -85,6 +85,7 @@ namespace AHH.Parsers
                         temp_stats.HitDelay = (float)Convert.ToDouble(split[6]);
                         temp_stats.Luck = (Luck)Enum.Parse(typeof(Luck), split[7]);
                         temp_stats.Focus = (Focus)Enum.Parse(typeof(Focus), split[8]);
+						temp_stats.Speed = (float)Convert.ToDouble(split[9]);
                     }
 					stats[temp_stats.Type].Add(temp_stats);
 				}

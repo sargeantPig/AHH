@@ -13,6 +13,7 @@ namespace AHH.AI
 		Moving,
 		Thinking,
 		Attacking,
+        Retaliating,
 		Resurrecting,
 		Dead
 	}
@@ -78,6 +79,7 @@ namespace AHH.AI
 		Ai_States Ai_States { get; set; }
 		Guid AID { get; }
 		ref Stats GetStats();
+		Dictionary<Corner, Vector2> Corners { get; }
 	}
 
 	struct Stats
@@ -92,6 +94,7 @@ namespace AHH.AI
 		int baseDamage { get; set; }
 		double range { get; set; }
 		float hitDelay { get; set; }
+		float speed { get; set; }
 
 		public Stats(Stats stats)
 		{
@@ -105,6 +108,7 @@ namespace AHH.AI
 			this.range = stats.range;
 			this.weaponType = stats.weaponType;
 			this.focus = stats.focus;
+			this.speed = stats.speed;
 		}
 
 		public string Name
@@ -165,6 +169,11 @@ namespace AHH.AI
 		{
 			get { return hitDelay; }
 			set { hitDelay = value; }
+		}
+		public float Speed
+		{
+			get { return speed; }
+			set { speed = value; }
 		}
 
 	}

@@ -25,7 +25,9 @@ namespace AHH.User
         string buildingID { get; set; } //currently selected building to place
 		Player_Modes mode { get; set; }
 		Cursor cursor { get; set; }
-
+		
+		int energy { get; set; }
+	
 
 #if DEBUG
         Vector2 rect_dimensions = new Vector2(10, 10);
@@ -40,6 +42,7 @@ namespace AHH.User
 			mode = Player_Modes.Building;
             controls = new ControlMapper("Content/settings/controls.txt");
 			this.cursor = new Cursor(cursor);
+			this.energy = 1000;
         }
 
         public void Update(UiMaster master, MouseState ms )
@@ -79,6 +82,12 @@ namespace AHH.User
 		{
 			get { return cursor; }
 			set { cursor = value; }
+		}
+
+		public int Energy
+		{
+			get { return energy; }
+			set { energy = value; }
 		}
 
     }

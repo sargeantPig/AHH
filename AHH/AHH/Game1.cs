@@ -37,7 +37,7 @@ namespace AHH
 		{
 			graphics = new GraphicsDeviceManager(this);
 			Content.RootDirectory = "Content";
-			graphics.IsFullScreen = true;
+			//graphics.IsFullScreen = true;
 			Resolution.Init(ref graphics);
 			
 			rng = new Random(int.Parse(Guid.NewGuid().ToString().Substring(0, 8), System.Globalization.NumberStyles.HexNumber));
@@ -69,6 +69,8 @@ namespace AHH
 		protected override void LoadContent()
 		{
 			// Create a new SpriteBatch, which can be used to draw textures.
+			AiUnit.statusBarTexture = new Texture2D[] { Content.Load<Texture2D>(@"texture/ui/status_bar_bottom"), Content.Load<Texture2D>(@"texture/ui/status_bar_top")};
+			Building.statusBarTexture = new Texture2D[] { Content.Load<Texture2D>(@"texture/ui/status_bar_bottom"), Content.Load<Texture2D>(@"texture/ui/status_bar_top") };
 			BaseObject.DebugFont = Content.Load<SpriteFont>(@"fonts/debug");
 			spriteBatch = new SpriteBatch(GraphicsDevice);
 			Texture2D t_r = new Texture2D(GraphicsDevice, 1, 1);
@@ -97,8 +99,8 @@ namespace AHH
 
 			grid = new Grid(gridSize, new Vector2(0, 0), t_r, t_b, t_g, tileSize, @"Content/buildings/buildings.txt", @"Content/UI/ui_grid_menu.txt", Content);
             player = new Player(t_b);
-			os = new Overseer(Content);
-			architech = new Architech(Content);
+			os = new Overseer(Content, new Texture2D[] { t_r, t_g });
+			architech = new Architech(Content, grid);
 			uiMaster = new UiMaster(Content);
 			wizard = new Wizard(Content);
 		}
@@ -128,7 +130,7 @@ namespace AHH
 			player.Update(uiMaster, Mouse.GetState());
 			uiMaster.Update(player);
 			
-			grid.Update(player);
+			grid.Update(player, architech);
 			architech.Update(grid, uiMaster, player, gameTime);
 			os.Update(gameTime, player.Cursor, architech, grid, rng);
 			wizard.Update(gameTime, architech, os, uiMaster, grid, player);

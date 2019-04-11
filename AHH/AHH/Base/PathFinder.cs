@@ -9,6 +9,7 @@ namespace AHH.Base
 		ThreadStart th_offload { get; set; }
 		Thread th_child { get; set; }
 
+	
 		public OffloadThread()
 		{
 

@@ -2,14 +2,15 @@
 ##############################
 Type	Knight
 Sound	{sound_file}
-Texture	texture/unit/test_ai_spritesheet
-H_Texture	texture/unit/test_ai_spritesheet
-C_Texture	texture/unit/test_ai_spritesheet
-Projectile	texture/unit/test_ai_spritesheet
+Texture	texture/unit/test_ai_swordsman
+H_Texture	texture/unit/test_ai_swordsman
+C_Texture	texture/unit/test_ai_swordsman
+Projectile	texture/unit/test_ai_swordsman
 Animation
-Move, 0, 0, 100
-Attack, 1, 1, 100
-Think, 2, 2, 100
+Move, 1, 1, 100
+Attack, 2, 2, 100
+Think, 0, 0, 100
+Dead, 3, 3, 100
 
 Type	Priest
 Sound	{sound_file}
@@ -18,9 +19,10 @@ H_Texture	texture/unit/test_ai_priest
 C_Texture	texture/unit/test_ai_priest
 Projectile	texture/unit/test_ai_priest
 Animation
-Move, 0, 0, 100
-Attack, 1, 1, 100
-Think, 2, 2, 100
+Move, 1, 1, 100
+Attack, 2, 2, 100
+Think, 0, 0, 100
+Dead, 3, 3, 100
 
 Type	Archer
 Sound	{sound_file}
@@ -29,9 +31,10 @@ H_Texture	texture/unit/test_ai_archer
 C_Texture	texture/unit/test_ai_archer
 Projectile	texture/unit/test_ai_archer
 Animation
-Move, 0, 0, 100
-Attack, 1, 1, 100
-Think, 2, 2, 100
+Move, 1, 1, 100
+Attack, 2, 2, 100
+Think, 0, 0, 100
+Dead, 3, 3, 100
 
 Type	Horseman
 Sound	{sound_file}
@@ -40,6 +43,56 @@ H_Texture	texture/unit/test_ai_horse
 C_Texture	texture/unit/test_ai_horse
 Projectile	texture/unit/test_ai_horse
 Animation
-Move, 0, 0, 100
-Attack, 1, 1, 100
-Think, 2, 2, 100
+Move, 1, 1, 100
+Attack, 2, 2, 100
+Think, 0, 0, 100
+Dead, 3, 3, 100
+
+#############
+Type	Z_Knight
+Sound	{sound_file}
+Texture	texture/unit/test_ai_swordsman_zombie
+H_Texture	texture/unit/test_ai_swordsman_zombie
+C_Texture	texture/unit/test_ai_swordsman_zombie
+Projectile	texture/unit/test_ai_swordsman_zombie
+Animation
+Move, 1, 1, 100
+Attack, 2, 2, 100
+Think, 0, 0, 100
+Dead, 3, 3, 100
+
+Type	Z_Priest
+Sound	{sound_file}
+Texture	texture/unit/test_ai_priest_zombie
+H_Texture	texture/unit/test_ai_priest_zombie
+C_Texture	texture/unit/test_ai_priest_zombie
+Projectile	texture/unit/test_ai_priest_zombie
+Animation
+Move, 1, 1, 100
+Attack, 2, 2, 100
+Think, 0, 0, 100
+Dead, 3, 3, 100
+
+Type	Z_Archer
+Sound	{sound_file}
+Texture	texture/unit/test_ai_archer_zombie
+H_Texture	texture/unit/test_ai_archer_zombie
+C_Texture	texture/unit/test_ai_archer_zombie
+Projectile	texture/unit/test_ai_archer_zombie
+Animation
+Move, 1, 1, 100
+Attack, 2, 2, 100
+Think, 0, 0, 100
+Dead, 3, 3, 100
+
+Type	Z_Horseman
+Sound	{sound_file}
+Texture	texture/unit/test_ai_horse_zombie
+H_Texture	texture/unit/test_ai_horse_zombie
+C_Texture	texture/unit/test_ai_horse_zombie
+Projectile	texture/unit/test_ai_horse_zombie
+Animation
+Move, 1, 1, 100
+Attack, 2, 2, 100
+Think, 0, 0, 100
+Dead, 3, 3, 100

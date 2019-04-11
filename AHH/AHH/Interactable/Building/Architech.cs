@@ -10,6 +10,8 @@ using AHH.User;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
+using AHH.Extensions;
+using AHH.AI;
 
 namespace AHH.Interactable.Building
 {
@@ -22,13 +24,17 @@ namespace AHH.Interactable.Building
         string selectedBuilding;
         bool buildingPlaced { get; set; }
 
-        public Architech(ContentManager cm)
+		Point home { get; }
+
+        public Architech(ContentManager cm, Grid grid)
         {
             selectedBuilding = "";
             buildings = new Dictionary<Point, Building>();
             building_data = Parsers.Parsers.Parse_Stats<BuildingTypes, BuildingData>(@"Content\buildings\building_descr.txt");
             building_types = Parsers.Parsers.Parse_Types<BuildingTypes, Type_Data<BuildingTypes>>(@"Content\buildings\building_types.txt", cm);
-        }
+			home = new Point(25, 7);
+			PlaceBuilding(home, grid, BuildingTypes.NTower);
+		}
 
         public Dictionary<Point, Building> NearBuildings(Vector2 position, float range)
         {
@@ -50,16 +56,52 @@ namespace AHH.Interactable.Building
         public bool IsInRange(Dictionary<Corner, Vector2> corners, Point bID, float range)
         {
 
-            if (Vector2.Distance(corners[Corner.TopLeft], buildings[bID].Corners[Corner.TopLeft]) <= range * 64)
+            if (Vector2.Distance(corners[Corner.TopLeft], buildings[bID].Corners[Corner.TopLeft]) <= range * 32)
                 return true;
-            if (Vector2.Distance(corners[Corner.TopRight], buildings[bID].Corners[Corner.TopRight]) <= range * 64)
+            if (Vector2.Distance(corners[Corner.TopRight], buildings[bID].Corners[Corner.TopRight]) <= range * 32)
                 return true;
-            if (Vector2.Distance(corners[Corner.BottomLeft], buildings[bID].Corners[Corner.BottomLeft]) <= range * 64)
+            if (Vector2.Distance(corners[Corner.BottomLeft], buildings[bID].Corners[Corner.BottomLeft]) <= range * 32)
                 return true;
-            if (Vector2.Distance(corners[Corner.BottomRight], buildings[bID].Corners[Corner.BottomRight]) <= range * 64)
+            if (Vector2.Distance(corners[Corner.BottomRight], buildings[bID].Corners[Corner.BottomRight]) <= range * 32)
                 return true;
             return false;
-        }
+        }	
+
+		public Point GetGrave(Overseer os)
+		{
+			Point grave = new Point();
+
+			Dictionary<Point, WTuple<Point, Building, int>> temp = new Dictionary<Point, WTuple<Point, Building, int>>();
+
+			foreach (KeyValuePair<Point, Building> kv in buildings)
+			{
+				if (kv.Value.GetBuildingData().Type == BuildingTypes.Grave)
+					temp.Add(kv.Key, new WTuple<Point, Building, int>( kv.Key, kv.Value, 0));
+			}
+
+			if (temp.Count == 0)
+				return home;
+
+			foreach (Zombie zom in os.Zombies.Values)
+			{
+				if (temp.ContainsKey(zom.Home))
+					temp[zom.Home].Item3++;
+
+			}
+
+			int lowest = 100;
+
+			foreach(var t in temp)
+			{
+				if(t.Value.Item3 < lowest)
+				{
+					grave = t.Key;
+					lowest = t.Value.Item3;
+				}
+			}
+
+			return grave;
+		}
 
         public bool PlaceBuilding(Grid grid, BuildingTypes buildingID)
         {
@@ -72,8 +114,14 @@ namespace AHH.Interactable.Building
                 //add building to list
                 Building newBuilding = new Building(grid.GetTile(grid.SelectedTiles[0]).Position, building_data[buildingID][0], building_types[buildingID]);
                 newBuilding.InitAdjacent(grid);
-                newBuilding.GetChildren = new List<Point>(grid.SelectedTiles);
-                if (buildings.ContainsKey(grid.GetTile(grid.SelectedTiles[0]).Order))
+                newBuilding.GetChildren = new List<Point>();
+
+				foreach (Point p in grid.SelectedTiles)
+				{
+					newBuilding.GetChildren.Add(new Point(p.X, p.Y));
+				}
+
+				if (buildings.ContainsKey(grid.GetTile(grid.SelectedTiles[0]).Order))
                     return false;
                 grid.ChangeSelectedTilesState(TileStates.Limbo);
                 buildings.Add(grid.GetTile(grid.SelectedTiles[0]).Order, newBuilding);
@@ -83,9 +131,36 @@ namespace AHH.Interactable.Building
             else return false; // cannot build
         }
 
+		private bool PlaceBuilding(Point point, Grid grid, BuildingTypes buildingID)
+		{
+			//get tiles the building will encompass
+			grid.SelectTiles(point, new Point(building_data[buildingID][0].Size.X / 64, building_data[buildingID][0].Size.Y / 64));
+			
+			//check no tile is blocked return if true
+			if (grid.CheckBlocked())
+			{
+				//add building to list
+				Building newBuilding = new Building(grid.GetTile(grid.SelectedTiles[0]).Position, building_data[buildingID][0], building_types[buildingID]);
+				newBuilding.InitAdjacent(grid);
+				newBuilding.GetChildren = new List<Point>();
+				foreach (Point p in grid.SelectedTiles)
+				{
+					newBuilding.GetChildren.Add(new Point(p.X, p.Y));
+				}
+
+				if (buildings.ContainsKey(grid.GetTile(grid.SelectedTiles[0]).Order))
+					return false;
+				grid.ChangeSelectedTilesState(TileStates.Limbo);
+				buildings.Add(grid.GetTile(grid.SelectedTiles[0]).Order, newBuilding);
+				//buildingPlaced = true;
+				return true; //success
+			}
+			else return false; // cannot build
+		}
+
         public void BuildComplete(Building b, Grid grid)
         {
-            grid.SelectedTiles = b.GetChildren;
+            grid.SelectedTiles = new List<Point>(b.GetChildren);
             //set tiles found to blocked
             grid.ChangeSelectedTilesState(TileStates.Blocked);
 
@@ -94,12 +169,25 @@ namespace AHH.Interactable.Building
 
 		public bool Dismantle(Grid grid, Building b)
 		{
-			grid.SelectedTiles = b.GetChildren;
+			grid.SelectedTiles = new List<Point>(b.GetChildren);
 
 			
-			grid.ChangeSelectedTilesState(TileStates.Active);
+			 grid.ChangeSelectedTilesState(TileStates.Active);
 
 			return true;
+		}
+
+		public List<Point> CompileBuildingTiles()
+		{
+			List<Point> points = new List<Point>();
+			foreach (Building b in buildings.Values)
+			{
+				foreach (Point p in b.GetChildren)
+				{
+					points.Add(p);
+				}
+			}
+			return points;
 		}
 
 		public void SpellEffect(Spell spell)
@@ -151,8 +239,10 @@ namespace AHH.Interactable.Building
 		public void Draw(SpriteBatch sb, Player player, Grid grid)
 		{
 			foreach (Building b in buildings.Values)
+			{
 				b.Draw(sb);
-
+				b.Draw_Status(sb);
+			}
 			//draw ghost of building if in buildmode 
 			if (player.Mode == Player_Modes.Building)
 			{
@@ -181,5 +271,9 @@ namespace AHH.Interactable.Building
 			else return null;
 		}
 
+		public Point Home
+		{
+			get { return home; }
+		}
     }
 }

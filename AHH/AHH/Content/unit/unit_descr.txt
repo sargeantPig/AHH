@@ -1,20 +1,36 @@
 ##Units
 #Name	Swordsman
 #Type	Knight
-#Stats	{health, weaponType, armourType, baseDmg, range, hitDelay, luck, focus}
+#Stats	{health, weaponType, armourType, baseDmg, range, hitDelay, luck, focus, speed}
 
 Name	Swordsman
 Type	Knight
-Stats	2, Sword, Heavy, 4, 1, 1000, Trained, Aggressive
+Stats	200, Sword, Heavy, 4, 1, 1000, Trained, Aggressive, 0.5
 
 Name	Squire
 Type	Priest
-Stats	2, Spear, Heavy, 1, 2, 2000, Trained, Focused
+Stats	100, Spear, Heavy, 1, 2, 2000, Trained, Focused, 1
 
 Name	Bow
 Type	Archer
-Stats	2, Bow, Heavy, 4, 3, 2000, Trained, Hyper
+Stats	150, Bow, Heavy, 4, 3, 2000, Trained, Hyper, 0.9
 
 Name	pl
 Type	Horseman
-Stats	2, Bone, Heavy, 5, 1, 1500, Trained, Focused
+Stats	250, Bone, Heavy, 5, 1, 1500, Trained, Focused, 2.5
+
+Name	ZSwordsman
+Type	Z_Knight
+Stats	180, Sword, Heavy, 4, 1, 1000, Trained, Aggressive, 0.5
+
+Name	ZSquire
+Type	Z_Priest
+Stats	80, Spear, Heavy, 1, 2, 2000, Trained, Focused, 1
+
+Name	ZBow
+Type	Z_Archer
+Stats	130, Bow, Heavy, 4, 3, 2000, Trained, Hyper, 0.9
+
+Name	Zpl
+Type	Z_Horseman
+Stats	230, Bone, Heavy, 5, 1, 1500, Trained, Focused, 2.5

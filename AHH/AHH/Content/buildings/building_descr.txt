@@ -6,4 +6,8 @@
 
 Name	Wall
 Type	Wall
-Stats	100, 0, Reinforced, 10000, 100, 128, 128
+Stats	100, 0, Reinforced, 100, 100, 128, 128
+
+Name	Necromancer Tower
+Type	NTower
+Stats	1000, 0, Reinforced, 100, 100000, 128, 128

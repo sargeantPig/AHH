@@ -1,0 +1,59 @@
+﻿##Research Tree
+#List research in ascending order 
+#ButtonName - links the research to a button
+#research name - name of research
+#cost
+#research types list of modifiers (these are percentages, so 0.10 would increase something by 10%)
+#ZHealth
+#ZSpeed
+#ZDamage
+#WHealth
+#WProduct
+#WCost
+#SPower
+#SLength
+#SSpeed
+
+ButtonName	R1
+ResearchName	Quick Bone
+Cost	100
+Researchables
+ZSpeed	0.10
+
+ResearchName	Necrotic Rage
+Cost	100
+Researchables
+ZSpeed	0.05
+ZDamage	0.10
+
+ResearchName	Body Maggots
+Cost	100
+Researchables
+ZHealth	0.25
+ZDamage	0.10
+
+ResearchName	Unholy Bones
+Cost	100
+Researchables
+ZSpeed	0.20
+ZDamage	0.20
+ZHeatlh	0.20
+
+ResearchName	Minions Of Death
+Cost	100
+Researchables
+ZSpeed	0.50
+ZDamage	1
+ZHealth 2
+
+ButtonName	R2
+ResearchName	VersatileWalls
+Cost	100
+Researchables
+WHealth	0.50
+
+ButtonName	R3
+ResearchName	Spell Potency
+Cost	100
+Researchables
+SPower	0.50

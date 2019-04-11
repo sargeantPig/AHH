@@ -5,9 +5,11 @@ using System.Text;
 using System.Threading.Tasks;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework;
+using AHH.AI;
 
 namespace AHH.Extensions
 {
+
 	public static class Extensions
 	{
 		public static Vector2 DirectionTo(this Vector2 from, Vector2 to)
@@ -103,7 +105,10 @@ namespace AHH.Extensions
 		{
 			return (a + b) / 2;
 		}
+
+		
 	}
+
 	public class WTuple<t1, t2, t3>
 	{
 		t1 Item_1 { get; set; }

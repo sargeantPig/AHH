@@ -34,7 +34,7 @@ namespace AHH.Interactable.Spells
 		{
 			foreach (KeyValuePair<int, Spell> kv in castedSpells)
 			{
-				kv.Value.Update(gt, arch, os);
+				kv.Value.Update(gt, arch, os, grid);
 
 				if (kv.Value.State == Spell_States.Dead)
 					deadSpells.Add(kv.Key);

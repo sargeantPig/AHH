@@ -10,10 +10,14 @@ using AHH.Base;
 using AHH.UI;
 using AHH.Extensions;
 using System.Threading;
+using AHH.UI.Elements;
+
 namespace AHH.Interactable.Building
 {
 	class Building : InteractableMovingSprite
 	{
+		public static Texture2D[] statusBarTexture;
+
 		int cost { get; set; }
 		Dictionary<Corner, Vector2> corners { get; set; }
 		List<Vector2> adjacentTiles { get; set; }
@@ -22,10 +26,12 @@ namespace AHH.Interactable.Building
 
 		BuildingData data;
 		Type_Data<BuildingTypes> type;
-        BuildingData stats;
+        BuildingData stats { get; set; }
         BuildingStates state { get; set; }
-
         float b_elasped = 0;
+
+		StatusBar statusBar;
+
 		public Building(Vector2 position, BuildingData bd, Type_Data<BuildingTypes> bt)
 			: base(position, bd.Size, bt.Texture, bt.H_texture, bt.C_texture, 0, bt.Animations)
 		{
@@ -36,6 +42,7 @@ namespace AHH.Interactable.Building
             this.stats = bd;
             base.CurrentState = "Building";
             CalculateCorners();
+			statusBar = new StatusBar(new Point(bd.Size.X, bd.Size.Y/5), (int)stats.Health, statusBarTexture);
 		}
 
 		public Building()
@@ -57,6 +64,8 @@ namespace AHH.Interactable.Building
 		{
 			base.Update(ms, gt);
 
+			statusBar.Update(data.Health);
+			statusBar.UpdatePosition(Position);
             switch (state)
             {
                 case BuildingStates.Building:
@@ -211,9 +220,14 @@ namespace AHH.Interactable.Building
 
             foreach (Vector2 v in adjacentTiles)
             {
-                sb.Draw(Texture, new Rectangle((int)v.X, (int)v.Y, 64, 64), Color.White);
+                //sb.Draw(Texture, new Rectangle((int)v.X, (int)v.Y, 64, 64), Color.White);
             }
         }
+
+		public void Draw_Status(SpriteBatch sb)
+		{
+			statusBar.Draw(sb, null);
+		}
 
         public List<Point> GetChildren
         {

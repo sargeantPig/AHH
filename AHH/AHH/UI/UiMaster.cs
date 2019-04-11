@@ -90,6 +90,13 @@ namespace AHH.UI
 			action_queue.RemoveAt(0);
 		}
 
+		public void ManipulateElements()
+		{
+
+
+
+		}
+
 		public ButtonFunction NextAction
 		{
 			get {

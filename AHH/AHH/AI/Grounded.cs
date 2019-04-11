@@ -13,46 +13,40 @@ namespace AHH.AI
 	class Grounded : AiUnit
 	{
 		int pathAttempts = 0;
-		bool wait { get; set; }
-		Point destination = new Point(10, 10);
+		protected bool wait { get; set; }
+		protected Point destination = new Point(10, 10);
 		Point defenderID = new Point();
-		Ai_States nextState = Ai_States.Thinking;
-		Vector2 prevPos = new Vector2();
+        Guid attackerID = new Guid();
+		protected Ai_States nextState = Ai_States.Thinking;
+		protected Vector2 prevPos = new Vector2();
 		float hitElasped = 0;
 
-		Dictionary<Corner, Vector2> corners = new Dictionary<Corner, Vector2>() {
-
-			{Corner.TopLeft, new Vector2() },
-			{Corner.TopRight, new Vector2() },
-			{Corner.BottomLeft, new Vector2() },
-			{Corner.BottomRight, new Vector2() }
-
-
-		};
-
-		public Grounded(Vector2 position, Point rectExtends, float speed, Type_Data<Ai_Type> types, Stats stats, Grid grid)
-			: base(position, rectExtends, speed, types.Animations, stats, types, grid)
+		public Grounded(Vector2 position, Point rectExtends, Type_Data<Ai_Type> types, Stats stats, Grid grid)
+			: base(position, rectExtends, stats.Speed, types.Animations, stats, types, grid)
 		{
            
 		}
 
-		public void CalculateCorners()
-		{
-			//clear to recalculate
-			corners[Corner.TopLeft] =  new Vector2(Position.X, Position.Y);
-			corners[Corner.TopRight] = new Vector2(Position.X + size.X, Position.Y);
-			corners[Corner.BottomLeft] = new Vector2(Position.X, Position.Y + size.Y);
-			corners[Corner.BottomRight] = new Vector2(Position.X + size.X, Position.Y + size.Y);
-		}
-
-
 		public void Update(Cursor ms, GameTime gt, Architech arch, Grid grid, Random rng, Overseer os)
 		{
 			base.Update(gt);
+			base.Update();
 			CalculateCorners();
 
-			if (Ai_States == Ai_States.Dead)
+			GetFreeCorners(grid);
+
+			if (Ai_States == Ai_States.Retaliating)
+			{
+				Fighting(os, gt, rng);
+				CurrentState = "Attack";
 				return;
+			}
+			if (Ai_States == Ai_States.Dead)
+			{
+				CurrentState = "Dead";
+				return;
+			}
+				
 
 			if (grid.CheckPositions(new List<Vector2>() { Position }).Count == 0)
 			{
@@ -69,7 +63,7 @@ namespace AHH.AI
 
 			if (arch.GetBuilding(defenderID) != null)
 			{
-				if (arch.IsInRange(corners, defenderID, (float)Stats.Range) && nextState == Ai_States.Attacking)
+				if (arch.IsInRange(Corners, defenderID, (float)Stats.Range) && nextState == Ai_States.Attacking)
 				{
 					Ai_States = Ai_States.Attacking;
 				}
@@ -98,7 +92,7 @@ namespace AHH.AI
 						
 			if (arch.GetBuilding(defenderID) != null)
 			{
-				if (arch.IsInRange(corners, defenderID, (float)Stats.Range))
+				if (arch.IsInRange(Corners, defenderID, (float)Stats.Range))
 				{
 					if (hitElasped >= Stats.HitDelay)
 					{
@@ -116,7 +110,47 @@ namespace AHH.AI
 			}
 		}
 
-		void Moving( )
+		void Fighting(Overseer os, GameTime gt, Random rng)
+		{
+			if (os.Zombies.ContainsKey(attackerID))
+			{
+				if (os.Zombies[attackerID].Ai_States != Ai_States.Dead)
+				{
+					if (!os.ZIsInRange(Corners, attackerID, (float)Stats.Range))
+					{
+						Ai_States = Ai_States.Thinking;
+					}
+
+					else
+					{
+						Ai_States = Ai_States.Retaliating;
+
+						hitElasped += gt.ElapsedGameTime.Milliseconds;
+
+						if (hitElasped >= Stats.HitDelay)
+						{
+							hitElasped = 0;
+							os.Combat<Grounded>(this, (Grounded)os.Zombies[attackerID], rng);
+						}
+					}
+
+				}
+				else { nextState = Ai_States.Thinking; Ai_States = Ai_States.Thinking; }
+
+			}
+			else { nextState = Ai_States.Thinking; Ai_States = Ai_States.Thinking; }
+
+
+		}
+
+		public void Retaliate(Guid atkid)
+        {
+			this.attackerID = atkid;
+			Ai_States = Ai_States.Retaliating;
+        }
+
+
+		protected void Moving( )
 		{
 			if (WayPoints.Count == 0)
 			{
@@ -130,7 +164,7 @@ namespace AHH.AI
 
 		}
 
-		void Think(Architech arch, Grid grid, Random rng)
+		protected  void Think(Architech arch, Grid grid, Random rng)
 		{
 
 			//Work out preffered action - taking into account hp and focus.
@@ -149,6 +183,7 @@ namespace AHH.AI
 			{
 				case Focus.Focused:
 					//nextState = Ai_States.Thinking;
+					destination = Grid.ToGridPosition(arch.GetBuilding(arch.Home).AdjacentTiles[0], Grid.GetTileSize);
 					Think_Pathing(grid);
 					break;
 				case Focus.Aggressive:
@@ -220,7 +255,7 @@ namespace AHH.AI
 			else { Ai_States = Ai_States.Thinking; Ai_States = nextState = Ai_States.Thinking; }
 		}
 
-		void Think_Pathing(Grid grid)
+		protected void Think_Pathing(Grid grid)
 		{
 			WayPoints.Clear();
 
@@ -237,7 +272,7 @@ namespace AHH.AI
 				wait = false;
 				WayPoints = CalculateWayPoints(PFResult);
 
-                if (grid.CheckPositions(WayPoints).Count != WayPoints.Count) //theres a break in a waypoint
+				if (grid.CheckPositions(WayPoints).Count != WayPoints.Count) //theres a break in a waypoint
                 {
 					PFResult = null;
 					nextState = Ai_States.Thinking;
@@ -246,20 +281,23 @@ namespace AHH.AI
                 }
                  
                 else Ai_States = Ai_States.Moving;
+				//Ai_States = Ai_States.Moving;
                 //Pathfinder = null;
 			}
 			else
 			{
-				if (!GetPath(grid, Position, destination))
+				int counter = 0;
+				if (!GetPath(grid, freeCorners[0], destination))
 				{
 					CheckActivity();
 					pathAttempts++;
 				}
-				else wait = false;
+
+				else { wait = false; pathAttempts = 0; }
 
 				wait = true;
 
-				if (pathAttempts > 5)
+				if (pathAttempts > 20)
 				{
 					pathAttempts = 0;
 					Ai_States = Ai_States.Thinking;
@@ -296,7 +334,7 @@ namespace AHH.AI
 
 		}
 
-		Dictionary<Focus, int> PrefferedAction()
+		protected Dictionary<Focus, int> PrefferedAction()
 		{
 
 			Dictionary<Focus, int> focusPoints = new Dictionary<Focus, int>()

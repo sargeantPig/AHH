@@ -38,7 +38,7 @@ namespace AHH.Base
 			{
 				for (int x = 0; x < dimensions.X; x++)
 				{
-					tiles[x, y] = new Tile(new Vector2(x * tileSize.X, (y * tileSize.Y) + position.Y), texture, t_highlighted, t_clicked, tileSize, new Point(x, y));
+					tiles[x, y] = new Tile(new Vector2(x * tileSize.X, (y * tileSize.Y) + position.Y), t_highlighted, texture, t_clicked, tileSize, new Point(x, y));
 				}
 			}
 		}
@@ -117,7 +117,7 @@ namespace AHH.Base
 			return sanitized;
 		}
 
-		public void Update(Player player)
+		public void Update(Player player, Architech arch)
 		{
 			base.Update(player.Cursor);
 
@@ -127,6 +127,46 @@ namespace AHH.Base
 				if (tile.IsClicked || (player.Cursor.isRightPressed && tile.IsHighlighted))
 					SelectTile(tile.Order);
 			}
+
+			//CheckTiles(arch.CompileBuildingTiles());
+		}
+
+		void CheckTiles(List<Point> points)
+		{
+			for (int x = 0; x < tiles.GetLength(0); x++)
+			{
+				for (int y = 0; y < tiles.GetLength(1); y++)
+				{
+					if (points.FindIndex(z => z.X == new Point(x, y).X && z.Y == new Point(x, y).Y) > -1)
+					{
+						tiles[x, y].State = TileStates.Blocked;
+					}
+					else tiles[x, y].State = TileStates.Active;
+				}
+			}
+
+		}
+
+		public Vector2 Closest_Active_Tile(Vector2 pos)
+		{
+			float distance = int.MaxValue;
+			Vector2 p = new Vector2();
+			foreach (Tile t in tiles)
+			{
+				if (t.State == TileStates.Active)
+				{
+					var tempdis = Vector2.Distance(Position, t.Position);
+					if (tempdis < distance)
+					{
+						distance = tempdis;
+						p = t.Position;
+					}
+				}
+
+			}
+
+			return p;
+
 		}
 
 		public Tile GetTile(Point point)
@@ -159,8 +199,8 @@ namespace AHH.Base
 			List<Point> done = new List<Point>();
 			List<Point> check = new List<Point>();
 
-			if (this.GetTile(start).State == TileStates.Blocked)
-				return TileStates.Blocked;
+			//if (this.GetTile(start).State == TileStates.Blocked)
+				//return TileStates.Blocked;
 			if (this.GetTile(finish).State == TileStates.Blocked)
 				return TileStates.Blocked;
 
@@ -268,7 +308,7 @@ namespace AHH.Base
                 for (int x = 0; x < dimensions.X; x++)
                 {
                     tiles[x, y].Draw(sb);
-                    tiles[x, y].Draw_Debug(sb);
+                    //tiles[x, y].Draw_Debug(sb);
                 }
             }
 

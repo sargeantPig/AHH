@@ -33,7 +33,7 @@ namespace AHH.Interactable.Spells
 			CurrentState = "Main";
 		}
 
-		public void Update(GameTime gt, Architech arch, Overseer os)
+		public void Update(GameTime gt, Architech arch, Overseer os, Grid grid)
 		{
 			elaspedAlive += gt.ElapsedGameTime.Milliseconds;
 			elaspedTick += gt.ElapsedGameTime.Milliseconds;
@@ -41,7 +41,7 @@ namespace AHH.Interactable.Spells
 			if (elaspedTick >= stats.Tick && state == Spell_States.Alive)
 			{
 				arch.SpellEffect(this);
-				os.SpellEffect(this);
+				os.SpellEffect(this, grid, arch );
 				elaspedTick = 0;
 			}
 
