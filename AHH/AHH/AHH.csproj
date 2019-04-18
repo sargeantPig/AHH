@@ -63,6 +63,7 @@
     <Compile Include="AI\Grounded.cs" />
     <Compile Include="AI\Mounted.cs" />
     <Compile Include="AI\Overseer.cs" />
+    <Compile Include="AI\Projectile.cs" />
     <Compile Include="AI\Zombie.cs" />
     <Compile Include="Base\PathFinder.cs" />
     <Compile Include="Base\Objects\AnimatedSprite.cs" />
@@ -104,6 +105,7 @@
     <Compile Include="UI\Elements\Strip.cs" />
     <Compile Include="UI\Elements\Text.cs" />
     <Compile Include="UI\UiMaster.cs" />
+    <Compile Include="User\Options.cs" />
     <Compile Include="User\Player.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

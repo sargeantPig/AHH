@@ -44,6 +44,11 @@ namespace AHH.Base
 			return size;
 		}
 
+		public Vector2 Center
+		{
+			get { return new Vector2(Position.X + (size.X / 2), Position.Y + (size.Y / 2)); }
+		}
+
 		new public StaticSprite DeepCopy()
 		{
 			BaseObject b = base.DeepCopy();
@@ -54,6 +59,8 @@ namespace AHH.Base
 			s.Position = new Vector2(b.Position.X, b.Position.Y);
 			return s;
 		}
+
+
 	}
 
 }

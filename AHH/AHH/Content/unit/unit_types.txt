@@ -29,7 +29,7 @@ Sound	{sound_file}
 Texture	texture/unit/test_ai_archer
 H_Texture	texture/unit/test_ai_archer
 C_Texture	texture/unit/test_ai_archer
-Projectile	texture/unit/test_ai_archer
+Projectile	texture/unit/projectile
 Animation
 Move, 1, 1, 100
 Attack, 2, 2, 100
@@ -78,7 +78,7 @@ Sound	{sound_file}
 Texture	texture/unit/test_ai_archer_zombie
 H_Texture	texture/unit/test_ai_archer_zombie
 C_Texture	texture/unit/test_ai_archer_zombie
-Projectile	texture/unit/test_ai_archer_zombie
+Projectile	texture/unit/projectile
 Animation
 Move, 1, 1, 100
 Attack, 2, 2, 100

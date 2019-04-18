@@ -9,6 +9,7 @@ namespace AHH.Base
 	{
 		Point order { get; }
 		TileStates state { get; set; }
+		TileStates previous_state { get; set; }
 		Point parent { get; set; }
 		List<Point> children { get; set; }
 
@@ -64,6 +65,12 @@ namespace AHH.Base
 		public TileStates State
 		{
 			get { return state; }
+			set { state = value; }
+		}
+
+		public TileStates PreviousState
+		{
+			get { return previous_state; }
 			set { state = value; }
 		}
 

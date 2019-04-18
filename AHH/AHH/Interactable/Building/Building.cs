@@ -11,6 +11,7 @@ using AHH.UI;
 using AHH.Extensions;
 using System.Threading;
 using AHH.UI.Elements;
+using AHH.User;
 
 namespace AHH.Interactable.Building
 {
@@ -28,10 +29,9 @@ namespace AHH.Interactable.Building
 		Type_Data<BuildingTypes> type;
         BuildingData stats { get; set; }
         BuildingStates state { get; set; }
-        float b_elasped = 0;
-
 		StatusBar statusBar;
-
+		float temp_health;
+		float temp_cost = 0;
 		public Building(Vector2 position, BuildingData bd, Type_Data<BuildingTypes> bt)
 			: base(position, bd.Size, bt.Texture, bt.H_texture, bt.C_texture, 0, bt.Animations)
 		{
@@ -43,6 +43,8 @@ namespace AHH.Interactable.Building
             base.CurrentState = "Building";
             CalculateCorners();
 			statusBar = new StatusBar(new Point(bd.Size.X, bd.Size.Y/5), (int)stats.Health, statusBarTexture);
+			this.temp_health = this.GetBuildingData().Health;
+			this.GetBuildingData().Health = 1;
 		}
 
 		public Building()
@@ -60,46 +62,82 @@ namespace AHH.Interactable.Building
 			adjThread.Th_Child.Start();
 		}
 
-		public void Update(Cursor ms, GameTime gt, Architech arch, Grid grid)
+		public void Update(Player player, GameTime gt, Architech arch, Grid grid, List<Rectangle> units)
 		{
-			base.Update(ms, gt);
+			base.Update(player.Cursor, gt);
 
 			statusBar.Update(data.Health);
 			statusBar.UpdatePosition(Position);
+
+			
             switch (state)
             {
                 case BuildingStates.Building:
-                    Build(gt, arch, grid);
+                    Build(gt, arch, grid, units, player);
                     break;
                 case BuildingStates.Disabled:
                     break;
                 case BuildingStates.Production:
-                    Produce();
+                    Produce(player, gt);
                     break;
             }
 
+
 		}
 
-        void Build(GameTime gt, Architech arch, Grid grid)
+		void Build(GameTime gt, Architech arch, Grid grid, List<Rectangle> units, Player player)
         { 
-            b_elasped += gt.ElapsedGameTime.Milliseconds;
-            if (b_elasped >= stats.BuildTime)
-            {
-                //finish building
-                state = BuildingStates.Production; //start producing 
-                arch.BuildComplete(this, grid);
-                base.CurrentState = "Production";
+			bool impassable = false;
+
+			foreach (Rectangle rect in units)
+			{
+				if (this.Box.Intersects(rect))
+				{
+					impassable = true;
+					break;
+				}
+			}
+
+            if (Options.GetTick && !impassable && player.Energy > 0)
+			{
+
+				if (temp_cost < GetBuildingData().Cost )
+				{
+					temp_cost += 1;
+					var pct = Extensions.Extensions.PercentAofB(temp_cost, GetBuildingData().Cost) / 100;
+					GetBuildingData().Health = pct * temp_health;
+					player.IncreaseEnergy -= 1;
+				}
+
+				else
+				{
+					this.GetBuildingData().Health = temp_health;
+					//finish building
+					state = BuildingStates.Production; //start producing 
+					arch.BuildComplete(this, grid);
+					base.CurrentState = "Production";
+				}
             }
 
             else
             {
-                //minus resources from pool while building
+                
             }
 
         }
 
-        void Produce()
-        { }
+        void Produce(Player p, GameTime gt)
+        {
+			if (Options.GetTick)
+			{
+				p.IncreaseEnergy += (int)stats.Production;
+
+				if (p.Energy <= 0)
+					GetBuildingData().Health -= 0.1f;
+
+			}
+
+		}
 
 
 		public void CalculateCorners()
@@ -220,9 +258,12 @@ namespace AHH.Interactable.Building
 
             foreach (Vector2 v in adjacentTiles)
             {
-                //sb.Draw(Texture, new Rectangle((int)v.X, (int)v.Y, 64, 64), Color.White);
+                sb.Draw(Texture, new Rectangle((int)v.X, (int)v.Y, 64, 64), Color.White);
+
             }
-        }
+
+			sb.Draw(Texture, Box, Color.Red);
+		}
 
 		public void Draw_Status(SpriteBatch sb)
 		{
@@ -238,6 +279,11 @@ namespace AHH.Interactable.Building
 		public ref BuildingData GetBuildingData()
 		{
 			return ref data;
+		}
+
+		public BuildingStates State
+		{
+			get { return state; }
 		}
 
 	}

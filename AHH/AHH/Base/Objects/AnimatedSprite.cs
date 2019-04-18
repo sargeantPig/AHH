@@ -70,6 +70,12 @@ namespace AHH.Base
 			sb.Draw(base.Texture, base.Position, Source, Color.White);
 		}
 
+		public void Draw_Debug(SpriteBatch sb)
+		{
+			sb.Draw(Texture, Box, Color.Red);
+
+		}
+
 		public void AddState(string key, Vector3 newState)
 		{
 			States.Add(key, newState);

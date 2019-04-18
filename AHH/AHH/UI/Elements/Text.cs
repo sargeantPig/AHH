@@ -17,12 +17,12 @@ namespace AHH.UI
 
 		public void Draw(SpriteBatch sb)
 		{
-			sb.DrawString(DebugFont, value, Position, Color.Black);
+			sb.DrawString(DebugFont, value, Position, colour);
 		}
 
 		public void Draw(SpriteBatch sb, Vector2 position)
 		{
-			sb.DrawString(DebugFont, value, position, Color.Black);
+			sb.DrawString(DebugFont, value, position, colour);
 		}
 
 		public string Value

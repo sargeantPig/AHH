@@ -45,6 +45,12 @@ namespace AHH.Extensions
 
 			return closest;
 		}
+		public static T GetRandom<T>(this List<T> list, Random rng)
+		{
+			var rnd = rng.Next(0, list.Count);
+			return list[rnd];
+
+		}
 		public static List<Vector2> GetEdges(this Vector2[,] shape)
 		{
 			List<Vector2> edges = new List<Vector2>();
@@ -83,7 +89,6 @@ namespace AHH.Extensions
 
 			return a;
 		}
-
 		public static T RandomFlag<T>(Random rnd, int min, int max)
 		{
 			Array flags = Enum.GetValues(typeof(T));
@@ -91,7 +96,6 @@ namespace AHH.Extensions
 
 			return a;
 		}
-
 		public static Matrix_ ToMatrix(this Vector2 vec)
 		{
 			Matrix_ m = new Matrix_(new Vector2[,] {
@@ -100,12 +104,27 @@ namespace AHH.Extensions
 			});
 			return m;
 		}
-
 		public static float Midpoint(float a, float b)
 		{
 			return (a + b) / 2;
 		}
+		public static WTuple<Vector2, Point, int> GetLowestValue(this List<WTuple<Vector2, Point, int>> tuple)
+		{
+			var temp = new WTuple<Vector2, Point, int>(tuple.First());
+			int counter = int.MaxValue;
 
+			foreach (var tup in tuple)
+			{
+				if (tup.Item3 <= counter)
+				{
+					counter = tup.Item3;
+					temp = new WTuple<Vector2, Point, int>(tup);
+				}
+			}
+
+			return temp;
+
+		}
 		
 	}
 
@@ -120,6 +139,13 @@ namespace AHH.Extensions
 			this.Item_1 = Item_1;
 			this.Item_2 = Item_2;
 			this.Item_3 = Item_3;
+
+		}
+		public WTuple(WTuple<t1, t2, t3> wtuple)
+		{
+			this.Item_1 = wtuple.Item1;
+			this.Item_2 = wtuple.Item2;
+			this.Item_3 = wtuple.Item3;
 
 		}
 

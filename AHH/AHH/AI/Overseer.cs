@@ -11,6 +11,8 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using AHH.Interactable.Building;
 using AHH.Interactable.Spells;
+using AHH.User;
+
 namespace AHH.AI
 {
 	//sets up and manages AIs, including creation and deleting.
@@ -35,12 +37,11 @@ namespace AHH.AI
 			statusBarTextures = statusBars;
 		}
 
-		public void Update(GameTime gt, Cursor ms, Architech arch, Grid grid, Random rng)
+		public void Update(GameTime gt, Cursor ms, Architech arch, Grid grid, Player p, Random rng)
 		{
 
 			if (arch.BuildingPlaced)
 			{
-
 				foreach (Ai ai in ais.Values)
 				{
 					if (ai.Ai_States != Ai_States.Attacking && ai.Ai_States != Ai_States.Dead)
@@ -51,8 +52,10 @@ namespace AHH.AI
 							((Grounded)ai).Wait = false;
 							((Grounded)ai).PFResult = null;
 						}
-						ai.Ai_States = Ai_States.Thinking;
+						ai.Ai_States = Ai_States.Target;
 					}
+					
+
 				}
 			}
 
@@ -69,8 +72,13 @@ namespace AHH.AI
 					{
 						ai.Ai_States = Ai_States.Dead;
 					}
+					else if (ai.Ai_States == Ai_States.Dead)
+					{
+						if (Options.GetTick)
+							p.IncreaseEnergy += 1;
+					}
 					/*if (ai.IsZombie && ai.Health <= 0)
-						remove_queue.Add(ai.AID);*/
+					remove_queue.Add(ai.AID);*/
 				}
 			}
 
@@ -164,8 +172,11 @@ namespace AHH.AI
 						break;
 				}
 
-				final_dmg += attacker.Stats.BaseDamage;
+				if (d.State == BuildingStates.Building)
+					final_dmg *= 2;
 
+				final_dmg += attacker.Stats.BaseDamage;
+				
 				d.GetBuildingData().Health -= final_dmg;
 			}
 
@@ -216,16 +227,47 @@ namespace AHH.AI
 
 		}
 
+		public Dictionary<Point, object> GetUnitPoints()
+		{
+			Dictionary<Point, object> points = new Dictionary<Point, object>();
+			foreach (Ai ai in ais.Values)
+			{
+				foreach (Vector2 corn in ai.Corners.Values)
+				{
+					if(!points.ContainsKey(Grid.ToGridPosition(corn, Grid.GetTileSize)))
+						points.Add(Grid.ToGridPosition(corn, Grid.GetTileSize), new object());
+
+				}
+
+			}
+
+			return points;
+
+		}
+
+		public List<Rectangle> GetUnitRects()
+		{
+			List<Rectangle> rects = new List<Rectangle>();
+
+			foreach (Ai ai in ais.Values)
+			{
+				rects.Add(ai.Box);
+			}
+
+			return rects;
+
+		}
+
 		public bool IsInRange(Dictionary<Corner, Vector2> corners, Guid id, float range)
 		{
 
-			if (Vector2.Distance(corners[Corner.TopLeft], ais[id].Corners[Corner.TopLeft]) <= range * 32)
+			if (Vector2.Distance(corners[Corner.TopLeft], ais[id].Corners[Corner.TopRight]) <= range * 32)
 				return true;
-			if (Vector2.Distance(corners[Corner.TopRight], ais[id].Corners[Corner.TopRight]) <= range * 32)
+			if (Vector2.Distance(corners[Corner.TopRight], ais[id].Corners[Corner.BottomLeft]) <= range * 32)
 				return true;
-			if (Vector2.Distance(corners[Corner.BottomLeft], ais[id].Corners[Corner.BottomLeft]) <= range * 32)
+			if (Vector2.Distance(corners[Corner.BottomLeft], ais[id].Corners[Corner.BottomRight]) <= range * 32)
 				return true;
-			if (Vector2.Distance(corners[Corner.BottomRight], ais[id].Corners[Corner.BottomRight]) <= range * 32)
+			if (Vector2.Distance(corners[Corner.BottomRight], ais[id].Corners[Corner.TopLeft]) <= range * 32)
 				return true;
 			return false;
 		}
@@ -293,13 +335,14 @@ namespace AHH.AI
 
 			foreach (Ai ai in ais.Values)
 			{
-				/*if (ai is Grounded)
-					((Grounded)ai).Draw(sb);*/
+				//if (ai is Grounded)
+					//((Grounded)ai).Draw(sb);
 			}
 
 			foreach (Ai ai in ais.Values)
 			{
 				ai.Draw(sb);
+				//ai.Draw_Debug(sb);
 				switch (ai.Ai_States)
 				{
 					case Ai_States.Moving:
@@ -308,7 +351,7 @@ namespace AHH.AI
 					case Ai_States.Attacking:
 						attack++;
 						break;
-					case Ai_States.Thinking:
+					case Ai_States.Idle:
 						think++;
 						break;
 

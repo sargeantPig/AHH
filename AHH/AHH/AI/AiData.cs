@@ -11,10 +11,13 @@ namespace AHH.AI
 	enum Ai_States
 	{
 		Moving,
-		Thinking,
 		Attacking,
         Retaliating,
 		Resurrecting,
+		Pursue,
+		Idle,
+		Target,
+		Thinking,
 		Dead
 	}
 
@@ -67,6 +70,7 @@ namespace AHH.AI
 
 	interface Ai
 	{
+		void Draw_Debug(SpriteBatch sb);
 		float Health { get; set; }
 		void SetAttacker(ref AiUnit attacker);
 		AiUnit GetAttacker();
@@ -80,6 +84,8 @@ namespace AHH.AI
 		Guid AID { get; }
 		ref Stats GetStats();
 		Dictionary<Corner, Vector2> Corners { get; }
+		List<Vector2> WayPoints { get; set; }
+		Rectangle Box { get; set; }
 	}
 
 	struct Stats

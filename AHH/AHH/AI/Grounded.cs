@@ -12,15 +12,15 @@ namespace AHH.AI
 {
 	class Grounded : AiUnit
 	{
-		int pathAttempts = 0;
+		protected int pathAttempts = 0;
 		protected bool wait { get; set; }
 		protected Point destination = new Point(10, 10);
 		Point defenderID = new Point();
         Guid attackerID = new Guid();
-		protected Ai_States nextState = Ai_States.Thinking;
+		protected Ai_States nextState = Ai_States.Idle;
 		protected Vector2 prevPos = new Vector2();
 		float hitElasped = 0;
-
+		bool keepTarget = false;
 		public Grounded(Vector2 position, Point rectExtends, Type_Data<Ai_Type> types, Stats stats, Grid grid)
 			: base(position, rectExtends, stats.Speed, types.Animations, stats, types, grid)
 		{
@@ -32,84 +32,210 @@ namespace AHH.AI
 			base.Update(gt);
 			base.Update();
 			CalculateCorners();
-
 			GetFreeCorners(grid);
 
-			if (Ai_States == Ai_States.Retaliating)
+			foreach (var proj in projectile.Values)
 			{
-				Fighting(os, gt, rng);
-				CurrentState = "Attack";
-				return;
+				if (arch.GetBuilding(defenderID) != null)
+					proj.Update(arch.GetBuilding(defenderID).Center, this);
 			}
+
 			if (Ai_States == Ai_States.Dead)
-			{
-				CurrentState = "Dead";
 				return;
-			}
-				
 
-			if (grid.CheckPositions(new List<Vector2>() { Position }).Count == 0)
-			{
-				Position = prevPos;
-				var nearCheck = arch.NearBuildings(Position, 1f);
-				if (arch.NearBuildings(Position, 1f).Count != 0 && Ai_States == Ai_States.Thinking)
-				{
-					Ai_States = Ai_States.Attacking;
-					defenderID = nearCheck.Keys.ElementAt(0);
-					Attacking(os, arch, gt, rng);
-					return;
-				}
-			}
-
-			if (arch.GetBuilding(defenderID) != null)
-			{
-				if (arch.IsInRange(Corners, defenderID, (float)Stats.Range) && nextState == Ai_States.Attacking)
-				{
-					Ai_States = Ai_States.Attacking;
-				}
-			}
-
-			if (wait)
-			{
-				Think_Pathing(grid);
-				return;
-			}
+			CheckTarget(arch);
 
 			switch (Ai_States)
 			{
-				case Ai_States.Thinking: CurrentState = "Think"; Think(arch, grid, rng); break;
-				case Ai_States.Resurrecting: Ressurect(); break;
-				case Ai_States.Moving: CurrentState = "Move"; Moving(); break;
-				case Ai_States.Attacking: CurrentState = "Attack"; Attacking(os, arch, gt, rng); break;
+				case Ai_States.Idle:
+					if (wait)
+						Think_Pathing(grid, rng);
+					else if (PFResult != null)
+						Think_Pathing(grid, rng);
+					return;
+				case Ai_States.Target: EasyGetTarget(arch, grid, rng); //can go to idle or move
+					break;
+				case Ai_States.Moving: Moving(arch, grid); // can go to idle or attacking
+					break;
+				case Ai_States.Attacking: Attacking(os, arch, gt, rng); // can go to idle or target
+					break;
+				case Ai_States.Dead:
+					return;
+
 			}
 
 			prevPos = Position;
 		}
 
-		void Attacking(Overseer os, Architech arch, GameTime gt, Random rng)
+		protected void Idle(Architech arch, Grid grid, Random rng)
+		{
+			//decide whether to move or find a target
+			//move or acquire a target
+			Focus focus = Think(rng);
+
+			switch (focus)
+			{
+				case Focus.Aggressive: Ai_States = Ai_States.Moving;
+					break;
+				case Focus.Focused: Ai_States = Ai_States.Target;
+					break;
+				case Focus.Hyper: Ai_States = Ai_States.Moving;
+					break;
+				case Focus.Violent: Ai_States = Ai_States.Target;
+					break;
+			}
+
+		}
+
+		protected void Moving(Architech arch, Grid grid)
+		{
+			if (WayPoints.Count > 0)
+				Moving();
+		}
+
+		protected void Moving()
+		{
+			bool reached = MoveTo(WayPoints[0]);
+			if (reached)
+				WayPoints.RemoveAt(0);
+		}
+
+		protected void Attacking(Overseer os, Architech arch, GameTime gt, Random rng)
 		{
 			hitElasped += gt.ElapsedGameTime.Milliseconds;
-						
+
+			if (CheckTarget(arch))
+			{
+				if (hitElasped >= Stats.HitDelay)
+				{
+					os.Combat(this, arch.GetBuilding(defenderID), rng);
+					hitElasped = 0;
+					Projectile p = new Projectile(Position, new Point(16, 16), data.Projectile, 5);
+					projectile.Add( p.ID, p );
+				}
+			}
+
+		}
+
+		void EasyGetTarget(Architech arch, Grid grid, Random rng)
+		{
+			if (!keepTarget)
+			{
+				var buildings = arch.GetBuildings;
+				var focus = Think(rng);
+				int index = 0;
+				switch (focus)
+				{
+					case Focus.Focused:
+						index = rng.Next((int)(buildings.Count * 0.8), buildings.Count);
+						break;
+					case Focus.Hyper:
+						index = rng.Next(0, (int)(buildings.Count * 0.3));
+						break;
+					case Focus.Aggressive:
+						index = rng.Next((int)(buildings.Count * 0.3), buildings.Count);
+						break;
+					case Focus.Violent:
+						index = rng.Next(0, (int)(buildings.Count * 0.1));
+						break;
+				}
+
+				KeyValuePair<Point, Building> building = buildings.ToList()[index];
+				var edges = building.Value.AdjacentTiles;
+
+				if (edges == null)
+				{
+					defenderID = Point.Zero;
+					return; }
+
+				destination = Grid.ToGridPosition(edges.GetRandom(rng), Grid.GetTileSize);
+				defenderID = building.Key;
+			}
+
+			else
+			{
+				Building building = arch.GetBuilding(defenderID);
+				var edges = building.AdjacentTiles;
+
+				if (edges == null)
+				{
+					defenderID = Point.Zero;
+					return; }
+
+				destination = Grid.ToGridPosition(edges.GetRandom(rng), Grid.GetTileSize);
+			}
+
+			Ai_States = Ai_States.Idle;
+			Think_Pathing(grid, rng);
+		}
+
+		protected void AcquireTarget(Architech arch, Grid grid, bool newTarget, Random rng)
+		{
+			if (newTarget)
+			{
+				PFResult = null;
+				if (Stats.Focus == Focus.Focused && rng.Next(0, 10) > 5)
+				{
+					
+					defenderID = arch.Home;
+					var home = arch.GetBuilding(defenderID);
+					var edges = home.AdjacentTiles;
+					if (edges == null)
+					{
+						Ai_States = Ai_States.Idle;
+						return;
+					}
+					var dest = edges.GetRandom(rng);
+					destination = Grid.ToGridPosition(dest, Grid.GetTileSize);
+				}
+
+
+				else {
+					var building = arch.NearBuilding(Position, 1000);
+					var edges = building.Value.AdjacentTiles;
+
+					if (edges == null)
+					{
+						Ai_States = Ai_States.Idle;
+						return;
+					}
+					var dest = edges.GetRandom(rng);
+					destination = Grid.ToGridPosition(dest, Grid.GetTileSize);
+					defenderID = building.Key;
+
+				}
+			}
+
+			if (Think_Pathing(grid, rng))
+				Ai_States = Ai_States.Thinking;
+
+			if (pathAttempts >= maxPattempts)
+			{
+				wait = false;
+				pathAttempts = 0;
+				Ai_States = Ai_States.Target;
+				p_wait = true;
+			}
+		}
+
+		bool CheckTarget(Architech arch)
+		{
 			if (arch.GetBuilding(defenderID) != null)
 			{
 				if (arch.IsInRange(Corners, defenderID, (float)Stats.Range))
 				{
-					if (hitElasped >= Stats.HitDelay)
-					{
-						os.Combat(this, arch.GetBuilding(defenderID), rng);
-						hitElasped = 0;
-					}
+					Ai_States = Ai_States.Attacking;
+					return true;
 				}
+				else if (WayPoints.Count == 0)
+				{ Ai_States = Ai_States.Target;  keepTarget = !keepTarget;}
+			}
 
-				else { nextState = Ai_States.Thinking; Ai_States = Ai_States.Thinking; }
-			}
-			else
-			{
-				nextState = Ai_States.Thinking;
-				Ai_States = Ai_States.Thinking;
-			}
+			else { Ai_States = Ai_States.Target; defenderID = new Point(); WayPoints.Clear(); keepTarget = false; }
+
+			return false;
 		}
-
+		
 		void Fighting(Overseer os, GameTime gt, Random rng)
 		{
 			if (os.Zombies.ContainsKey(attackerID))
@@ -118,7 +244,7 @@ namespace AHH.AI
 				{
 					if (!os.ZIsInRange(Corners, attackerID, (float)Stats.Range))
 					{
-						Ai_States = Ai_States.Thinking;
+						Ai_States = Ai_States.Idle;
 					}
 
 					else
@@ -131,14 +257,17 @@ namespace AHH.AI
 						{
 							hitElasped = 0;
 							os.Combat<Grounded>(this, (Grounded)os.Zombies[attackerID], rng);
+
+							var p = new Projectile(Position, new Point(16, 16), data.Projectile, 5);
+							projectile.Add(p.ID, p);
 						}
 					}
 
 				}
-				else { nextState = Ai_States.Thinking; Ai_States = Ai_States.Thinking; }
+				else { Ai_States = Ai_States.Idle; }
 
 			}
-			else { nextState = Ai_States.Thinking; Ai_States = Ai_States.Thinking; }
+			else { Ai_States = Ai_States.Idle; }
 
 
 		}
@@ -149,24 +278,8 @@ namespace AHH.AI
 			Ai_States = Ai_States.Retaliating;
         }
 
-
-		protected void Moving( )
+		protected Focus Think(Random rng)
 		{
-			if (WayPoints.Count == 0)
-			{
-				Ai_States = nextState;
-				return;
-			}
-
-			bool reached = MoveTo(WayPoints[0]);
-			if (reached)
-				WayPoints.RemoveAt(0);
-
-		}
-
-		protected  void Think(Architech arch, Grid grid, Random rng)
-		{
-
 			//Work out preffered action - taking into account hp and focus.
 			var points = PrefferedAction();
 
@@ -179,136 +292,63 @@ namespace AHH.AI
 
 			int choice = rng.Next(0, bag.Count);
 
-			switch (bag[choice])
-			{
-				case Focus.Focused:
-					//nextState = Ai_States.Thinking;
-					destination = Grid.ToGridPosition(arch.GetBuilding(arch.Home).AdjacentTiles[0], Grid.GetTileSize);
-					Think_Pathing(grid);
-					break;
-				case Focus.Aggressive:
-					nextState = Ai_States.Thinking;
-					PFResult = null; Think_Forward(grid);
-					break;
-				case Focus.Hyper:
-					nextState = Ai_States.Thinking;
-					PFResult = null;
-					break;
-				case Focus.Violent:
-					nextState = Ai_States.Attacking;
-					PFResult = null; Think_Violence(arch, grid,rng);
-					break;
-
-			}
-
-            bag.Clear();
+			return bag[choice];
 		}
 
-		void Think_Violence(Architech arch, Grid grid, Random rng)
-		{
-
-			WayPoints.Clear();
-			//check if buildings are nearby if path is blocke
-			Dictionary<Point, Building> near = arch.NearBuildings(Position, 5);
-			Vector2 closestBuildingPos = new Vector2(int.MaxValue, int.MaxValue);
-			float min = 99999;
-
-			if (near.Count == 0)
-			{
-				Ai_States = Ai_States.Thinking;
-				return;
-			}
-
-			Building temp = new Building();
-			foreach (KeyValuePair<Point, Building> kv in near)
-			{
-				float dis = Vector2.Distance(Position, kv.Value.Position);
-
-				if (dis < min && kv.Value.AdjacentTiles != null)
-				{
-					min = dis;
-					temp = kv.Value;
-					defenderID = kv.Key;
-					closestBuildingPos = kv.Value.Position;
-				}
-			}
-
-			if (closestBuildingPos.X != int.MaxValue)
-			{
-				//get adjacent points
-				List<Vector2> edges = temp.AdjacentTiles;
-
-				edges = new List<Vector2>(grid.CheckPositions(edges));
-
-				if (edges == null || edges.Count == 0)
-				{
-					Ai_States = Ai_States.Thinking;
-					return;
-				}
-
-				Vector2 closestEdge = Position.ClosestVector(edges);
-				destination = Grid.ToGridPosition(edges[rng.Next(0, edges.Count - 1)], Grid.GetTileSize);
-				//destination = Grid.ToGridPosition(closestEdge, Grid.GetTileSize);
-				Think_Pathing(grid);
-			}
-
-			else { Ai_States = Ai_States.Thinking; Ai_States = nextState = Ai_States.Thinking; }
-		}
-
-		protected void Think_Pathing(Grid grid)
+		protected bool Think_Pathing(Grid grid, Random rng)
 		{
 			WayPoints.Clear();
 
 			if (PFResult != null)
 			{
+				wait = false;
 				if (PFResult.GetType() == typeof(TileStates))
 				{
-					wait = false;
-					nextState = Ai_States.Thinking;
-					Ai_States = Ai_States.Thinking;
-					return;
+					PFResult = null;
+					Ai_States = Ai_States.Idle;
+					WayPoints.Clear();
+					p_wait = true;
+					return false;
 				}
 
-				wait = false;
-				WayPoints = CalculateWayPoints(PFResult);
+				WayPoints = CalculateWayPoints(PFResult, rng);
 
 				if (grid.CheckPositions(WayPoints).Count != WayPoints.Count) //theres a break in a waypoint
-                {
+				{
 					PFResult = null;
-					nextState = Ai_States.Thinking;
-                    Ai_States = Ai_States.Thinking;
-                    WayPoints.Clear();
-                }
-                 
-                else Ai_States = Ai_States.Moving;
-				//Ai_States = Ai_States.Moving;
-                //Pathfinder = null;
+					Ai_States = Ai_States.Idle;
+					WayPoints.Clear();
+					p_wait = true;
+					return false;
+				}
+
+				else
+				{
+					PFResult = null;
+					p_wait = false;
+					Ai_States = Ai_States.Moving;
+					return true;
+				}
 			}
-			else
+			else if(freeCorners.Count > 0)
 			{
-				int counter = 0;
 				if (!GetPath(grid, freeCorners[0], destination))
 				{
 					CheckActivity();
 					pathAttempts++;
 				}
 
-				else { wait = false; pathAttempts = 0; }
+				else {
+					wait = false; pathAttempts = 0;
+					return true; }
 
 				wait = true;
-
-				if (pathAttempts > 20)
-				{
-					pathAttempts = 0;
-					Ai_States = Ai_States.Thinking;
-					nextState = Ai_States.Thinking;
-					wait = false;
-				}
 			}
 
+			return false; 
 		}
 
-		void Think_Forward(Grid grid)
+		void Forward(Grid grid, Architech arch)
 		{
 			WayPoints.Clear();
 			//check if can move forward
@@ -322,14 +362,12 @@ namespace AHH.AI
 				if (nextTile.State != TileStates.Blocked && nextTile.State != TileStates.Immpassable)
 					a_nextLocation = nextTile.Position;
 				WayPoints.Add(a_nextLocation);
-				nextState = Ai_States.Thinking;
 				Ai_States = Ai_States.Moving;
 			}
 
 			else
 			{
-
-				Ai_States = Ai_States.Thinking;
+				Ai_States = Ai_States.Idle;
 			}
 
 		}
@@ -345,12 +383,6 @@ namespace AHH.AI
 				{ Focus.Violent, 0}
 			};
 
-			//0 = focused
-			//1 = aggressive
-			//2 = hyper
-			//3 = violent
-
-			//gather focus points
 			switch (Stats.Focus)
 			{
 				case Focus.Focused:
@@ -442,11 +474,6 @@ namespace AHH.AI
 			return focusPoints;
 		}
 
-		void Ressurect()
-		{
-
-		}
-
 		new public void Draw(SpriteBatch sb)
 		{
 			foreach (Vector2 v in WayPoints)
@@ -458,7 +485,6 @@ namespace AHH.AI
 		{
 			set { wait = value; }
 		}
-
 		
 	}
 }

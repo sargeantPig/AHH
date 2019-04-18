@@ -6,8 +6,16 @@
 
 Name	Wall
 Type	Wall
-Stats	100, 0, Reinforced, 100, 100, 128, 128
+Stats	1000, -2, Reinforced, 100, 300, 128, 128
 
 Name	Necromancer Tower
 Type	NTower
-Stats	1000, 0, Reinforced, 100, 100000, 128, 128
+Stats	10000, 5, Reinforced, 100, 500, 128, 128
+
+Name	Grave
+Type	Grave
+Stats	50, -5, Reinforced, 100, 300, 64, 64
+
+Name	Energy Conduit
+Type	EnergyConduit
+Stats	100, 10, Reinforced, 100, 1000, 64, 64

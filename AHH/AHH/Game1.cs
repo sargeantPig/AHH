@@ -37,19 +37,13 @@ namespace AHH
 		{
 			graphics = new GraphicsDeviceManager(this);
 			Content.RootDirectory = "Content";
-			//graphics.IsFullScreen = true;
+			graphics.IsFullScreen = false;
 			Resolution.Init(ref graphics);
 			
 			rng = new Random(int.Parse(Guid.NewGuid().ToString().Substring(0, 8), System.Globalization.NumberStyles.HexNumber));
 			
 		}
 
-		/// <summary>
-		/// Allows the game to perform any initialization it needs to before starting to run.
-		/// This is where it can query for any required services and load any non-graphic
-		/// related content.  Calling base.Initialize will enumerate through any components
-		/// and initialize them as well.
-		/// </summary>
 		protected override void Initialize()
 		{
 			// TODO: Add your initialization logic here
@@ -57,15 +51,11 @@ namespace AHH
 			tileSize.Y = 64;//graphics.PreferredBackBufferWidth / (gridSize.X);
 
 			Resolution.SetVirtualResolution(1920, 1080);
-			Resolution.SetResolution(graphics.GraphicsDevice.Viewport.Width, graphics.GraphicsDevice.Viewport.Height, graphics.IsFullScreen);
+			Resolution.SetResolution(1920*2, 720*2, graphics.IsFullScreen);
 
 			base.Initialize();
 		}
 
-		/// <summary>
-		/// LoadContent will be called once per game and is the place to load
-		/// all of your content.
-		/// </summary>
 		protected override void LoadContent()
 		{
 			// Create a new SpriteBatch, which can be used to draw textures.
@@ -98,7 +88,7 @@ namespace AHH
 			}
 
 			grid = new Grid(gridSize, new Vector2(0, 0), t_r, t_b, t_g, tileSize, @"Content/buildings/buildings.txt", @"Content/UI/ui_grid_menu.txt", Content);
-            player = new Player(t_b);
+            player = new Player(t_b, new Point(1900, 50), new Texture2D[] {Content.Load<Texture2D>(@"texture/ui/healthbar_bottom"), Content.Load<Texture2D>(@"texture/ui/healthbar_top")});
 			os = new Overseer(Content, new Texture2D[] { t_r, t_g });
 			architech = new Architech(Content, grid);
 			uiMaster = new UiMaster(Content);
@@ -124,19 +114,22 @@ namespace AHH
 			if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
 				Exit();
 
-            // TODO: Add your update logic here
-            player.Input.KB = Keyboard.GetState();
+			// TODO: Add your update logic here
 
+			Options.Update(gameTime);
+            player.Input.KB = Keyboard.GetState();
 			player.Update(uiMaster, Mouse.GetState());
 			uiMaster.Update(player);
-			
-			grid.Update(player, architech);
-			architech.Update(grid, uiMaster, player, gameTime);
-			os.Update(gameTime, player.Cursor, architech, grid, rng);
+			grid.Update(player, architech, os);
+			architech.Update(grid, uiMaster, player, gameTime, os.GetUnitRects());
+			os.Update(gameTime, player.Cursor, architech, grid, player, rng);
 			wizard.Update(gameTime, architech, os, uiMaster, grid, player);
 
             player.Input.KBP = player.Input.KB;
 			player.Cursor.prevState = player.Cursor.GetState;
+
+			if(Options.GetTick)
+				player.UpdateEnergy();
 			base.Update(gameTime);
 		}
 

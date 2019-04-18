@@ -24,8 +24,9 @@ namespace AHH.Base
 			Vector2 direction = Extensions.Extensions.DirectionTo(Position, destination);
 			if (Position != destination)
 			{
-
-				Position += direction * (Speed * Velocity);
+				var temp = direction * (Speed * Velocity).X;
+				temp = new Vector2((float)Math.Round(temp.X), (float)Math.Round(temp.Y));
+				Position += temp;
 
 				if (distance < 2)
 				{
@@ -49,7 +50,7 @@ namespace AHH.Base
 
 		public Vector2 UpdateBox
 		{
-			set { Box = new Rectangle((int)value.X, (int)value.Y, Box.X, Box.Y); }
+			set { Box = new Rectangle((int)value.X, (int)value.Y, Box.Width, Box.Height); }
 		}
 
 		public Vector2 GetVelocity

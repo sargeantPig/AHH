@@ -15,6 +15,8 @@ using AHH.Parsers;
 using AHH.Extensions;
 using System.Threading;
 using AHH.Interactable.Building;
+using AHH.AI;
+
 namespace AHH.Base
 {
 	class Grid : InteractableStaticSprite
@@ -64,6 +66,13 @@ namespace AHH.Base
 					selectedTiles.Add(new Point(x, y));
 				}
 			}
+		}
+
+		public void SelectTiles(List<Point> tiles)
+		{
+			selectedTiles.Clear();
+			foreach (Point p in tiles)
+				selectedTiles.Add(p);
 		}
 
 		public void SelectTile(Point point)
@@ -117,15 +126,27 @@ namespace AHH.Base
 			return sanitized;
 		}
 
-		public void Update(Player player, Architech arch)
+		public void Update(Player player, Architech arch, Overseer os)
 		{
 			base.Update(player.Cursor);
+
+			Dictionary<Point, object> unitpoints = os.GetUnitPoints();
 
 			foreach (Tile tile in tiles)
 			{
 				tile.Update(player.Cursor);
 				if (tile.IsClicked || (player.Cursor.isRightPressed && tile.IsHighlighted))
 					SelectTile(tile.Order);
+
+				/*if (unitpoints.ContainsKey(new Point(tile.Order.X, tile.Order.Y)))
+				{
+					if(tile.State != TileStates.Immpassable)
+						tile.PreviousState = tile.State;
+					tile.State = TileStates.Immpassable;
+
+				}
+				else if(tile.State != TileStates.Blocked ) tile.State = tile.PreviousState;
+					*/		
 			}
 
 			//CheckTiles(arch.CompileBuildingTiles());
@@ -208,12 +229,13 @@ namespace AHH.Base
 			int counter = 0;
 			grid[check[0].X, check[0].Y].Item3 = counter;
 			counter++;
+			List<WTuple<Vector2, Point, int>> toCheck = new List<WTuple<Vector2, Point, int>>();
 			while (check.Count > 0)
 			{
 				//check all around the tile and assign a counter
 				Vector2 max = new Vector2(check[0].X + 1, check[0].Y + 1);
 				Vector2 min = new Vector2(check[0].X - 1, check[0].Y - 1);
-
+				
 
 				if (check[0].X + 1 >= dimensions.X)
 					max.X = dimensions.X - 1;
@@ -244,12 +266,22 @@ namespace AHH.Base
 							else if (tiles[x, y].State == TileStates.Active || tiles[x, y].State == TileStates.Limbo)
 							{
 								grid[x, y].Item2 = TileStates.Active;
+								float distance = Vector2.Distance(grid[x, y].Item1, grid[finish.X, finish.Y].Item1);
+								float score = distance + 1;
 								grid[x, y].Item3 = grid[check[0].X, check[0].Y].Item3 + 1;
-								check.Add(new Point(x, y));
+								toCheck.Add(new WTuple<Vector2, Point, int>(grid[x, y].Item1, new Point(x, y), (int)score));
 							}
 						}
 					}
 				}
+
+				if (toCheck.Count > 0)
+				{
+					var v = toCheck.GetLowestValue();
+					check.Add(v.Item2);
+					toCheck.RemoveAt(toCheck.FindIndex(x => x.Item2 == v.Item2));
+				}
+
 
 				done.Add(check[0]);
 
@@ -265,7 +297,7 @@ namespace AHH.Base
 
 			done.Clear();
 
-			return null;
+			return TileStates.Blocked;
 		}
 
 		static public Point ToGridPosition(Vector2 position, Point size)

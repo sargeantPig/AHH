@@ -12,7 +12,7 @@ namespace AHH.Base
 		Guid id { get; set; }
 		Vector2 position { get; set; }
 
-		public BaseObject() { this.id = new Guid(); }
+		public BaseObject() { this.id = Guid.NewGuid(); }
 
 		public BaseObject(Vector2 position) { this.id = Guid.NewGuid(); this.position = position; }
 

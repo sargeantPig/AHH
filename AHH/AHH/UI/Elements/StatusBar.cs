@@ -20,7 +20,9 @@ namespace AHH.UI.Elements
 
 		int currentValue;
 		int maxValue;
-		public StatusBar(Point size, int maxValue, Texture2D[] textures)
+
+		Text text;
+		public StatusBar(Point size, int maxValue, Texture2D[] textures, Text text = null)
 		{
 			this.b_size = size;
 			t_size = b_size;
@@ -28,15 +30,25 @@ namespace AHH.UI.Elements
 			currentValue = maxValue;
 			bottom = textures[0];
 			top = textures[1];
+			if(text != null)
+				this.text = new Text(Position + new Vector2(bottom.Width /2, top.Height /2), text.Value, text.Colour);
 		}
 
 		public void Update(float value)
 		{
+			MathHelper.Clamp(value, 0, maxValue);
+
 			currentValue = (int)value.PercentAofB(maxValue);
+
 
 			if (currentValue == 100)
 			{
 				currentValue = t_size.X;
+				if (text != null)
+				{
+					text.Value = value.ToString() + "/" + maxValue.ToString();
+					text.Position = Position + new Vector2(bottom.Width / 2, top.Height / 2);
+				}
 				return;
 			}
 
@@ -47,6 +59,12 @@ namespace AHH.UI.Elements
 				currentValue = t_size.X - (int)temp;
 			}
 			else currentValue = 0;
+
+			if (text != null)
+			{
+				text.Value = value.ToString() + "/" + maxValue.ToString();
+				text.Position = Position + new Vector2(bottom.Width / 2, top.Height / 2);
+			}
 		}
 
 		public void UpdatePosition(Vector2 position)
@@ -67,7 +85,11 @@ namespace AHH.UI.Elements
 			{
 				sb.Draw(textures[0], new Rectangle(Position.ToPoint(), b_size), Color.White);
 				sb.Draw(textures[1], new Rectangle(Position.ToPoint(), new Point(currentValue)), new Rectangle(0, 0, t_size.X, t_size.Y), Color.White);
+				
 			}
+
+			if (text != null)
+				text.Draw(sb);
 		}
 
 		public void Draw(SpriteBatch sb)

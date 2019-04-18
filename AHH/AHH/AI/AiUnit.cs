@@ -18,58 +18,107 @@ namespace AHH.AI
 		Stats stats;
 		float real_health { get; set; }
 		Ai_States ai_State { get; set; }
-		OffloadThread pathfinder { get; set; }
+		static OffloadThread[] pathfinder { get; set; }
 		bool isZombie { get; set; }
 		List<Vector2> waypoints { get; set; }
 		object pf_result { get; set; }
 		Dictionary<Corner, Vector2> corners { get; set; }
-		const float waitMax = 1;
-		static float elasped = 0;
+		static protected float waitMax = 100;
+		protected float elasped = 0;
+		protected bool p_wait = false;
 		StatusBar statusBar;
+		protected Dictionary<Guid, Projectile> projectile = new Dictionary<Guid, Projectile>();
+		protected List<Guid> removeProj_queue = new List<Guid>();
+
+		protected int maxPattempts = 10000;
 
 		protected List<Vector2> freeCorners = new List<Vector2>();
 
+		protected int pathfinderID = -1;
+
+		protected Type_Data<Ai_Type> data;
 		public AiUnit(Vector2 position, Point rectExtends, float speed, Dictionary<string, Vector3> states, Stats stats, Type_Data<Ai_Type> unit_types, Grid grid)
 			: base(position, rectExtends, unit_types.Texture, unit_types.H_texture, unit_types.C_texture, speed, states)
 		{
 			this.stats = stats;
 			real_health = this.stats.Health;
 			waypoints = new List<Vector2>();
-			ai_State = Ai_States.Thinking;
+			ai_State = Ai_States.Target;
 			corners = new Dictionary<Corner, Vector2>();
 			
 			pf_result = null;
 			statusBar = new StatusBar(new Point(rectExtends.X, rectExtends.Y/ 5), (int)stats.Health, statusBarTexture);
-			
+			pathfinder = new OffloadThread[4];
+			data = unit_types;
 		}
 
 		public void Update()
 		{
 			statusBar.Update(stats.Health);
 			statusBar.UpdatePosition(Position);
+
+			foreach (KeyValuePair<Guid, Projectile> g in projectile)
+			{
+				if(!g.Value.Alive)
+					removeProj_queue.Add(g.Key);
+			}
+				
+			foreach (Guid g in removeProj_queue)
+				projectile.Remove(g);
 		}
 
 		public bool GetPath(Grid grid, Vector2 position, Point destination)
 		{
-			if (pathfinder == null)
+			if (pathfinderID == -1)
 			{
-				elasped = 0;
+				for (int x = 0; x < pathfinder.Length; x++)
+				{
+					if (pathfinder[x] == null)
+					{
+						elasped = 0;
 
-				pathfinder = new OffloadThread();
-				Pathfinder.Th_Offload = new ThreadStart(() => {
-					this.pf_result = grid.Pathfinder(Grid.ToWorldPosition(destination, Grid.GetTileSize), Position);
-				});
+						pathfinder[x] = new OffloadThread();
+						pathfinder[x].Th_Offload = new ThreadStart(() =>
+						{
+							this.pf_result = grid.Pathfinder(Grid.ToWorldPosition(destination, Grid.GetTileSize), Position);
+						});
 
-                Pathfinder.Th_Child = new Thread(Pathfinder.Th_Offload);
-                //Console.WriteLine("Pathfinder Starting " + DateTime.Now.ToString("h:mm:ss"));
-				pathfinder.Th_Child.Start();
-				return true;
+						pathfinder[x].Th_Child = new Thread(pathfinder[x].Th_Offload);
+						Console.WriteLine("Pathfinder Starting " + x.ToString() + ": " + DateTime.Now.ToString("h:mm:ss"));
+						pathfinder[x].Th_Child.Start();
+						pathfinderID = x;
+						return true;
+					}
+				}
+
 			}
 
-			else return false;
+			else if (pathfinderID > -1)
+			{
+				if (pathfinder[pathfinderID] == null)
+				{
+					elasped = 0;
+
+					pathfinder[pathfinderID] = new OffloadThread();
+					pathfinder[pathfinderID].Th_Offload = new ThreadStart(() =>
+					{
+						this.pf_result = grid.Pathfinder(Grid.ToWorldPosition(destination, Grid.GetTileSize), Position);
+					});
+					Console.WriteLine("Pathfinder Starting " + pathfinderID.ToString() + ": " + DateTime.Now.ToString("h:mm:ss"));
+					pathfinder[pathfinderID].Th_Child = new Thread(pathfinder[pathfinderID].Th_Offload);
+					//Console.WriteLine("Pathfinder Starting " + DateTime.Now.ToString("h:mm:ss"));
+					pathfinder[pathfinderID].Th_Child.Start();
+					return true;
+				}
+
+				else {return false; }
+
+
+			}
+
+			pathfinderID = -1;
+			return false;
 		}
-
-
 
 		public void CalculateCorners()
 		{
@@ -83,6 +132,7 @@ namespace AHH.AI
 
 		protected void GetFreeCorners(Grid grid)
 		{
+			freeCorners.Clear();
 			foreach (Vector2 v in Corners.Values)
 			{
 				if (grid.GetTile(Grid.ToGridPosition(v, Grid.GetTileSize)).State == TileStates.Blocked)
@@ -102,7 +152,7 @@ namespace AHH.AI
 			statusBar.Draw(sb, textures);
 		}
 
-		protected List<Vector2> CalculateWayPoints(object grid)
+		protected List<Vector2> CalculateWayPoints(object grid, Random rng)
 		{
 			WTuple<Vector2, TileStates, int>[,] _grid = ((WTuple<Vector2, TileStates, int>[,])grid);
 			List<Vector2> points = new List<Vector2>();
@@ -149,11 +199,11 @@ namespace AHH.AI
 				
 				int trueMaxY = MathHelper.Clamp(current.Y + 1, current.Y, maxy);
 
+				List<Vector2> lfound = new List<Vector2>();
+				List<Point> pfound = new List<Point>();
+
 				for (int x = (int)min.X; x <= max.X; x++)
 				{
-					if (found)
-						break;
-
 					for (int y = (int)min.Y; y <= max.Y; y++)
 					{
 						if (x != current.X || y != current.Y)
@@ -161,28 +211,45 @@ namespace AHH.AI
 							if (_grid[x, y].Item3 < _grid[current.X, current.Y].Item3)
 							{
 								next = new Vector2(_grid[x, y].Item1.X + (size.X/2), _grid[x, y].Item1.Y + (size.Y/2));
-								current = new Point(x, y);
-								points.Add(next);
-								found = true;
-								break;
+								pfound.Add(new Point(x, y));
+								lfound.Add(next);
 							}
 						}
-						if (found)
-							break;
 					}
 				}
+
+				var rnd = rng.Next(0, lfound.Count);
+
+				if (isZombie)
+					points.Add(lfound[0]);
+				else
+					points.Add(lfound[rnd]);
+				current = pfound[rnd];
 			}
 
 			return points;
 		}
 
+		new public void Draw(SpriteBatch sb)
+		{
+			base.Draw(sb);
+
+			foreach (var proj in projectile.Values)
+			{
+				proj.Draw(sb);
+			}
+		}
+
 		protected void CheckActivity()
 		{
-			if (pathfinder != null)
+
+			if (pathfinderID < 0)
+				return;
+			if (pathfinder[pathfinderID] != null)
 			{
-				if (!pathfinder.Th_Child.IsAlive)
+				if (!pathfinder[pathfinderID].Th_Child.IsAlive)
 				{
-					Pathfinder_ = null;
+					pathfinder[pathfinderID] = null;
 				}
 			}
 		}
@@ -231,13 +298,13 @@ namespace AHH.AI
 			set { ai_State = value; }
 		}
 
-		public OffloadThread Pathfinder
+		public OffloadThread[] Pathfinder
 		{
 			get { return pathfinder; }
 			set { pathfinder = value; }
 		}
 
-		public OffloadThread Pathfinder_
+		public OffloadThread[] Pathfinder_
 		{
 			get { return pathfinder; }
 			set { pathfinder = value; }
