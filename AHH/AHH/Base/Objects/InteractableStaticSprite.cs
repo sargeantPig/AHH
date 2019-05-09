@@ -29,11 +29,11 @@ namespace AHH.Base
 			if (Box.Contains(mouse.GetRealPosition))
 			{
 				isHighlighted = true;
-				if (mouse.GetState.LeftButton == ButtonState.Pressed)
-					isClicked = true;
+                if (mouse.GetState.LeftButton == ButtonState.Pressed && mouse.GetState != mouse.prevState)
+                    isClicked = true;
+                else IsClicked = false;
 			}
 			else { isHighlighted = false; isClicked = false; }
-
 
 		}
 

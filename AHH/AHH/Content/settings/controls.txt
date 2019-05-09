@@ -5,3 +5,6 @@
 HotKey_Build	B
 HotKey_Research	R
 HotKey_Spells	S
+HotKey_Cycle_Forward	F
+HotKey_Cycle_Backward	D
+HotKey_Demolish	E

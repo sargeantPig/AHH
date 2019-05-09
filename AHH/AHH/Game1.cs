@@ -13,6 +13,8 @@ using AHH.User;
 using AHH.AI;
 using AHH.Interactable.Building;
 using AHH.Interactable.Spells;
+using AHH.Research;
+
 namespace AHH
 {
 	/// <summary>
@@ -31,8 +33,12 @@ namespace AHH
 		Overseer os;
 		UiMaster uiMaster;
 		Architech architech;
+        Researcher researcher;
 		Wizard wizard;
-		int num = 0;
+        int num = 0;
+		StaticSprite backdrop;
+		StaticSprite terrain;
+		StaticSprite light;
 		public Game1()
 		{
 			graphics = new GraphicsDeviceManager(this);
@@ -51,7 +57,7 @@ namespace AHH
 			tileSize.Y = 64;//graphics.PreferredBackBufferWidth / (gridSize.X);
 
 			Resolution.SetVirtualResolution(1920, 1080);
-			Resolution.SetResolution(1920*2, 720*2, graphics.IsFullScreen);
+			Resolution.SetResolution(1920, 1080, graphics.IsFullScreen);
 
 			base.Initialize();
 		}
@@ -87,13 +93,20 @@ namespace AHH
 				points[i] = new Vector2(rng.Next(0, 600), rng.Next(0, 600));
 			}
 
-			grid = new Grid(gridSize, new Vector2(0, 0), t_r, t_b, t_g, tileSize, @"Content/buildings/buildings.txt", @"Content/UI/ui_grid_menu.txt", Content);
+
+
+			grid = new Grid(gridSize, new Vector2(0, 0), Content.Load<Texture2D>(@"texture/tile_n"), Content.Load<Texture2D>(@"texture/tile_h"), Content.Load<Texture2D>(@"texture/tile_c"), tileSize, @"Content/buildings/buildings.txt", @"Content/UI/ui_grid_menu.txt", Content);
             player = new Player(t_b, new Point(1900, 50), new Texture2D[] {Content.Load<Texture2D>(@"texture/ui/healthbar_bottom"), Content.Load<Texture2D>(@"texture/ui/healthbar_top")});
 			os = new Overseer(Content, new Texture2D[] { t_r, t_g });
 			architech = new Architech(Content, grid);
 			uiMaster = new UiMaster(Content);
 			wizard = new Wizard(Content);
-		}
+            researcher = new Researcher(Content);
+			backdrop = new StaticSprite(new Vector2(0, 0), Content.Load<Texture2D>(@"texture/ui/backdrop2"), new Point(1920, 1080));
+			terrain = new StaticSprite(new Vector2(0, -5), Content.Load<Texture2D>(@"texture/terrain"), new Point(1920, 1080 - (3 * 64)));
+			light = new StaticSprite(Vector2.Zero, Content.Load<Texture2D>(@"texture/terrainLight"), new Point(1920, 1080 - (3 * 64)));
+
+        }
 
 		/// <summary>
 		/// UnloadContent will be called once per game and is the place to unload
@@ -119,12 +132,12 @@ namespace AHH
 			Options.Update(gameTime);
             player.Input.KB = Keyboard.GetState();
 			player.Update(uiMaster, Mouse.GetState());
-			uiMaster.Update(player);
+			uiMaster.Update(player, gameTime);
 			grid.Update(player, architech, os);
-			architech.Update(grid, uiMaster, player, gameTime, os.GetUnitRects());
-			os.Update(gameTime, player.Cursor, architech, grid, player, rng);
+			architech.Update(grid, uiMaster, os, player, gameTime, os.GetUnitRects());
+			os.Update(gameTime, player.Cursor, architech, uiMaster, grid, player, rng);
 			wizard.Update(gameTime, architech, os, uiMaster, grid, player);
-
+            researcher.Update(gameTime, os, architech, uiMaster, player);
             player.Input.KBP = player.Input.KB;
 			player.Cursor.prevState = player.Cursor.GetState;
 
@@ -147,11 +160,13 @@ namespace AHH
 								   BlendState.AlphaBlend,
 								   SamplerState.PointClamp, null, null, null,
 								   Resolution.getTransformationMatrix());
-
+			backdrop.Draw(spriteBatch);
+			terrain.Draw(spriteBatch);
 			grid.Draw(spriteBatch, player.SelectedBuilding);
 			architech.Draw(spriteBatch, player, grid);
 			os.Draw(spriteBatch);
 			wizard.Draw(spriteBatch);
+			light.Draw(spriteBatch);
 			uiMaster.Draw(spriteBatch, player);
 			player.Draw(spriteBatch);
 			spriteBatch.End();

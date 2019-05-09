@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework;
 using AHH.AI;
+using System.Collections;
 
 namespace AHH.Extensions
 {
@@ -14,14 +15,20 @@ namespace AHH.Extensions
 	{
 		public static Vector2 DirectionTo(this Vector2 from, Vector2 to)
 		{
-			Vector2 direction = from - to;
+			Vector2 direction = to - from;
 			direction.Normalize();
-			return -direction;
+			return direction;
 		}
 		public static float PercentAofB(this float a, float b)
 		{
 			return (a / b) * 100;
 		}
+
+        public static float PercentT(this float a, float b)
+        {
+            return (a * b);
+        }
+
 		public static float PercentDecrease(this float current, float original)
 		{
 			float decrease = original - current;
@@ -48,7 +55,8 @@ namespace AHH.Extensions
 		public static T GetRandom<T>(this List<T> list, Random rng)
 		{
 			var rnd = rng.Next(0, list.Count);
-			return list[rnd];
+           
+			return list[rnd]; 
 
 		}
 		public static List<Vector2> GetEdges(this Vector2[,] shape)
@@ -126,7 +134,103 @@ namespace AHH.Extensions
 
 		}
 		
+        
+
 	}
+
+    public class Stager<t1, t3> : DicWTuple<t1, bool, t3>
+    {
+        public Stager(List<WTuple<t1, bool, t3>> dic)
+          :  base(dic)
+        {
+
+        }
+
+        new public void SetItem3(t1 key, t3 item3)
+        {
+            int index = GetIndex(key);
+            if(items[index].Item2 == false)
+                items[index].Item3 = item3;
+        }
+    }
+
+    public class DicWTuple<t1, t2, t3>
+    {
+        protected List<WTuple<t1, t2, t3>> items;
+        public DicWTuple(List<WTuple<t1, t2, t3>> wTuples)
+        {
+            items = new List<WTuple<t1, t2, t3>>(wTuples);
+        }
+
+        protected WTuple<t1, t2, t3> GetValue(t1 ind)
+        {
+            int index = GetIndex(ind);
+            return items[index];
+        }
+
+        protected int GetIndex(t1 ind)
+        {
+            int i = 0;
+            foreach (var tuple in items)
+            {
+                
+                if (tuple.Item1.Equals(ind))
+                    return i;
+                i++;
+            }
+
+            return -1;
+        }
+
+        void Set(int index, WTuple<t1, t2, t3> value)
+        {
+            items[index].Item2 = value.Item2;
+            items[index].Item3 = value.Item3;
+        }
+
+        public void SetItem3(t1 key, t3 item3)
+        {
+            int index = GetIndex(key);
+
+            items[index].Item3 = item3;
+        }
+
+        public void SetItem2(t1 key, t2 item2)
+        {
+            int index = GetIndex(key);
+
+            items[index].Item2 = item2;
+        }
+
+        public WTuple<t1, t2, t3> this[t1 ind]
+        {
+            get { return GetValue(ind); }
+
+            set { Set(GetIndex(ind), value); }
+        }
+
+        public bool ContainsKey(t1 key)
+        {
+            int index = GetIndex(key);
+
+            if (index <= -1)
+                return false;
+
+            return true;
+        }
+
+        public void Add(WTuple<t1, t2, t3> item)
+        {
+            if(!ContainsKey(item.Item1))
+                items.Add(item);
+        }
+
+        public int Count
+        {
+            get { return items.Count; }
+        }
+    }
+
 
 	public class WTuple<t1, t2, t3>
 	{

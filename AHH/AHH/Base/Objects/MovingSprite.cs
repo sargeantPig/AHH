@@ -31,6 +31,7 @@ namespace AHH.Base
 				if (distance < 2)
 				{
 					Position = destination;
+                    
 				}
 
 				UpdateBox = Position;

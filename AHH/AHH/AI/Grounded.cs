@@ -7,6 +7,7 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using AHH.Interactable.Building;
 using AHH.Extensions;
+using AHH.UI.Elements;
 
 namespace AHH.AI
 {
@@ -20,30 +21,54 @@ namespace AHH.AI
 		protected Ai_States nextState = Ai_States.Idle;
 		protected Vector2 prevPos = new Vector2();
 		float hitElasped = 0;
-		bool keepTarget = false;
+		protected bool keepTarget = false;
+        float norm_speed;
+        int waypointsReached = 0;
+        bool marcher = true;
 		public Grounded(Vector2 position, Point rectExtends, Type_Data<Ai_Type> types, Stats stats, Grid grid)
 			: base(position, rectExtends, stats.Speed, types.Animations, stats, types, grid)
 		{
-           
+			RefreshInfo();
+            norm_speed = stats.Speed;
+            Ai_States = Ai_States.Marching;
+            this.Speed = 1;
 		}
 
-		public void Update(Cursor ms, GameTime gt, Architech arch, Grid grid, Random rng, Overseer os)
+		protected void RefreshInfo()
 		{
+			Info = new InfoPanel(
+				new Dictionary<Text, Text>()
+				{
+                    { new Text(Vector2.One, "Name: ", Color.White), new Text(Vector2.One, Stats.Name, Color.White) },
+                    { new Text(Vector2.One, "Health: ", Color.White), new Text(Vector2.One, Stats.Health.ToString(), Color.White) },
+                    { new Text(Vector2.One, "Armour: ", Color.White), new Text(Vector2.One, Stats.ArmourType.ToString(), Color.White) }
+                }, data.Texture, Vector2.Zero);
+		}
+
+		public void Update(Cursor ms, GameTime gt, Architech arch, Grid grid, Random rng, Overseer os, UiMaster ui)
+		{
+			base.Update(ms, gt);
 			base.Update(gt);
 			base.Update();
 			CalculateCorners();
 			GetFreeCorners(grid);
 
+			RefreshInfo();
+
+			if (IsHighlighted)
+				ui.RecieveInfo(new KeyValuePair<Guid, InfoPanel>(this.ID, Info));
+			else ui.RemoveInfo(this.ID);
+
 			foreach (var proj in projectile.Values)
 			{
 				if (arch.GetBuilding(defenderID) != null)
-					proj.Update(arch.GetBuilding(defenderID).Center, this);
+					proj.Update();
 			}
 
 			if (Ai_States == Ai_States.Dead)
 				return;
-
-			CheckTarget(arch);
+            if(Ai_States != Ai_States.Retaliating)
+			    CheckTarget(arch);
 
 			switch (Ai_States)
 			{
@@ -59,8 +84,14 @@ namespace AHH.AI
 					break;
 				case Ai_States.Attacking: Attacking(os, arch, gt, rng); // can go to idle or target
 					break;
+                case Ai_States.Retaliating:
+                    Fighting(os, gt, rng);
+                    break;
 				case Ai_States.Dead:
 					return;
+                case Ai_States.Marching:
+                    Forward(grid, arch);
+                    break;
 
 			}
 
@@ -96,8 +127,22 @@ namespace AHH.AI
 		protected void Moving()
 		{
 			bool reached = MoveTo(WayPoints[0]);
-			if (reached)
-				WayPoints.RemoveAt(0);
+            if (reached)
+            {
+                WayPoints.RemoveAt(0);
+                waypointsReached++;
+            }
+
+            if (waypointsReached > 5 && marcher)
+            {
+                WayPoints.Clear();
+                Ai_States = Ai_States.Target;
+                this.Speed = norm_speed;
+                marcher = false;
+            }
+
+            else if (waypointsReached <= 5 && WayPoints.Count >0)
+                Ai_States = Ai_States.Marching;
 		}
 
 		protected void Attacking(Overseer os, Architech arch, GameTime gt, Random rng)
@@ -110,7 +155,7 @@ namespace AHH.AI
 				{
 					os.Combat(this, arch.GetBuilding(defenderID), rng);
 					hitElasped = 0;
-					Projectile p = new Projectile(Position, new Point(16, 16), data.Projectile, 5);
+					Projectile p = new Projectile(this.Center, new Point(16, 16), data.Projectile, 5, arch.GetBuilding(defenderID).Center);
 					projectile.Add( p.ID, p );
 				}
 			}
@@ -143,7 +188,7 @@ namespace AHH.AI
 				KeyValuePair<Point, Building> building = buildings.ToList()[index];
 				var edges = building.Value.AdjacentTiles;
 
-				if (edges == null)
+				if (edges == null || edges.Count == 0)
 				{
 					defenderID = Point.Zero;
 					return; }
@@ -157,7 +202,7 @@ namespace AHH.AI
 				Building building = arch.GetBuilding(defenderID);
 				var edges = building.AdjacentTiles;
 
-				if (edges == null)
+				if (edges == null || edges.Count == 0)
 				{
 					defenderID = Point.Zero;
 					return; }
@@ -258,7 +303,7 @@ namespace AHH.AI
 							hitElasped = 0;
 							os.Combat<Grounded>(this, (Grounded)os.Zombies[attackerID], rng);
 
-							var p = new Projectile(Position, new Point(16, 16), data.Projectile, 5);
+							var p = new Projectile(Position, new Point(16, 16), data.Projectile, 5, os.Zombies[attackerID].Center);
 							projectile.Add(p.ID, p);
 						}
 					}
@@ -359,15 +404,25 @@ namespace AHH.AI
 
 			if (nextTile != null)
 			{
-				if (nextTile.State != TileStates.Blocked && nextTile.State != TileStates.Immpassable)
-					a_nextLocation = nextTile.Position;
-				WayPoints.Add(a_nextLocation);
-				Ai_States = Ai_States.Moving;
+                if (nextTile.State != TileStates.Blocked && nextTile.State != TileStates.Immpassable)
+                {
+                    a_nextLocation = nextTile.Position;
+                    WayPoints.Add(new Vector2(Position.X + 64, Position.Y));
+                    Ai_States = Ai_States.Moving;
+
+                }
+
+                else { Ai_States = Ai_States.Target;
+                    waypointsReached += 6;
+                    this.Speed = norm_speed;
+                }
 			}
 
 			else
 			{
-				Ai_States = Ai_States.Idle;
+				Ai_States = Ai_States.Target;
+                waypointsReached += 6;
+                this.Speed = norm_speed;
 			}
 
 		}
@@ -485,6 +540,7 @@ namespace AHH.AI
 		{
 			set { wait = value; }
 		}
+
 		
 	}
 }

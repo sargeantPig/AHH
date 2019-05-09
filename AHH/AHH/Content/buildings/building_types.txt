@@ -38,3 +38,13 @@ Animation
 Disables, 2, 2, 100
 Production, 1, 1, 100
 Building, 0, 0, 100
+
+Type	NecroticOrrery
+Sound	{sound_file}
+Texture	texture/buildings/necromancer_tower
+H_Texture	texture/buildings/necromancer_tower
+C_Texture	texture/buildings/necromancer_tower
+Animation
+Disables, 2, 2, 100
+Production, 1, 1, 100
+Building, 0, 0, 100

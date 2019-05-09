@@ -6,31 +6,39 @@
 Name	Swordsman
 Type	Knight
 Stats	70, Sword, Heavy, 4, 1, 1000, Trained, Aggressive, 1
+Descr	A Holy Swordsman of unquestionable honour.
 
 Name	Squire
 Type	Priest
-Stats	50, Spear, Heavy, 1, 2, 2000, Trained, Focused, 1
+Stats	50, Spear, Heavy, 1, 3, 2000, Trained, Focused, 1
+Descr	A Holy priest of radiant light.
 
 Name	Bow
 Type	Archer
-Stats	50, Bow, Heavy, 4, 3, 2000, Trained, Hyper, 1.1
+Stats	50, Bow, Heavy, 4, 5, 2000, Trained, Hyper, 1.1
+Descr	An Archer of precise accuracy,
 
 Name	pl
 Type	Horseman
 Stats	75, Bone, Heavy, 5, 1, 1500, Trained, Focused, 1.5
+Descr	A mounter knight of unbreakable will.
 
 Name	ZSwordsman
 Type	Z_Knight
 Stats	50, Sword, Heavy, 4, 1, 1000, Trained, Aggressive, 1
+Descr	Ahh
 
 Name	ZSquire
 Type	Z_Priest
-Stats	50, Spear, Heavy, 1, 2, 2000, Trained, Focused, 1
+Stats	50, Spear, Heavy, 1, 20, 2000, Trained, Focused, 1
+Descr	Ugh
 
 Name	ZBow
 Type	Z_Archer
-Stats	50, Bow, Heavy, 4, 3, 2000, Trained, Hyper, 1.1
+Stats	50, Bow, Heavy, 4, 30, 2000, Trained, Hyper, 1.1
+Descr	Grarh
 
 Name	Zpl
 Type	Z_Horseman
 Stats	50, Bone, Heavy, 5, 1, 1500, Trained, Focused, 2.5
+Descr	Grrugh

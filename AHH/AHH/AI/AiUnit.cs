@@ -48,7 +48,7 @@ namespace AHH.AI
 			
 			pf_result = null;
 			statusBar = new StatusBar(new Point(rectExtends.X, rectExtends.Y/ 5), (int)stats.Health, statusBarTexture);
-			pathfinder = new OffloadThread[4];
+			pathfinder = new OffloadThread[12];
 			data = unit_types;
 		}
 
@@ -56,7 +56,7 @@ namespace AHH.AI
 		{
 			statusBar.Update(stats.Health);
 			statusBar.UpdatePosition(Position);
-
+            
 			foreach (KeyValuePair<Guid, Projectile> g in projectile)
 			{
 				if(!g.Value.Alive)
@@ -278,7 +278,7 @@ namespace AHH.AI
 
 		public void Ressurect(Overseer os)
 		{
-			stats = os.GetStats[stats.Type][0];
+			stats = os.GetStats[stats.Type];
 			
 		}
 

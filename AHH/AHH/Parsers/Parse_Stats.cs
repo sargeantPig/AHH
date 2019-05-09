@@ -13,12 +13,12 @@ namespace AHH.Parsers
 
 	static partial class Parsers
 	{
-		public static Dictionary<T, List<Y>> Parse_Stats<T, Y>(string filepath)
+		public static Dictionary<T, Y> Parse_Stats<T, Y>(string filepath)
 		{
 			if (!File.Exists(filepath))
 				return null;
 
-			Dictionary<T, List<Y>> stats = new Dictionary<T, List<Y>>();
+			Dictionary<T, Y> stats = new Dictionary<T, Y>();
 			StreamReader sr = new StreamReader(filepath);
 			string line = "";
 
@@ -43,8 +43,7 @@ namespace AHH.Parsers
 				{
 					string[] split = line.Split('\t');
 					temp_stats.Type = (T)Enum.Parse(typeof(T), split[1]);
-					if (!stats.ContainsKey(temp_stats.Type))
-						stats.Add(temp_stats.Type, new List<Y>());
+					
 				}
 
 				if (line.StartsWith("Stats"))
@@ -87,8 +86,28 @@ namespace AHH.Parsers
                         temp_stats.Focus = (Focus)Enum.Parse(typeof(Focus), split[8]);
 						temp_stats.Speed = (float)Convert.ToDouble(split[9]);
                     }
-					stats[temp_stats.Type].Add(temp_stats);
+                    
 				}
+
+                if (line.StartsWith("Descr"))
+                {
+                    string[] split = line.Split('\t');
+                    string final = "";
+                    for (int x = 1; x < split.Length; x++)
+                    {
+                        final += split[x];
+                        final += "\r\n";
+                    }
+
+                    temp_stats.Descr = final;
+
+                    if (!stats.ContainsKey(temp_stats.Type))
+                    {
+                        stats.Add(temp_stats.Type, temp_stats);
+                    }
+                    else stats[temp_stats.Type] = temp_stats;
+
+                }
 
 			}
 			return stats;

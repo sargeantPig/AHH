@@ -8,6 +8,8 @@ using System.Text;
 using System.Threading.Tasks;
 using AHH.AI;
 using AHH.Interactable.Building;
+using AHH.User;
+
 namespace AHH.Interactable.Spells
 {
 	enum Spell_States
@@ -33,17 +35,23 @@ namespace AHH.Interactable.Spells
 			CurrentState = "Main";
 		}
 
-		public void Update(GameTime gt, Architech arch, Overseer os, Grid grid)
+		public void Update(GameTime gt, Architech arch, Overseer os, Grid grid, Player p)
 		{
 			elaspedAlive += gt.ElapsedGameTime.Milliseconds;
 			elaspedTick += gt.ElapsedGameTime.Milliseconds;
 
-			if (elaspedTick >= stats.Tick && state == Spell_States.Alive)
-			{
-				arch.SpellEffect(this);
-				os.SpellEffect(this, grid, arch );
-				elaspedTick = 0;
-			}
+            if (elaspedTick >= stats.Tick && state == Spell_States.Alive && p.Energy > stats.Cost && Options.GetTick)
+            {
+                arch.SpellEffect(this);
+                os.SpellEffect(this, grid, arch);
+                elaspedTick = 0;
+                p.IncreaseEnergy -= stats.Cost;
+            }
+
+            else if (p.Energy <= stats.Cost)
+            {
+                state = Spell_States.Dead;
+            }
 
 			if (elaspedAlive >= stats.Duration)
 				state = Spell_States.Dead;

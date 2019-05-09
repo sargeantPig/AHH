@@ -12,13 +12,16 @@ using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using AHH.Extensions;
 using AHH.AI;
+using AHH.Research;
+using AHH.UI.Elements;
 
 namespace AHH.Interactable.Building
 {
 	class Architech : BaseObject
 	{
+
 		Dictionary<Point, Building> buildings { get; set; }
-		Dictionary<BuildingTypes, List<BuildingData>> building_data { get; }
+		Dictionary<BuildingTypes, BuildingData> building_data { get; }
 		Dictionary<BuildingTypes, Type_Data<BuildingTypes>> building_types { get; }
 		List<Point> remove_queue = new List<Point>();
 		string selectedBuilding;
@@ -34,6 +37,16 @@ namespace AHH.Interactable.Building
 			building_types = Parsers.Parsers.Parse_Types<BuildingTypes, Type_Data<BuildingTypes>>(@"Content\buildings\building_types.txt", cm);
 			home = new Point(25, 7);
 			PlaceBuilding(home, grid, BuildingTypes.NTower);
+
+            BuildingTypes[] bts = new BuildingTypes[] { BuildingTypes.EnergyConduit, BuildingTypes.Grave, BuildingTypes.NecroticOrrery,
+            BuildingTypes.NTower, BuildingTypes.Wall};
+
+            foreach (BuildingTypes bt in bts)
+            {
+                building_data[bt] = new BuildingData(building_data[bt]);
+                building_data[bt].Info.Picture = building_types[bt].Texture;
+            }
+
 		}
 
 		public Dictionary<Point, Building> NearBuildings(Vector2 position, float range)
@@ -82,19 +95,19 @@ namespace AHH.Interactable.Building
 		public bool IsInRange(Dictionary<Corner, Vector2> corners, Point bID, float range)
 		{
 
-			if (Vector2.Distance(corners[Corner.TopLeft], buildings[bID].Corners[Corner.TopLeft]) <= range * 16)
+			if (Vector2.Distance(corners[Corner.TopLeft], buildings[bID].Corners[Corner.TopLeft]) <= range * 32)
 				return true;
-			if (Vector2.Distance(corners[Corner.TopRight], buildings[bID].Corners[Corner.TopRight]) <= range * 16)
+			if (Vector2.Distance(corners[Corner.TopRight], buildings[bID].Corners[Corner.TopRight]) <= range * 32)
 				return true;
-			if (Vector2.Distance(corners[Corner.BottomLeft], buildings[bID].Corners[Corner.BottomLeft]) <= range * 16)
+			if (Vector2.Distance(corners[Corner.BottomLeft], buildings[bID].Corners[Corner.BottomLeft]) <= range * 32)
 				return true;
-			if (Vector2.Distance(corners[Corner.BottomRight], buildings[bID].Corners[Corner.BottomRight]) <= range * 16)
+			if (Vector2.Distance(corners[Corner.BottomRight], buildings[bID].Corners[Corner.BottomRight]) <= range * 32)
 				return true;
 
 			foreach (Vector2 v in corners.Values)
 			{
 				var temp = Vector2.Distance(v, buildings[bID].Center);
-				if (temp <= (range) * 16)
+				if (temp <= (range) * 64)
 					return true;
 
 			}
@@ -152,13 +165,13 @@ namespace AHH.Interactable.Building
 		public bool PlaceBuilding(Grid grid, BuildingTypes buildingID)
 		{
 			//get tiles the building will encompass
-			grid.SelectTiles(grid.SelectedTiles[0], new Point(building_data[buildingID][0].Size.X / 64, building_data[buildingID][0].Size.Y / 64));
+			grid.SelectTiles(grid.SelectedTiles[0], new Point(building_data[buildingID].Size.X / 64, building_data[buildingID].Size.Y / 64));
 
 			//check no tile is blocked return if true
 			if (grid.CheckBlocked())
 			{
 				//add building to list
-				Building newBuilding = new Building(grid.GetTile(grid.SelectedTiles[0]).Position, building_data[buildingID][0], building_types[buildingID]);
+				Building newBuilding = new Building(grid.GetTile(grid.SelectedTiles[0]).Position, building_data[buildingID], building_types[buildingID]);
 				newBuilding.InitAdjacent(grid);
 				newBuilding.GetChildren = new List<Point>();
 
@@ -180,13 +193,13 @@ namespace AHH.Interactable.Building
 		private bool PlaceBuilding(Point point, Grid grid, BuildingTypes buildingID)
 		{
 			//get tiles the building will encompass
-			grid.SelectTiles(point, new Point(building_data[buildingID][0].Size.X / 64, building_data[buildingID][0].Size.Y / 64));
+			grid.SelectTiles(point, new Point(building_data[buildingID].Size.X / 64, building_data[buildingID].Size.Y / 64));
 
 			//check no tile is blocked return if true
 			if (grid.CheckBlocked())
 			{
 				//add building to list
-				Building newBuilding = new Building(grid.GetTile(grid.SelectedTiles[0]).Position, building_data[buildingID][0], building_types[buildingID]);
+				Building newBuilding = new Building(grid.GetTile(grid.SelectedTiles[0]).Position, building_data[buildingID], building_types[buildingID]);
 				newBuilding.InitAdjacent(grid);
 				newBuilding.GetChildren = new List<Point>();
 				foreach (Point p in grid.SelectedTiles)
@@ -223,6 +236,47 @@ namespace AHH.Interactable.Building
 			return true;
 		}
 
+        void Dismantle(Grid grid)
+        {
+            if (grid.SelectedTiles[0] == home)
+                return;
+
+            if (buildings.ContainsKey(grid.SelectedTiles[0]))
+            {
+                Dismantle(grid, buildings[grid.SelectedTiles[0]]);
+                buildings.Remove(grid.SelectedTiles[0]);
+            }
+            else
+            {
+                Point p = FindParent(grid.SelectedTiles[0]);
+
+                if (p == home)
+                    return;
+
+                if (buildings.ContainsKey(p))
+                {
+                    Dismantle(grid, buildings[p]);
+                    buildings.Remove(p);
+                }
+
+                else return;
+            }
+        }
+
+        Point FindParent(Point p)
+        {
+            foreach (var building in buildings)
+            {
+                foreach (var po in building.Value.GetChildren)
+                {
+                    if (p == po)
+                        return building.Value.GetChildren[0];
+                }
+            }
+
+            return Point.Zero;
+        }
+
 		public List<Point> CompileBuildingTiles()
 		{
 			List<Point> points = new List<Point>();
@@ -235,8 +289,36 @@ namespace AHH.Interactable.Building
 			}
 			return points;
 		}
+        public void ChangeStats(float percent, List<BuildingTypes> b_types, Researchables stat)
+        {
+            foreach (BuildingTypes at in b_types)
+            {
+                ApplyStat(at, stat, percent);
+            }
+        }
 
-		public void SpellEffect(Spell spell)
+        void ApplyStat(BuildingTypes ai, Researchables stat, float percent)
+        {
+            var temp_stat = BuildingData.Empty();
+            switch (stat)
+            {
+                case Researchables.WHealth:
+                    var mod = Extensions.Extensions.PercentT(building_data[ai].Health, percent);
+                    temp_stat.Health += mod;
+                    building_data[ai] += temp_stat;
+                    break;
+                case Researchables.WCost:
+                    temp_stat.Cost += Extensions.Extensions.PercentT(building_data[ai].Cost, percent);
+                    building_data[ai] += temp_stat;
+                    break;
+                case Researchables.WProduct:
+                    temp_stat.Production += (int)Extensions.Extensions.PercentT(building_data[ai].Production, percent);
+                    building_data[ai] += temp_stat;
+                    break;
+            }
+        }
+
+        public void SpellEffect(Spell spell)
 		{
 			// get buildings in radius
 
@@ -244,13 +326,17 @@ namespace AHH.Interactable.Building
 			// apply spell effect
 		}
 
-		public void Update(Grid grid, UiMaster master, Player player, GameTime gt, List<Rectangle> units)
+		public void Update(Grid grid, UiMaster master, Overseer os, Player player, GameTime gt, List<Rectangle> units)
 		{
 			buildingPlaced = false;
 
 			foreach (KeyValuePair<Point, Building> kv in buildings)
 			{
 				kv.Value.Update(player, gt, this, grid, units);
+
+                if (kv.Value.State == BuildingStates.Production)
+                    kv.Value.Produce(player, gt, os);
+
 				if (kv.Value.GetBuildingData().Health <= 0)
 				{
 					remove_queue.Add(kv.Key);
@@ -280,17 +366,69 @@ namespace AHH.Interactable.Building
 						master.Pop_Action();
 						selectedBuilding = ButtonFunction.EnergyConduit.ToString();
 						break;
+                    case ButtonFunction.NecroticOrrery:
+                        master.Pop_Action();
+                        selectedBuilding = ButtonFunction.NecroticOrrery.ToString();
+                        break;
 				}
 
 			}
 
-			if (player.Cursor.isLeftPressed && grid.IsHighlighted && selectedBuilding != "" && player.Mode == Player_Modes.Building)
-			{
-				PlaceBuilding(grid, (BuildingTypes)Enum.Parse(typeof(BuildingTypes), selectedBuilding));
-			}
+            if (master.Highlight != ButtonFunction.Nan)
+            {
+                switch (master.Highlight)
+                {
+                    case ButtonFunction.EnergyConduit:
+                        master.RecieveInfo(new KeyValuePair<Guid, InfoPanel>(building_data[BuildingTypes.EnergyConduit].Id, 
+                            building_data[BuildingTypes.EnergyConduit].Info));
+                        RemoveInfo(master, new BuildingTypes[] { BuildingTypes.Grave, BuildingTypes.Wall, BuildingTypes.NecroticOrrery });
+                        break;
+                    case ButtonFunction.NecroticOrrery:
+                        master.RecieveInfo(new KeyValuePair<Guid, InfoPanel>(building_data[BuildingTypes.NecroticOrrery].Id,
+                           building_data[BuildingTypes.NecroticOrrery].Info));
+                        RemoveInfo(master, new BuildingTypes[] { BuildingTypes.Grave, BuildingTypes.Wall, BuildingTypes.EnergyConduit });
+                        break;
+                    case ButtonFunction.Wall:
+                        master.RecieveInfo(new KeyValuePair<Guid, InfoPanel>(building_data[BuildingTypes.Wall].Id,
+                             building_data[BuildingTypes.Wall].Info));
+                        RemoveInfo(master, new BuildingTypes[] { BuildingTypes.Grave, BuildingTypes.NecroticOrrery, BuildingTypes.EnergyConduit });
+                        break;
+                    case ButtonFunction.Grave:
+                        master.RecieveInfo(new KeyValuePair<Guid, InfoPanel>(building_data[BuildingTypes.Grave].Id,
+                             building_data[BuildingTypes.Grave].Info));
+                        RemoveInfo(master, new BuildingTypes[] { BuildingTypes.Wall, BuildingTypes.NecroticOrrery, BuildingTypes.EnergyConduit });
+                        break;
+
+
+                }
+            }
+
+           if(player.Mode != Player_Modes.Building) RemoveInfo(master, new BuildingTypes[] { BuildingTypes.Wall, BuildingTypes.NTower, BuildingTypes.Grave, BuildingTypes.EnergyConduit });
+
+
+            if (player.Cursor.isLeftPressed && player.Cursor.GetState != player.Cursor.prevState &&
+                grid.IsHighlighted && selectedBuilding != "" && player.Mode == Player_Modes.Building)
+            {
+                PlaceBuilding(grid, (BuildingTypes)Enum.Parse(typeof(BuildingTypes), selectedBuilding));
+            }
+
+            else if (player.Cursor.isLeftPressed && player.Cursor.GetState != player.Cursor.prevState &&
+                grid.IsHighlighted &&  player.Mode == Player_Modes.Demolish)
+            {
+                Dismantle(grid);
+            }
 		}
 
-		public void Draw(SpriteBatch sb, Player player, Grid grid)
+        void RemoveInfo(UiMaster master, BuildingTypes[] buttonFunctions)
+        {
+            foreach (BuildingTypes bf in buttonFunctions)
+            {
+                master.RemoveInfo(building_data[bf].Id);
+            }
+
+        }
+
+        public void Draw(SpriteBatch sb, Player player, Grid grid)
 		{
 			foreach (Building b in buildings.Values)
 			{
@@ -307,12 +445,23 @@ namespace AHH.Interactable.Building
 					{
 						Vector2 pos = grid.GetHighlightedTile().Position;
 						var td = building_types[(BuildingTypes)Enum.Parse(typeof(BuildingTypes), selectedBuilding)];
-						var bd = building_data[(BuildingTypes)Enum.Parse(typeof(BuildingTypes), selectedBuilding)][0];
+						var bd = building_data[(BuildingTypes)Enum.Parse(typeof(BuildingTypes), selectedBuilding)];
 						sb.Draw(td.Texture, pos, new Rectangle(0, 0, bd.Size.X, bd.Size.Y), Color.White);
 					}
 				}
 			}
 		}
+
+        public int GetOrrery()
+        {
+            int count = 0;
+            foreach (var b in buildings)
+            {
+                if(b.Value.GetBuildingData().Type == BuildingTypes.NecroticOrrery)
+                count++;
+            }
+            return count;
+        }
 
 		public bool BuildingPlaced
 		{
@@ -324,6 +473,19 @@ namespace AHH.Interactable.Building
 			if (buildings.ContainsKey(id))
 				return buildings[id];
 			else return null;
+		}
+
+		public int GetBuildingsBuilding()
+		{
+			int count = 0;
+
+			foreach (var building in buildings.Values)
+			{
+				if (building.State == BuildingStates.Building)
+					count += 1;
+			}
+
+			return count;
 		}
 
 		public Dictionary<Point, Building> GetBuildings

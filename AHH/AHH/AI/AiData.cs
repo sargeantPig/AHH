@@ -18,6 +18,7 @@ namespace AHH.AI
 		Idle,
 		Target,
 		Thinking,
+        Marching,
 		Dead
 	}
 
@@ -82,6 +83,7 @@ namespace AHH.AI
 		bool IsZombie { get; set; }
 		Ai_States Ai_States { get; set; }
 		Guid AID { get; }
+        Vector2 Center { get; }
 		ref Stats GetStats();
 		Dictionary<Corner, Vector2> Corners { get; }
 		List<Vector2> WayPoints { get; set; }
@@ -101,7 +103,7 @@ namespace AHH.AI
 		double range { get; set; }
 		float hitDelay { get; set; }
 		float speed { get; set; }
-
+        string descr { get; set; }
 		public Stats(Stats stats)
 		{
 			this.name = stats.name;
@@ -115,8 +117,33 @@ namespace AHH.AI
 			this.weaponType = stats.weaponType;
 			this.focus = stats.focus;
 			this.speed = stats.speed;
+            this.descr = stats.descr;
 		}
 
+        static public Stats Empty()
+        {
+            var temp = new Stats();
+
+            temp.baseDamage = 0;
+            temp.health = 0;
+            temp.hitDelay = 0;
+            temp.range = 0;
+            temp.speed = 0;
+
+            return temp;
+        }
+
+
+        static public Stats operator +(Stats first, Stats second)
+        {
+            first.baseDamage += second.baseDamage;
+            first.health += second.health;
+            first.hitDelay += second.hitDelay;
+            first.range += second.range;
+            first.speed += second.speed;
+
+            return first;
+        }
 		public string Name
 		{
 			get { return name; }
@@ -181,6 +208,12 @@ namespace AHH.AI
 			get { return speed; }
 			set { speed = value; }
 		}
+
+        public string Descr
+        {
+            get { return descr; }
+            set { descr = value; }
+        }
 
 	}
 }

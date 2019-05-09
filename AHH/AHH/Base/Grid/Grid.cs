@@ -35,6 +35,7 @@ namespace AHH.Base
 			selectedTiles = new List<Point>();
 			tiles = new Tile[dimensions.X, dimensions.Y];
 			this.dimensions = dimensions;
+            this.size = dimensions;
 			Grid._position = position;
 			for (int y = 0; y < dimensions.Y; y++)
 			{

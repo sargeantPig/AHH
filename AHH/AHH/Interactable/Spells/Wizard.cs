@@ -11,12 +11,13 @@ using AHH.AI;
 using AHH.UI;
 using Microsoft.Xna.Framework.Graphics;
 using AHH.User;
+using AHH.UI.Elements;
 
 namespace AHH.Interactable.Spells
 {
 	class Wizard
 	{
-		Dictionary<SpellType, List<Spell_Stats>> spell_data { get; set; }
+		Dictionary<SpellType, Spell_Stats> spell_data { get; set; }
 		Dictionary<SpellType, Type_Data<SpellType>> spell_types { get; set; }
 		Dictionary<int, Spell> castedSpells;
 		List<int> deadSpells = new List<int>();
@@ -28,13 +29,21 @@ namespace AHH.Interactable.Spells
 			spell_types = Parsers.Parsers.Parse_Types<SpellType, Type_Data<SpellType>>(@"Content\spells\spell_types.txt", cm);
 
 			castedSpells = new Dictionary<int, Spell>();
-		}
+
+            SpellType[] sts = new SpellType[] { SpellType.Ressurect, SpellType.DrainEssence};
+
+            foreach (SpellType st in sts)
+            {
+                spell_data[st] = new Spell_Stats(spell_data[st]);
+                spell_data[st].Info.Picture = spell_types[st].Texture;
+            }
+        }
 
 		public void Update(GameTime gt, Architech arch, Overseer os, UiMaster master, Grid grid, Player player)
 		{
 			foreach (KeyValuePair<int, Spell> kv in castedSpells)
 			{
-				kv.Value.Update(gt, arch, os, grid);
+				kv.Value.Update(gt, arch, os, grid, player);
 
 				if (kv.Value.State == Spell_States.Dead)
 					deadSpells.Add(kv.Key);
@@ -65,16 +74,49 @@ namespace AHH.Interactable.Spells
 
 			}
 
-			if (player.Cursor.isLeftPressed && grid.IsHighlighted && selectedSpell != "" && player.Mode == Player_Modes.Spells && player.Cursor.GetState != player.Cursor.prevState )
+            if (master.Highlight != ButtonFunction.Nan)
+            {
+                switch (master.Highlight)
+                {
+                    case ButtonFunction.DrainEssence:
+                        master.RecieveInfo(new KeyValuePair<Guid, InfoPanel>(spell_data[SpellType.DrainEssence].ID,
+                            spell_data[SpellType.DrainEssence].Info));
+                        RemoveInfo(master, new SpellType[] { SpellType.Ressurect});
+                        break;
+                    case ButtonFunction.Ressurect:
+                        master.RecieveInfo(new KeyValuePair<Guid, InfoPanel>(spell_data[SpellType.Ressurect].ID,
+                           spell_data[SpellType.Ressurect].Info));
+                        RemoveInfo(master, new SpellType[] {SpellType.DrainEssence });
+                        break;
+                  
+
+
+
+                }
+            }
+
+            if (player.Mode != Player_Modes.Spells) RemoveInfo(master, new SpellType[] { SpellType.Ressurect, SpellType.DrainEssence});
+
+
+            if (player.Cursor.isLeftPressed && grid.IsHighlighted && selectedSpell != "" && player.Mode == Player_Modes.Spells && player.Cursor.GetState != player.Cursor.prevState )
 			{
 				CastSpell(grid, (SpellType)Enum.Parse(typeof(SpellType), selectedSpell));
 			}
 			
 		}
 
-		public void CastSpell(Grid grid, SpellType spell)
+        void RemoveInfo(UiMaster master, SpellType[] buttonFunctions)
+        {
+            foreach (SpellType st in buttonFunctions)
+            {
+                master.RemoveInfo(spell_data[st].ID);
+            }
+
+        }
+
+        public void CastSpell(Grid grid, SpellType spell)
 		{
-			castedSpells.Add(Guid.NewGuid().GetHashCode(), new Spell(grid.GetTile(grid.SelectedTiles[0]).Position, spell_data[spell][0], spell_types[spell]));
+			castedSpells.Add(Guid.NewGuid().GetHashCode(), new Spell(grid.GetTile(grid.SelectedTiles[0]).Position, spell_data[spell], spell_types[spell]));
 
 		}
 

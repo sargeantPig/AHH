@@ -46,5 +46,16 @@ namespace AHH.Base
 			if (isClicked)
 				sb.Draw(t_clicked, Position, TextureSource, Color.White);
 		}
+
+		public bool IsHighlighted
+		{
+			get { return isHighlighted; }
+		}
+
+		public bool IsClicked
+		{
+			get { return isClicked; }
+			set { isClicked = value; }
+		}
 	}
 }

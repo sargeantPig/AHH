@@ -9,10 +9,11 @@ namespace AHH.User
 {
 	static class Options
 	{
-		const float tick = 0.5f;
+		const float tick = 500f;
 		static float tick_elasped = 0;
 		static bool newTick = false;
 
+        static float difficulty { get; set; }
 
 		static public bool GetTick
 		{
@@ -30,6 +31,14 @@ namespace AHH.User
 			else newTick = false;
 
 			tick_elasped += gt.ElapsedGameTime.Milliseconds;
+
+            difficulty += gt.ElapsedGameTime.Milliseconds;
 		}
+
+        public static float Difficulty
+        {
+            get { return difficulty; }
+
+        }
 	}
 }

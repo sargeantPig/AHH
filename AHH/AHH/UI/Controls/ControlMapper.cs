@@ -13,6 +13,9 @@ namespace AHH.UI
         HotKey_Build,
 		HotKey_Research,
 		HotKey_Spells,
+		HotKey_Cycle_Forward,
+        HotKey_Cycle_Backward,
+        HotKey_Demolish
     }
 
     class ControlMapper

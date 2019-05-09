@@ -3,7 +3,7 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 namespace AHH.UI
 {
-	class Text : BaseObject
+	class Text : BaseObject, IElement 
 	{
 		string value { get; set; }
 		Color colour { get; set; }
@@ -11,7 +11,11 @@ namespace AHH.UI
 		public Text(Vector2 position, string value = null, Color colour = new Color())
 			: base(position)
 		{
-			this.colour = colour;
+            if (colour == new Color())
+            {
+                this.colour = colour;
+            }
+			else this.colour = colour;
 			this.value = value;
 		}
 
@@ -25,7 +29,17 @@ namespace AHH.UI
 			sb.DrawString(DebugFont, value, position, colour);
 		}
 
-		public string Value
+        void IElement.Draw(SpriteBatch sb)
+        {
+            throw new System.NotImplementedException();
+        }
+
+        void IElement.Update(Cursor ms)
+        {
+            throw new System.NotImplementedException();
+        }
+
+        public string Value
 		{
 			get { return value; }
 			set { this.value = value; }
@@ -37,6 +51,14 @@ namespace AHH.UI
 			set { colour = value; }
 		}
 
-	}
+        new public Vector2 Position
+        {
+            set { base.Position = value - (DebugFont.MeasureString(this.value) / 2); }
+            get { return base.Position; }
+        }
+
+        Vector2 IElement.Position { get => throw new System.NotImplementedException(); set => throw new System.NotImplementedException(); }
+        bool IElement.IsActive { get => throw new System.NotImplementedException(); set => throw new System.NotImplementedException(); }
+    }
 
 }

@@ -1,0 +1,16 @@
+﻿##############
+###CYCLE#########
+###########
+Type	Button
+Name	C_Backward
+Value	D
+Size	64, 64
+H_texture	texture/ui/button_test_h
+Texture	texture/ui/button_test
+
+Type	Button
+Name	C_Forward
+Value	F
+Size	64, 64
+H_texture	texture/ui/button_test_h
+Texture	texture/ui/button_test

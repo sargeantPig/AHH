@@ -4,6 +4,7 @@ using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
 using AHH.UI;
+using AHH.UI.Elements;
 namespace AHH.Base
 {
 	class BaseObject
@@ -12,7 +13,10 @@ namespace AHH.Base
 		Guid id { get; set; }
 		Vector2 position { get; set; }
 
+		InfoPanel info { get; set; }
+
 		public BaseObject() { this.id = Guid.NewGuid(); }
+
 
 		public BaseObject(Vector2 position) { this.id = Guid.NewGuid(); this.position = position; }
 
@@ -36,6 +40,12 @@ namespace AHH.Base
 		{
 			set { position = value; }
 			get { return position; }
+		}
+
+		public InfoPanel Info
+		{
+			get { return info; }
+			set { info = value; }
 		}
 
 		public BaseObject DeepCopy()

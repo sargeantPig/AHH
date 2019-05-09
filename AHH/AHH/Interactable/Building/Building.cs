@@ -45,6 +45,7 @@ namespace AHH.Interactable.Building
 			statusBar = new StatusBar(new Point(bd.Size.X, bd.Size.Y/5), (int)stats.Health, statusBarTexture);
 			this.temp_health = this.GetBuildingData().Health;
 			this.GetBuildingData().Health = 1;
+
 		}
 
 		public Building()
@@ -77,9 +78,6 @@ namespace AHH.Interactable.Building
                     break;
                 case BuildingStates.Disabled:
                     break;
-                case BuildingStates.Production:
-                    Produce(player, gt);
-                    break;
             }
 
 
@@ -98,15 +96,17 @@ namespace AHH.Interactable.Building
 				}
 			}
 
-            if (Options.GetTick && !impassable && player.Energy > 0)
+            float tc_inc = GetBuildingData().Cost / 10;
+            
+            if ((Options.GetTick && !impassable && player.Energy >= tc_inc )|| temp_cost >= GetBuildingData().Cost)
 			{
 
 				if (temp_cost < GetBuildingData().Cost )
 				{
-					temp_cost += 1;
+					temp_cost += tc_inc;
 					var pct = Extensions.Extensions.PercentAofB(temp_cost, GetBuildingData().Cost) / 100;
 					GetBuildingData().Health = pct * temp_health;
-					player.IncreaseEnergy -= 1;
+					player.IncreaseEnergy -= tc_inc;
 				}
 
 				else
@@ -119,26 +119,55 @@ namespace AHH.Interactable.Building
 				}
             }
 
-            else
+            else if(Options.GetTick && player.Energy <= tc_inc && !impassable)
             {
-                
-            }
+				float count = Math.Abs(player.IncreaseEnergy);
+				float increase = 1 / (count == 0 ? 1 : count);
+				temp_cost += player.Energy + 1/(Math.Abs(player.IncreaseEnergy) + 1);
+
+				var pct = Extensions.Extensions.PercentAofB(temp_cost, GetBuildingData().Cost) / 100;
+				GetBuildingData().Health = pct * temp_health;
+
+				player.IncreaseEnergy -= player.Energy + 1 / (Math.Abs(player.IncreaseEnergy) + 1);
+			}
 
         }
 
-        void Produce(Player p, GameTime gt)
+        public void Produce(Player p, GameTime gt, AI.Overseer os)
         {
-			if (Options.GetTick)
-			{
-				p.IncreaseEnergy += (int)stats.Production;
+            if (Options.GetTick)
+            {
 
-				if (p.Energy <= 0)
-					GetBuildingData().Health -= 0.1f;
+                switch (data.Type)
+                {
+                    case BuildingTypes.EnergyConduit:
+                        p.IncreaseEnergy += (int)stats.Production * os.GetAliveAis();
+                        break;
+                    case BuildingTypes.NTower:
+                        p.IncreaseEnergy += (int)stats.Production * os.GetAliveAis();
+                        break;
+                    case BuildingTypes.Wall:
+                        p.IncreaseEnergy += (int)stats.Production * os.GetAliveAis();
+                        break;
+                    case BuildingTypes.Grave:
+                        p.IncreaseEnergy += (int)stats.Production * os.GetAliveAis();
+                        break;
+                    case BuildingTypes.NecroticOrrery:
+                        p.IncreaseEnergy += (int)stats.Production * os.GetAliveAis();
+                        break;
 
+                }
 			}
 
-		}
 
+            if (p.Energy <= 0)
+                GetBuildingData().Health -= 0.1f;
+            else if (p.Energy > 0 && p.IncreaseEnergy > 0)
+                GetBuildingData().Health += 0.1f;
+
+
+            GetBuildingData().Health = MathHelper.Clamp(GetBuildingData().Health, 0, temp_health);
+        }
 
 		public void CalculateCorners()
 		{

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.Xna.Framework.Graphics;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -12,16 +13,22 @@ namespace AHH.Research
 		ZHealth,
 		ZSpeed,
 		ZDamage,
+        ZRange,
 		WHealth,
 		WProduct,
 		WCost,
 		SPower,
 		SLength,
 		SSpeed,
+        AiHealth,
+        AiSpeed,
+        AiDamage,
+        AiRange
 	}
 
 	enum ResearchState
 	{
+        Waiting,
 		Researching,
 		Done
 	}
@@ -31,12 +38,14 @@ namespace AHH.Research
 		string name { get; set; }
 		List<KeyValuePair<Researchables, float>> modifiers { get; set; }
 		float researchTime { get; set; }
+        Texture2D texture { get; set; }
 
 		public ResearchData(ResearchData rd)
 		{
 			this.modifiers = rd.modifiers;
 			this.name = rd.name;
 			this.researchTime = rd.researchTime;
+            this.texture = rd.texture;
 		}
 
 		public string Name
@@ -58,6 +67,12 @@ namespace AHH.Research
 			set { this.modifiers = value; }
 			
 		}
+
+        public Texture2D Texture
+        {
+            get { return texture; }
+            set { texture = value; }
+        }
 		
 	}
 

@@ -16,7 +16,9 @@ namespace AHH.User
     {
         Building,
         Research,
-        Spells
+        Spells,
+        Demolish,
+        All
     }
 
 
@@ -31,7 +33,7 @@ namespace AHH.User
 		
 		int max_energy;
 		StatusBar status_bar;
-		int energyIncrease { get; set; }
+		float energyIncrease { get; set; }
 
 		Text text;
 
@@ -53,7 +55,7 @@ namespace AHH.User
 			max_energy = this.energy;
 			status_bar = new StatusBar(size, energy, statusBar, new Text(Vector2.One, "", Color.White));
 			status_bar.UpdatePosition(new Vector2(10, 850));
-			text = new Text(new Vector2(1800, 900), "", Color.White);
+			text = new Text( status_bar.Position + status_bar.GetText.Position + new Vector2(128, -22), "", Color.White);
         }
 
         public void Update(UiMaster master, MouseState ms )
@@ -67,13 +69,35 @@ namespace AHH.User
 				mode = Player_Modes.Research;
 			if (controls.IsPressed(Ctrls.HotKey_Spells))
 				mode = Player_Modes.Spells;
+
+            switch (master.NextAction)
+            {
+                case ButtonFunction.M_Build:
+                    master.Pop_Action();
+                    mode = Player_Modes.Building;
+                    break;
+                case ButtonFunction.M_Research:
+                    master.Pop_Action();
+                    mode = Player_Modes.Research;
+                    break;
+                case ButtonFunction.M_Spells:
+                    master.Pop_Action();
+                    mode = Player_Modes.Spells;
+                    break;
+                case ButtonFunction.M_Demolish:
+                    master.Pop_Action();
+                    mode = Player_Modes.Demolish;
+                    break;
+
+
+            }
 		}
 
 		public void UpdateEnergy()
 		{
-			energy += energyIncrease;
+			energy += (int)energyIncrease;
 			energy = MathHelper.Clamp(energy, 0, max_energy);
-			text.Value = energyIncrease.ToString();
+			text.Value = "(" + energyIncrease.ToString() + ")";
 			energyIncrease = 0;
 		}
 
@@ -113,7 +137,7 @@ namespace AHH.User
 			set { energy = value; }
 		}
 
-		public int IncreaseEnergy
+		public float IncreaseEnergy
 		{
 			get { return energyIncrease; }
 			set { energyIncrease = value; }

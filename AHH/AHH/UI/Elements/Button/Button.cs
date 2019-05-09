@@ -26,5 +26,10 @@ namespace AHH.UI
 			get { return isActive; }
 			set { isActive = value; }
 		}
+
+        public void Manipulate(string value)
+        {
+            text.Value = value;
+        }
 	}
 }

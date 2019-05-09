@@ -13,20 +13,27 @@ namespace AHH.AI
 	{
 		bool alive { get; set; }
 		float rotation = 1;
-		public Projectile(Vector2 position, Point size, Texture2D texture, float speed)
+
+        Vector2 destination;
+
+        Vector2 origin;
+		public Projectile(Vector2 position, Point size, Texture2D texture, float speed, Vector2 destination)
 			: base(position, size, texture, speed)
 		{
 			alive = true;
-		}
+            this.destination = destination;
 
-		public void Update(Vector2 destination, AiUnit unit)
+            var dir = position.DirectionTo(destination);
+            rotation = (float)Math.Atan2(dir.Y, dir.X);
+            origin = new Vector2(texture.Width / 2, texture.Height / 2);
+        }
+
+		public void Update()
 		{
 			if (MoveTo(destination))
 				alive = false;
 
-			var dir = Position.DirectionTo(destination);
-
-			rotation = -(float)Math.Atan2(dir.Y, dir.X);;
+			
 		}
 
 		public bool Alive
@@ -37,7 +44,7 @@ namespace AHH.AI
 
 		new public void Draw(SpriteBatch sb)
 		{
-			sb.Draw(Texture, Box, null, Color.White, rotation, new Vector2(8f, 8f), SpriteEffects.None, 1f);
+			sb.Draw(Texture, Box, null, Color.White, rotation, origin, SpriteEffects.None, 1f);
 		}
 	}
 }

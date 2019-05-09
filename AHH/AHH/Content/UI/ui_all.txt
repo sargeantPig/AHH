@@ -1,0 +1,30 @@
+﻿###################
+##ALL#########
+############
+Type	Button
+Name	M_Build
+Value	B
+Size	42, 42
+H_texture	texture/ui/button_test_h
+Texture	texture/ui/button_test
+
+Type	Button
+Name	M_Spells
+Value	S
+Size	42, 42
+H_texture	texture/ui/button_test_h
+Texture	texture/ui/button_test
+
+Type	Button
+Name	M_Research
+Value	R
+Size	42, 42
+H_texture	texture/ui/button_test_h
+Texture	texture/ui/button_test
+
+Type	Button
+Name	M_Demolish
+Value	E
+Size	42, 42
+H_texture	texture/ui/button_test_h
+Texture	texture/ui/button_test

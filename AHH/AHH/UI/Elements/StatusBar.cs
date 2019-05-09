@@ -21,7 +21,7 @@ namespace AHH.UI.Elements
 		int currentValue;
 		int maxValue;
 
-		Text text;
+		Text text { get; set;  }
 		public StatusBar(Point size, int maxValue, Texture2D[] textures, Text text = null)
 		{
 			this.b_size = size;
@@ -99,6 +99,11 @@ namespace AHH.UI.Elements
 		{
 			throw new NotImplementedException();
 		}
+
+        public Text GetText
+        {
+            get { return text; }
+        }
 
 	}
 }

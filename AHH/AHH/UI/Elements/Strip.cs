@@ -28,8 +28,25 @@ namespace AHH.UI.Elements
             foreach (KeyValuePair<string, IElement> kv in elements)
             {
                 if (kv.Value is Button)
-                {
+                {              
                     if (((Button)kv.Value).IsClicked)
+                    {
+                        return kv.Key;
+                    }  
+                }
+            }
+
+            return null;
+
+        }
+
+        public string GetHighlighted()
+        {
+            foreach (KeyValuePair<string, IElement> kv in elements)
+            {
+                if (kv.Value is Button)
+                {
+                    if (((Button)kv.Value).IsHighlighted)
                     {
                         return kv.Key;
                     }
@@ -70,6 +87,19 @@ namespace AHH.UI.Elements
         {
             foreach (IElement e in elements.Values)
                 e.Draw(sb);
+        }
+
+        public void Manipulate<T>(string name, string value)
+        {
+            if (elements.ContainsKey(name))
+            {
+                if (typeof(T) == typeof(Button))
+                {
+                    ((Button)elements[name]).Manipulate(value);
+                }
+
+            }
+
         }
     }
 }
