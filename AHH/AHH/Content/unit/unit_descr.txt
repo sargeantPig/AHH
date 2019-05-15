@@ -5,40 +5,40 @@
 
 Name	Swordsman
 Type	Knight
-Stats	70, Sword, Heavy, 4, 1, 1000, Trained, Aggressive, 1
-Descr	A Holy Swordsman of unquestionable honour.
+Stats	70, Sword, Medium, 4, 1, 1000, Trained, Hyper, 1
+Descr	A Holy Swordsman of	unquestionable honour.
 
-Name	Squire
+Name	Holy Man
 Type	Priest
-Stats	50, Spear, Heavy, 1, 3, 2000, Trained, Focused, 1
-Descr	A Holy priest of radiant light.
+Stats	50, Voice, None, 1, 3, 2000, Holy, Focused, 1
+Descr	A Holy priest of	radiant light.
 
-Name	Bow
+Name	Bowman
 Type	Archer
-Stats	50, Bow, Heavy, 4, 5, 2000, Trained, Hyper, 1.1
-Descr	An Archer of precise accuracy,
+Stats	50, Bow, Light, 2, 5, 2000, Cowardly, Aggressive, 1.1
+Descr	An Archer of	precise accuracy,
 
-Name	pl
+Name	Mounted Knight
 Type	Horseman
-Stats	75, Bone, Heavy, 5, 1, 1500, Trained, Focused, 1.5
-Descr	A mounter knight of unbreakable will.
+Stats	75, Spear, Heavy, 6, 1, 1500, Trained, Violent, 1.5
+Descr	A mounter knight of	unbreakable will.
 
-Name	ZSwordsman
+Name	Undead Swordsman
 Type	Z_Knight
-Stats	50, Sword, Heavy, 4, 1, 1000, Trained, Aggressive, 1
+Stats	50, Sword, Medium, 4, 1, 1000, Zombie, Hyper, 1
 Descr	Ahh
 
-Name	ZSquire
+Name	Necrolyt
 Type	Z_Priest
-Stats	50, Spear, Heavy, 1, 20, 2000, Trained, Focused, 1
+Stats	50, Voice, None, 1, 20, 2000, Zombie, Focused, 1
 Descr	Ugh
 
-Name	ZBow
+Name	Undead Bowman
 Type	Z_Archer
-Stats	50, Bow, Heavy, 4, 30, 2000, Trained, Hyper, 1.1
+Stats	50, Bow, Light, 2, 5, 2000, Zombie, Aggressive, 1.1
 Descr	Grarh
 
-Name	Zpl
+Name	Black Knight
 Type	Z_Horseman
-Stats	50, Bone, Heavy, 5, 1, 1500, Trained, Focused, 2.5
+Stats	50, Spear, Heavy, 6, 1, 1500, Zombie, Violent, 1.5
 Descr	Grrugh

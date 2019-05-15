@@ -1,0 +1,23 @@
+﻿#########################################
+##Main Menu Buttons
+#########################################
+Type	Button
+Name	MM_Start
+Value	Start
+Size	256, 128
+H_texture	texture/ui/button_test_h
+Texture	texture/ui/button_test
+
+Type	Button
+Name	MM_Hiscores
+Value	Hiscores
+Size	256, 128
+H_texture	texture/ui/button_test_h
+Texture	texture/ui/button_test
+
+Type	Button
+Name	Quit
+Value	Quit
+Size	256, 128
+H_texture	texture/ui/button_test_h
+Texture	texture/ui/button_test

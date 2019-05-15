@@ -24,7 +24,10 @@ namespace AHH.Base
 		public Texture2D Texture
 		{
 			get { return texture; }
-			set { texture = value; }
+			set {
+                texture = value;
+
+            }
 		}
 
 		public Rectangle Box

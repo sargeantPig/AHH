@@ -23,7 +23,8 @@ namespace AHH.Interactable.Building
         NTower,
         EnergyConduit,
         NecroticOrrery,
-        Grave
+        Grave,
+        Demolish
     }
     struct BuildingData
     {
@@ -36,6 +37,8 @@ namespace AHH.Interactable.Building
         Point size { get; set; }
         float build_time { get; set; }
         float cost { get; set; }
+
+        float orig_cost { get; set; }
         string descr { get; set; }
         InfoPanel info { get; set; }
 
@@ -51,6 +54,7 @@ namespace AHH.Interactable.Building
             this.cost = bd.cost;
             this.id = Guid.NewGuid();
             this.descr = bd.descr;
+            this.orig_cost = bd.orig_cost;
             Dictionary<Text, Text> items = new Dictionary<Text, Text>();
 
             items.Add(new Text(Vector2.Zero, ""), new Text(Vector2.Zero, this.name, Color.White));
@@ -58,10 +62,8 @@ namespace AHH.Interactable.Building
             items.Add(new Text(Vector2.Zero, "Descr: ", Color.White), new Text(Vector2.Zero, this.descr, Color.White));
 
             this.info = new InfoPanel(items, null, Vector2.Zero);
-           
-        
+                  
         }
-
 
         static public BuildingData operator +(BuildingData first, BuildingData second)
         {
@@ -69,7 +71,6 @@ namespace AHH.Interactable.Building
             first.build_time += second.build_time;
             first.cost += second.cost;
             first.production += second.production;
-
             return first;
         }
 
@@ -85,10 +86,23 @@ namespace AHH.Interactable.Building
             return b;
         }
 
+        static public BuildingData SetCost(BuildingData first, BuildingData second)
+        {
+            first.cost = second.cost;
+            return first;
+        }
+
         public BuildingTypes Type
         {
             get { return type; }
             set { type = value; }
+        }
+
+        public float OriginalCost
+        {
+            get { return orig_cost; }
+            set { orig_cost = value; }
+
         }
 
         public string Name

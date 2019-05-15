@@ -11,12 +11,16 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using AHH.Interactable.Building;
 using AHH.Extensions;
+using AHH.Interactable.Spells;
+using AHH.Functions;
+
 namespace AHH.Research
 {
     class Researcher
     {
 
         Dictionary<ButtonFunction, Dictionary<string, Research>> research;
+        List<Researchables> airesearch;
         Dictionary<string, Research> currentResearch { get; set; }
         int[] stage;
         List<ButtonFunction> functions = new List<ButtonFunction>()
@@ -29,7 +33,10 @@ namespace AHH.Research
 
         Stager<ButtonFunction, int> stager;
 
-        public Researcher(ContentManager cm)
+        int aiResearchTimer = 60000 * 1;
+        float elasped = 0;
+
+        public Researcher(ContentManager cm, Random rng)
         {
             research = Parsers.Parsers.ParseResearch(@"Content/research/research_tree.txt", cm);
             stage = new int[3];
@@ -45,15 +52,22 @@ namespace AHH.Research
             stager.Add(new WTuple<ButtonFunction, bool, int>(ButtonFunction.R1, false, 0));
             stager.Add(new WTuple<ButtonFunction, bool, int>(ButtonFunction.R2, false, 0));
             stager.Add(new WTuple<ButtonFunction, bool, int>(ButtonFunction.R3, false, 0));
+
+            int totalAiResearch = 30;
+            airesearch = new List<Researchables>();
+            for (int x = 0; x < totalAiResearch; x++)
+            {
+                airesearch.Add(Extensions.Extensions.RandomFlag<Researchables>(rng, 11, 13));
+            }
         }
 
-        public void Update(GameTime gt, Overseer os, Architech arch, UiMaster master, Player player)
+        public void Update(GameTime gt, Overseer os, Architech arch, UiMaster master, Player player, Wizard wiz, Random rnd)
         {
             int i = 0;
          
             foreach (ButtonFunction bf in functions)
             {
-                ResearchUpdate(gt, os, arch, master, player, i, bf);
+                ResearchUpdate(gt, os, arch, wiz, master, player, i, bf);
                 NextResearch(0, master, bf);
                 i++;
             }
@@ -103,6 +117,17 @@ namespace AHH.Research
             }
 
             if(player.Mode != Player_Modes.Research) RemoveInfo(master, new ButtonFunction[] { ButtonFunction.R1, ButtonFunction.R2, ButtonFunction.R3 });
+
+            elasped += gt.ElapsedGameTime.Milliseconds;
+
+            if (elasped >= aiResearchTimer)
+            {
+                var r = new ResearchData();
+                r.Modifiers = new List<KeyValuePair<Researchables, float>>();
+                r.Modifiers.Add(new KeyValuePair<Researchables, float>( airesearch.First(), rnd.Next(1, 5)/ 100));
+                ApplyResearch(r, os, arch, wiz, master);
+                elasped = 0;
+            }
         }
 
         void RemoveInfo(UiMaster master, ButtonFunction[] buttonFunctions)
@@ -114,13 +139,14 @@ namespace AHH.Research
 
         }
 
-        void ResearchUpdate(GameTime gt, Overseer os, Architech arch, UiMaster master, Player player, int ind, ButtonFunction b)
+        void ResearchUpdate(GameTime gt, Overseer os, Architech arch, Wizard wiz, UiMaster master, Player player, int ind, ButtonFunction b)
         {
             if (research[b].ToList()[stager[b].Item3].Value.State == ResearchState.Researching)
                 research[b].ToList()[stager[b].Item3].Value.Update(gt, this, player, arch);
             else if (research[b].ToList()[stager[b].Item3].Value.State == ResearchState.Done && !stager[b].Item2)
             {
-                ApplyResearch(research[b].ToList()[stager[b].Item3].Value.Data, os, arch);
+                ApplyResearch(research[b].ToList()[stager[b].Item3].Value.Data, os, arch, wiz, master);
+                master.Messenger.AddMessage(new Text(Vector2.Zero, research[b].ToList()[stager[b].Item3].Value.Data.Name + "Complete", Color.DarkGreen));
                 stager[b].Item3++;
                 if (stager[b].Item3 >= research[b].ToList().Count)
                 {
@@ -149,6 +175,20 @@ namespace AHH.Research
             if (stager[b].Item2 == true)
             { 
                 master.ManipulateElements("Tree Complete", Player_Modes.Research, b.ToString(), ind);
+
+                switch (b)
+                {
+                    case ButtonFunction.R1:
+                        Statistics.Ending = Endings.Death;
+                        break;
+                    case ButtonFunction.R2:
+                        Statistics.Ending = Endings.Passive;
+                        break;
+                    case ButtonFunction.R3:
+                        Statistics.Ending = Endings.God;
+                        break;
+                }
+                
                 return;
             }
 
@@ -156,7 +196,7 @@ namespace AHH.Research
                 research[b].ToList()[stager[b].Item3].Value.CurrentProgress.PercentAofB(research[b].ToList()[stager[b].Item3].Value.Data.ResearchTime) + "%", Player_Modes.Research, b.ToString(), ind);
         }
 
-        public void ApplyResearch(ResearchData rd, Overseer os, Architech arch)
+        public void ApplyResearch(ResearchData rd, Overseer os, Architech arch, Wizard wiz, UiMaster master)
         {
             List<Ai_Type> zombies = new List<Ai_Type>()
             {
@@ -178,21 +218,65 @@ namespace AHH.Research
                 BuildingTypes.Grave,
                 BuildingTypes.Wall
             };
+            List<SpellType> spells = new List<SpellType>()
+            {
+                SpellType.DrainEssence,
+                SpellType.Ressurect,
+                SpellType.RestoreEssence
+            };
+
+            switch (rd.Modifiers[0].Key)
+            {
+                case Researchables.ZDamage:
+                case Researchables.ZHealth:
+                case Researchables.ZSpeed:
+                case Researchables.WCost:
+                case Researchables.WHealth:
+                case Researchables.WProduct:
+                case Researchables.SCost:
+                case Researchables.SLength:
+                case Researchables.SPower:
+                    master.Messenger.AddMessage(new Text(Vector2.Zero, rd.Name + " Complete", Color.DodgerBlue));
+                    break;
+                case Researchables.AiDamage:
+                case Researchables.AiHealth:
+                case Researchables.AiSpeed:
+                    master.Messenger.AddMessage(new Text(Vector2.Zero, "A holy disturbance can be felt.", Color.PaleVioletRed));
+                    break;
+
+            }
+
+
+
 
             foreach (KeyValuePair<Researchables, float> rf in rd.Modifiers)
             {
-                if (rf.Key == Researchables.ZSpeed)
-                    os.ChangeStats(rf.Value, zombies, rf.Key);
-                else if (rf.Key == Researchables.ZHealth)
-                    os.ChangeStats(rf.Value, zombies, rf.Key);
-                else if (rf.Key == Researchables.ZDamage)
-                    os.ChangeStats(rf.Value, zombies, rf.Key);
-                else if (rf.Key == Researchables.WCost)
-                    arch.ChangeStats(rf.Value, buildings, rf.Key);
-                else if (rf.Key == Researchables.WHealth)
-                    arch.ChangeStats(rf.Value, buildings, rf.Key);
-                else if (rf.Key == Researchables.WProduct)
-                    arch.ChangeStats(rf.Value, buildings, rf.Key);
+                switch (rf.Key)
+                {
+                    case Researchables.ZDamage:
+                    case Researchables.ZHealth:
+                    case Researchables.ZSpeed:
+                        os.ChangeStats(rf.Value, zombies, rf.Key);
+                        break;
+                    case Researchables.WCost:
+                    case Researchables.WHealth:
+                    case Researchables.WProduct:
+                        arch.ChangeStats(rf.Value, buildings, rf.Key);
+                        break;
+                    case Researchables.AiDamage:
+                    case Researchables.AiHealth:
+                    case Researchables.AiSpeed:
+                        os.ChangeStats(rf.Value, ais, rf.Key);
+                        airesearch.RemoveAt(0);
+                        break;
+                    case Researchables.SCost:
+                    case Researchables.SLength:
+                    case Researchables.SPower:
+                        wiz.ChangeStats(rf.Value, spells, rf.Key);
+                        break;
+
+
+                }
 
             }
 

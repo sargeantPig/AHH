@@ -6,7 +6,7 @@
 
 Name	Wall
 Type	Wall
-Stats	3000, -1, Reinforced, 100, 300, 128, 128
+Stats	3000, -1, Reinforced, 100, 250, 64, 64
 Descr	Used to protect	your assets.
 
 Name	Necromancer Tower
@@ -28,3 +28,8 @@ Name	Necrotic Orrery
 Type	NecroticOrrery
 Stats	2000, -10, Reinforced, 100, 1000, 128, 128
 Descr	Allows Research, multiple	increase research speed.
+
+Name	Demolish
+Type	Demolish
+Stats	0, 0, Reinforced, 0, 0, 128, 128
+Descr	Demolish a building,	gain +100 energy per building.

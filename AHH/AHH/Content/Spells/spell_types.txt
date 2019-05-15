@@ -15,3 +15,27 @@ H_Texture	texture/spells/DrainEssence
 C_Texture	texture/spells/DrainEssence
 Animation
 Main, 0, 3, 200
+
+Type	RestoreEssence
+Sound	{sound_file}
+Texture	texture/spells/DrainEssence
+H_Texture	texture/spells/DrainEssence
+C_Texture	texture/spells/DrainEssence
+Animation
+Main, 0, 3, 200
+
+Type	DeadAgain
+Sound	{sound_file}
+Texture	texture/spells/DrainEssence
+H_Texture	texture/spells/DrainEssence
+C_Texture	texture/spells/DrainEssence
+Animation
+Main, 0, 3, 200
+
+Type	ClearDead
+Sound	{sound_file}
+Texture	texture/spells/DrainEssence
+H_Texture	texture/spells/DrainEssence
+C_Texture	texture/spells/DrainEssence
+Animation
+Main, 0, 3, 200

@@ -5,19 +5,19 @@ Type	Button
 Name	R1
 Value	Research1
 Size	256, 128
-H_texture	texture/ui/button_test_h
-Texture	texture/ui/button_test
+H_texture	texture/ui/Research_Button_H
+Texture	texture/ui/Research_Button
 
 Type	Button
 Name	R2
 Value	Research2
 Size	256, 128
-H_texture	texture/ui/button_test_h
-Texture	texture/ui/button_test
+H_texture	texture/ui/Research_Button_H
+Texture	texture/ui/Research_Button
 
 Type	Button
 Name	R3
 Value	Research3
 Size	256, 128
-H_texture	texture/ui/button_test_h
-Texture	texture/ui/button_test
+H_texture	texture/ui/Research_Button_H
+Texture	texture/ui/Research_Button

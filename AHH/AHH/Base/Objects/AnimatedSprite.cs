@@ -20,12 +20,18 @@ namespace AHH.Base
 		bool Active { get; set; }
 		bool active_mode = false;
 
-		public AnimatedSprite(Vector2 position, Point RectExtents, Texture2D texture, Dictionary<string, Vector3> states = null, bool active_mode = false)
+        Point size;
+
+		public AnimatedSprite(Vector2 position, Point RectExtents, Texture2D texture, Dictionary<string, Vector3> states = null, bool active_mode = false, int size = -1)
 			: base(position, texture, RectExtents)
 		{
 			this.Source = new Rectangle(0, 0, RectExtents.X, RectExtents.Y);
 			this.Active = false;
 			this.active_mode = active_mode;
+
+            if (size < 0)
+                this.size = RectExtents;
+            else this.size = new Point(size, size);
 			if (states == null && texture != null)
 			{
 				this.States = new Dictionary<string, Vector3>();
@@ -67,7 +73,7 @@ namespace AHH.Base
 
 		new public void Draw(SpriteBatch sb)
 		{
-			sb.Draw(base.Texture, base.Position, Source, Color.White);
+			sb.Draw(base.Texture, new Rectangle((int)Position.X, (int)Position.Y, size.X, size.Y), Source, Color.White);
 		}
 
 		public void Draw_Debug(SpriteBatch sb)
@@ -101,7 +107,10 @@ namespace AHH.Base
 		public string CurrentState
 		{
 			get { return currentState; }
-			set { currentState = value; }
+			set {
+                if (Frame > States[value].Y || Frame < States[value].X)
+                    Frame = (int)States[value].X;
+                currentState = value; }
 
 		}
 

@@ -3,28 +3,35 @@
 ############
 Type	Button
 Name	M_Build
-Value	B
-Size	42, 42
-H_texture	texture/ui/button_test_h
-Texture	texture/ui/button_test
+Value	Build
+Size	164, 42
+H_texture	texture/ui/Build_Button_H
+Texture	texture/ui/Build_Button
 
 Type	Button
 Name	M_Spells
-Value	S
-Size	42, 42
-H_texture	texture/ui/button_test_h
-Texture	texture/ui/button_test
+Value	Spells
+Size	164, 42
+H_texture	texture/ui/Spells_Button_H
+Texture	texture/ui/Spells_Button
 
 Type	Button
 Name	M_Research
-Value	R
-Size	42, 42
-H_texture	texture/ui/button_test_h
-Texture	texture/ui/button_test
+Value	Research
+Size	164, 42
+H_texture	texture/ui/Research_Button_H
+Texture	texture/ui/Research_Button
 
 Type	Button
-Name	M_Demolish
-Value	E
-Size	42, 42
-H_texture	texture/ui/button_test_h
-Texture	texture/ui/button_test
+Name	M_Tools
+Value	Tools
+Size	164, 42
+H_texture	texture/ui/Demolish_Button_H
+Texture	texture/ui/Demolish_Button
+
+Type	Button
+Name	M_Pause
+Value	Menu
+Size	164, 42
+H_texture	texture/ui/Pause_Button_H
+Texture	texture/ui/Pause_Button

@@ -51,8 +51,18 @@ namespace AHH.Interactable.Building
 		public Building()
 			: base(new Vector2(), new Point(), null, null, null, 0)
 		{ }
+        protected void RefreshInfo()
+        {
+            Info = new InfoPanel(
+                new Dictionary<Text, Text>()
+                {
+                    { new Text(Vector2.One, "Name: ", Color.White), new Text(Vector2.One, data.Name, Color.White) },
+                    { new Text(Vector2.One, "Health: ", Color.White), new Text(Vector2.One, data.Health.ToString(), Color.White) },
+                    { new Text(Vector2.One, "Descr: ", Color.White), new Text(Vector2.One, data.Descr.ToString(), Color.White) }
+                }, type.Texture, Vector2.Zero);
+        }
 
-		public void InitAdjacent(Grid grid)
+        public void InitAdjacent(Grid grid)
 		{
 			adjThread = new OffloadThread();
 			adjThread.Th_Offload = new ThreadStart(() => {
@@ -63,18 +73,22 @@ namespace AHH.Interactable.Building
 			adjThread.Th_Child.Start();
 		}
 
-		public void Update(Player player, GameTime gt, Architech arch, Grid grid, List<Rectangle> units)
+		public void Update(Player player, GameTime gt, Architech arch, Grid grid, List<Rectangle> units, UiMaster ui)
 		{
 			base.Update(player.Cursor, gt);
 
 			statusBar.Update(data.Health);
 			statusBar.UpdatePosition(Position);
 
-			
+            RefreshInfo();
+            if (IsHighlighted)
+                ui.RecieveInfo(new KeyValuePair<Guid, InfoPanel>(this.ID, Info));
+            else ui.RemoveInfo(this.ID);
+
             switch (state)
             {
                 case BuildingStates.Building:
-                    Build(gt, arch, grid, units, player);
+                    Build(gt, arch, grid, units, player, ui);
                     break;
                 case BuildingStates.Disabled:
                     break;
@@ -83,7 +97,7 @@ namespace AHH.Interactable.Building
 
 		}
 
-		void Build(GameTime gt, Architech arch, Grid grid, List<Rectangle> units, Player player)
+		void Build(GameTime gt, Architech arch, Grid grid, List<Rectangle> units, Player player, UiMaster ui)
         { 
 			bool impassable = false;
 
@@ -114,7 +128,7 @@ namespace AHH.Interactable.Building
 					this.GetBuildingData().Health = temp_health;
 					//finish building
 					state = BuildingStates.Production; //start producing 
-					arch.BuildComplete(this, grid);
+					arch.BuildComplete(this, grid, ui);
 					base.CurrentState = "Production";
 				}
             }
@@ -144,16 +158,16 @@ namespace AHH.Interactable.Building
                         p.IncreaseEnergy += (int)stats.Production * os.GetAliveAis();
                         break;
                     case BuildingTypes.NTower:
-                        p.IncreaseEnergy += (int)stats.Production * os.GetAliveAis();
+                        p.IncreaseEnergy += (int)stats.Production;
                         break;
                     case BuildingTypes.Wall:
-                        p.IncreaseEnergy += (int)stats.Production * os.GetAliveAis();
+                        p.IncreaseEnergy += (int)stats.Production;
                         break;
                     case BuildingTypes.Grave:
-                        p.IncreaseEnergy += (int)stats.Production * os.GetAliveAis();
+                        p.IncreaseEnergy += (int)stats.Production;
                         break;
                     case BuildingTypes.NecroticOrrery:
-                        p.IncreaseEnergy += (int)stats.Production * os.GetAliveAis();
+                        p.IncreaseEnergy += (int)stats.Production;
                         break;
 
                 }
@@ -181,6 +195,7 @@ namespace AHH.Interactable.Building
 
 		public List<Vector2> AdjacentTiles
 		{
+
 			get { return adjacentTiles; }
 		}
 
@@ -189,7 +204,7 @@ namespace AHH.Interactable.Building
 			get { return corners; }
 		}
 
-		List<Vector2> GetAdjacent(Grid grid)
+		public List<Vector2> GetAdjacent(Grid grid)
 		{
 			Extensions.Matrix_ points = new Extensions.Matrix_(new Vector2[,]
 			{ {corners[Corner.TopLeft], corners[Corner.BottomLeft], },

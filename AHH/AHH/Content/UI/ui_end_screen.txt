@@ -1,0 +1,11 @@
+﻿Type	TextBox
+Name	End Info
+Position	550, 100
+
+Type	Button
+Name	Quit
+Value	Save and Quit
+Size	256, 128
+Position	550, 700
+H_texture	texture/ui/Research_Button_H
+Texture	texture/ui/Research_Button

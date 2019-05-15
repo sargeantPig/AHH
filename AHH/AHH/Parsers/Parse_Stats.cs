@@ -53,6 +53,7 @@ namespace AHH.Parsers
 					if (typeof(Y) == typeof(Spell_Stats))
 					{
 						temp_stats.Cost = (float)Convert.ToDouble(split[1]);
+                        temp_stats.OriginalCost = (float)Convert.ToDouble(split[1]);
 						temp_stats.Range = (float)Convert.ToDouble(split[2]);
 						temp_stats.Duration = (float)Convert.ToDouble(split[3]);
 						temp_stats.Tick = (float)Convert.ToDouble(split[4]);
@@ -73,6 +74,7 @@ namespace AHH.Parsers
                         temp_stats.Production = Convert.ToInt32(split[2]);
 						temp_stats.Size = new Point(Convert.ToInt32(split[6]), Convert.ToInt32(split[7]));
                         temp_stats.Cost = (float)Convert.ToDouble(split[5]);
+                        temp_stats.OriginalCost = (float)Convert.ToDouble(split[5]);
                         temp_stats.BuildTime = (float)Convert.ToDouble(split[4]);
                     }
 

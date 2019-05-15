@@ -6,10 +6,25 @@
 
 Name	Ressurect
 Type	Ressurect
-Stats	10, 1, 3000, 300, 2, 0, 64, 64
+Stats	50, 1, 3000, 300, 2, 0, 64, 64
 Descr	Raise the Dead	to fight for your cause.
 
-Name	DrainEssence
+Name	Steal Soul
 Type	DrainEssence
-Stats	10, 1, 3000, 300, 2, 5, 64, 64
+Stats	75, 1, 3000, 300, 2, 10, 64, 64
 Descr	Sap the Health of	enemies.
+
+Name	Revitalise
+Type	RestoreEssence
+Stats	150, 1, 3000, 300, 2, 5, 64, 64
+Descr	Restore the health	of your minions.
+
+Name	Dead Again
+Type	DeadAgain
+Stats	200, 1, 3000, 300, 2, 0, 64, 64
+Descr	Kills your minions,	for later resurrection.
+
+Name	Clear Dead
+Type	ClearDead
+Stats	0, 1, 3000, 300, 2, 0, 64, 64
+Descr	Clear up Corpses,	gain +100 energy per corpse.

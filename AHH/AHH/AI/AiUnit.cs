@@ -37,6 +37,8 @@ namespace AHH.AI
 		protected int pathfinderID = -1;
 
 		protected Type_Data<Ai_Type> data;
+
+        bool checkWaypoints { get; set; }
 		public AiUnit(Vector2 position, Point rectExtends, float speed, Dictionary<string, Vector3> states, Stats stats, Type_Data<Ai_Type> unit_types, Grid grid)
 			: base(position, rectExtends, unit_types.Texture, unit_types.H_texture, unit_types.C_texture, speed, states)
 		{
@@ -45,14 +47,14 @@ namespace AHH.AI
 			waypoints = new List<Vector2>();
 			ai_State = Ai_States.Target;
 			corners = new Dictionary<Corner, Vector2>();
-			
 			pf_result = null;
 			statusBar = new StatusBar(new Point(rectExtends.X, rectExtends.Y/ 5), (int)stats.Health, statusBarTexture);
-			pathfinder = new OffloadThread[12];
+			pathfinder = new OffloadThread[1];
 			data = unit_types;
+            checkWaypoints = false;
 		}
 
-		public void Update()
+		public void Update(Grid grid)
 		{
 			statusBar.Update(stats.Health);
 			statusBar.UpdatePosition(Position);
@@ -65,9 +67,23 @@ namespace AHH.AI
 				
 			foreach (Guid g in removeProj_queue)
 				projectile.Remove(g);
+
+            if (checkWaypoints)
+            {
+                if (grid.CheckPositions(waypoints).Count != waypoints.Count)
+                {
+                    PFResult = null;
+                    waypoints.Clear();
+                    Ai_States = Ai_States.Target;
+                   
+                }
+
+                checkWaypoints = false;
+            }
+
 		}
 
-		public bool GetPath(Grid grid, Vector2 position, Point destination)
+		public bool GetPath(Grid grid, Vector2 position, Point destination, Random rng)
 		{
 			if (pathfinderID == -1)
 			{
@@ -80,7 +96,7 @@ namespace AHH.AI
 						pathfinder[x] = new OffloadThread();
 						pathfinder[x].Th_Offload = new ThreadStart(() =>
 						{
-							this.pf_result = grid.Pathfinder(Grid.ToWorldPosition(destination, Grid.GetTileSize), Position);
+							this.pf_result = grid.Pathfinder(Grid.ToWorldPosition(destination, Grid.GetTileSize), Position, rng, isZombie);
 						});
 
 						pathfinder[x].Th_Child = new Thread(pathfinder[x].Th_Offload);
@@ -102,7 +118,7 @@ namespace AHH.AI
 					pathfinder[pathfinderID] = new OffloadThread();
 					pathfinder[pathfinderID].Th_Offload = new ThreadStart(() =>
 					{
-						this.pf_result = grid.Pathfinder(Grid.ToWorldPosition(destination, Grid.GetTileSize), Position);
+						this.pf_result = grid.Pathfinder(Grid.ToWorldPosition(destination, Grid.GetTileSize), Position, rng, isZombie);
 					});
 					Console.WriteLine("Pathfinder Starting " + pathfinderID.ToString() + ": " + DateTime.Now.ToString("h:mm:ss"));
 					pathfinder[pathfinderID].Th_Child = new Thread(pathfinder[pathfinderID].Th_Offload);
@@ -119,6 +135,8 @@ namespace AHH.AI
 			pathfinderID = -1;
 			return false;
 		}
+
+
 
 		public void CalculateCorners()
 		{
@@ -152,83 +170,6 @@ namespace AHH.AI
 			statusBar.Draw(sb, textures);
 		}
 
-		protected List<Vector2> CalculateWayPoints(object grid, Random rng)
-		{
-			WTuple<Vector2, TileStates, int>[,] _grid = ((WTuple<Vector2, TileStates, int>[,])grid);
-			List<Vector2> points = new List<Vector2>();
-			//find start point
-			Point start = Grid.ToGridPosition(Position, Grid.GetTileSize);
-			Point current = start;
-			//find finish
-			Point finish = new Point();
-			for (int x = 0; x < _grid.GetLength(0); x++)
-			{
-				for (int y = 0; y < _grid.GetLength(1); y++)
-				{
-					if (_grid[x, y].Item3 == 0)
-					{
-						finish = new Point(x, y);
-						break;
-					}
-				}
-			}
-
-			while (current != finish)
-			{
-				Vector2 next = new Vector2();
-				bool found = false;
-
-
-				//check all around the tile and assign a counter
-				Vector2 max = new Vector2(current.X + 1, current.Y + 1);
-				Vector2 min = new Vector2(current.X - 1, current.Y - 1);
-				int maxx = _grid.GetLength(0);
-				int maxy = _grid.GetLength(1);
-				if (current.X + 1 >= maxx)
-					max.X = maxx - 1;
-				if (current.Y + 1 >= maxy)
-					max.Y = maxy - 1;
-				if (current.X - 1 < 0)
-					min.X = 0;
-				if (current.Y - 1 < 0)
-					min.Y = 0;
-
-
-				
-				int trueMaxX =	MathHelper.Clamp(current.X + 1, current.X, maxx);
-				
-				int trueMaxY = MathHelper.Clamp(current.Y + 1, current.Y, maxy);
-
-				List<Vector2> lfound = new List<Vector2>();
-				List<Point> pfound = new List<Point>();
-
-				for (int x = (int)min.X; x <= max.X; x++)
-				{
-					for (int y = (int)min.Y; y <= max.Y; y++)
-					{
-						if (x != current.X || y != current.Y)
-						{
-							if (_grid[x, y].Item3 < _grid[current.X, current.Y].Item3)
-							{
-								next = new Vector2(_grid[x, y].Item1.X + (size.X/2), _grid[x, y].Item1.Y + (size.Y/2));
-								pfound.Add(new Point(x, y));
-								lfound.Add(next);
-							}
-						}
-					}
-				}
-
-				var rnd = rng.Next(0, lfound.Count);
-
-				if (isZombie)
-					points.Add(lfound[0]);
-				else
-					points.Add(lfound[rnd]);
-				current = pfound[rnd];
-			}
-
-			return points;
-		}
 
 		new public void Draw(SpriteBatch sb)
 		{
@@ -344,6 +285,11 @@ namespace AHH.AI
 			get { return ID; }
 		}
 
+        public bool CheckWaypoints
+        {
+            get { return checkWaypoints; }
+            set { checkWaypoints = value; }
+        }
 		public Dictionary<Corner, Vector2> Corners
 		{
 			get { return corners; }

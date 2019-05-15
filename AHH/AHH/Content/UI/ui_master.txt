@@ -7,36 +7,60 @@
 
 Mode	Building
 ParseType	multi
-Location	60, 928
+Location	10, 948
 Size	256, 128
 Align	Horizontal
 File	Content/UI/ui_buildings.txt
 
 Mode	Research
 ParseType	multi
-Location	60, 928
+Location	10, 948
 Size	256, 128
 Align	Horizontal
 File	Content/UI/ui_research.txt
 
 Mode	Spells
 ParseType	multi
-Location	60, 928
+Location	10, 948
 Size	256, 128
 Align	Horizontal
 File	Content/UI/ui_spells.txt
 
+Mode	Pause
+ParseType	multi
+Location	10, 948
+Size	256, 128
+Align	Horizontal
+File	Content/UI/ui_pause.txt
+
+Mode	Tools
+ParseType	multi
+Location	10, 948
+Size	256, 128
+Align	Horizontal
+File	Content/UI/ui_demolish.txt
+
 Mode	All
 ParseType	multi
 Location	10, 907
-Size	42, 42
-Align	Vertical
+Size	164, 42
+Align	Horizontal
 File	Content/UI/ui_all.txt
 
 Mode	All
 ParseType	multi
-Location	1100, 992
+Location	1050, 992
 Size	64, 64
 Align	Horizontal
 File	Content/UI/ui_cycle.txt
-		
+
+Mode	MainMenu
+ParseType	multi
+Location	832, 518
+Size	256, 128
+Align	Vertical
+File	Content/UI/ui_main_menu.txt
+
+Mode	End_Screen
+ParseType	single
+File	Content/UI/ui_end_screen.txt

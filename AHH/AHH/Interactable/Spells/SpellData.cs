@@ -13,7 +13,9 @@ namespace AHH.Interactable.Spells
 	{
 		Ressurect,
 		DrainEssence,
-		RestoreEssence
+		RestoreEssence,
+        DeadAgain,
+        ClearDead
 	}
 
     struct Spell_Stats
@@ -24,6 +26,7 @@ namespace AHH.Interactable.Spells
         float range { get; set; }
         float duration { get; set; }
         float cost { get; set; }
+        float orig_cost { get; set; }
         Point size { get; set; }
         float speed { get; set; }
         float tick { get; set; }
@@ -44,6 +47,7 @@ namespace AHH.Interactable.Spells
             this.damage = ss.damage;
             this.id = Guid.NewGuid();
             this.descr = ss.descr;
+            this.orig_cost = ss.orig_cost;
             Dictionary<Text, Text> items = new Dictionary<Text, Text>();
 
             items.Add(new Text(Vector2.Zero, "", Color.White), 
@@ -54,6 +58,42 @@ namespace AHH.Interactable.Spells
          
             this.info = new InfoPanel(items, null, Vector2.Zero);
 
+        }
+
+        public static Spell_Stats Empty()
+        {
+            var b = new Spell_Stats();
+
+            b.cost = 0;
+            b.damage = 0;
+            b.duration = 0;
+
+            return b;
+        }
+
+        static public Spell_Stats operator +(Spell_Stats first, Spell_Stats second)
+        {
+            first.damage += second.damage;
+            first.duration += second.duration;
+            first.cost += second.cost;
+
+            return first;
+        }
+
+        static public Spell_Stats operator -(Spell_Stats first, Spell_Stats second)
+        {
+            first.damage -= second.damage;
+            first.duration -= second.duration;
+            first.cost -= second.cost;
+
+            return first;
+        }
+
+        static public Spell_Stats SetCost(Spell_Stats first, Spell_Stats second)
+        {
+            first.cost = second.cost;
+
+            return first;
         }
 
         public SpellType Type
@@ -126,6 +166,12 @@ namespace AHH.Interactable.Spells
         {
             get { return descr; }
             set { descr = value; }
+        }
+
+        public float OriginalCost
+        {
+            get { return orig_cost; }
+            set { orig_cost = value; }
         }
 
 	}

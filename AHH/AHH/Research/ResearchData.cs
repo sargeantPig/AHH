@@ -19,11 +19,10 @@ namespace AHH.Research
 		WCost,
 		SPower,
 		SLength,
-		SSpeed,
+        SCost,
         AiHealth,
         AiSpeed,
-        AiDamage,
-        AiRange
+        AiDamage
 	}
 
 	enum ResearchState

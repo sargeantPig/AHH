@@ -14,7 +14,8 @@ using AHH.AI;
 using AHH.Interactable.Building;
 using AHH.Interactable.Spells;
 using AHH.Research;
-
+using AHH.UI.Elements.Messages;
+using AHH.Functions;
 namespace AHH
 {
 	/// <summary>
@@ -39,6 +40,8 @@ namespace AHH
 		StaticSprite backdrop;
 		StaticSprite terrain;
 		StaticSprite light;
+        StaticSprite overlay_Screen;
+        Texture2D[] screens;
 		public Game1()
 		{
 			graphics = new GraphicsDeviceManager(this);
@@ -64,7 +67,9 @@ namespace AHH
 
 		protected override void LoadContent()
 		{
-			// Create a new SpriteBatch, which can be used to draw textures.
+            // Create a new SpriteBatch, which can be used to draw textures.
+            Statistics.Load(@"Content/settings/save.dat");
+            Message.DisplayTime = 5000;
 			AiUnit.statusBarTexture = new Texture2D[] { Content.Load<Texture2D>(@"texture/ui/status_bar_bottom"), Content.Load<Texture2D>(@"texture/ui/status_bar_top")};
 			Building.statusBarTexture = new Texture2D[] { Content.Load<Texture2D>(@"texture/ui/status_bar_bottom"), Content.Load<Texture2D>(@"texture/ui/status_bar_top") };
 			BaseObject.DebugFont = Content.Load<SpriteFont>(@"fonts/debug");
@@ -72,7 +77,7 @@ namespace AHH
 			Texture2D t_r = new Texture2D(GraphicsDevice, 1, 1);
 			Texture2D t_g = new Texture2D(GraphicsDevice, 1, 1);
 			Texture2D t_b = new Texture2D(GraphicsDevice, 1, 1);
-
+            
 			Color[] red = new Color[1];
 			Color[] green = new Color[1];
 			Color[] blue = new Color[1];
@@ -93,19 +98,24 @@ namespace AHH
 				points[i] = new Vector2(rng.Next(0, 600), rng.Next(0, 600));
 			}
 
-
-
 			grid = new Grid(gridSize, new Vector2(0, 0), Content.Load<Texture2D>(@"texture/tile_n"), Content.Load<Texture2D>(@"texture/tile_h"), Content.Load<Texture2D>(@"texture/tile_c"), tileSize, @"Content/buildings/buildings.txt", @"Content/UI/ui_grid_menu.txt", Content);
-            player = new Player(t_b, new Point(1900, 50), new Texture2D[] {Content.Load<Texture2D>(@"texture/ui/healthbar_bottom"), Content.Load<Texture2D>(@"texture/ui/healthbar_top")});
+            player = new Player(t_b, new Point(1900, 50), new Texture2D[] {Content.Load<Texture2D>(@"texture/ui/healthbar_bottom"), Content.Load<Texture2D>(@"texture/ui/healthbar_top")}, Content);
 			os = new Overseer(Content, new Texture2D[] { t_r, t_g });
 			architech = new Architech(Content, grid);
 			uiMaster = new UiMaster(Content);
 			wizard = new Wizard(Content);
-            researcher = new Researcher(Content);
+            researcher = new Researcher(Content, rng);
 			backdrop = new StaticSprite(new Vector2(0, 0), Content.Load<Texture2D>(@"texture/ui/backdrop2"), new Point(1920, 1080));
 			terrain = new StaticSprite(new Vector2(0, -5), Content.Load<Texture2D>(@"texture/terrain"), new Point(1920, 1080 - (3 * 64)));
-			light = new StaticSprite(Vector2.Zero, Content.Load<Texture2D>(@"texture/terrainLight"), new Point(1920, 1080 - (3 * 64)));
+            light = new StaticSprite(Vector2.Zero, Content.Load<Texture2D>(@"texture/terrainLight"), new Point(1920, 1080 - (3 * 64)));
+            screens = new Texture2D[3];
 
+            screens[0] = Content.Load<Texture2D>(@"texture/menu_screen");
+            screens[1] = Content.Load<Texture2D>(@"texture/ui/guide");
+            screens[2] = Content.Load<Texture2D>(@"texture/end_screen");
+            overlay_Screen = new StaticSprite(Vector2.Zero, screens[0], new Point(1920, 1080));
+
+           
         }
 
 		/// <summary>
@@ -124,26 +134,62 @@ namespace AHH
 		/// <param name="gameTime">Provides a snapshot of timing values.</param>
 		protected override void Update(GameTime gameTime)
 		{
-			if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
-				Exit();
-
+            if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape) ||
+                uiMaster.NextAction == ButtonFunction.Quit)
+            {
+                Statistics.Save(@"Content/settings/save.dat");
+                Exit();
+            }
 			// TODO: Add your update logic here
-
 			Options.Update(gameTime);
             player.Input.KB = Keyboard.GetState();
-			player.Update(uiMaster, Mouse.GetState());
-			uiMaster.Update(player, gameTime);
-			grid.Update(player, architech, os);
-			architech.Update(grid, uiMaster, os, player, gameTime, os.GetUnitRects());
-			os.Update(gameTime, player.Cursor, architech, uiMaster, grid, player, rng);
-			wizard.Update(gameTime, architech, os, uiMaster, grid, player);
-            researcher.Update(gameTime, os, architech, uiMaster, player);
-            player.Input.KBP = player.Input.KB;
-			player.Cursor.prevState = player.Cursor.GetState;
+			player.Update(uiMaster, Mouse.GetState(), architech, gameTime);
+            uiMaster.Update(player, gameTime);
 
-			if(Options.GetTick)
-				player.UpdateEnergy();
-			base.Update(gameTime);
+            switch (player.Mode)
+            {
+                case Player_Modes.Tutorial:
+                    overlay_Screen.Texture = screens[1];
+                    break;
+                case Player_Modes.MainMenu:
+                    overlay_Screen.Texture = screens[0];
+                    break;
+                case Player_Modes.Building:
+                case Player_Modes.Research:
+                case Player_Modes.Spells:
+                case Player_Modes.Tools:
+                case Player_Modes.Pause:
+                    break;
+                case Player_Modes.End_Screen:
+                    overlay_Screen.Texture = screens[2];
+                    break;
+                case Player_Modes.ES_Death:
+                    overlay_Screen.Texture = screens[2];
+                    break;
+                case Player_Modes.ES_God:
+                    overlay_Screen.Texture = screens[3];
+                    break;
+                case Player_Modes.ES_Passive:
+                    overlay_Screen.Texture = screens[4];
+                    break;
+            }
+
+            if (player.Mode != Player_Modes.Pause && player.Mode != Player_Modes.MainMenu && player.Mode != Player_Modes.Tutorial &&
+                player.Mode != Player_Modes.ES_Passive && player.Mode != Player_Modes.ES_God && player.Mode != Player_Modes.ES_Death && player.Mode != Player_Modes.End_Screen)
+            {
+                grid.Update(player, architech, os);
+                architech.Update(grid, uiMaster, os, player, gameTime, os.GetUnitRects());
+                os.Update(gameTime, player.Cursor, architech, uiMaster, grid, player, rng);
+                wizard.Update(gameTime, architech, os, uiMaster, grid, player);
+                researcher.Update(gameTime, os, architech, uiMaster, player, wizard, rng);
+                player.Input.KBP = player.Input.KB;
+                player.Cursor.prevState = player.Cursor.GetState;
+
+                if (Options.GetTick)
+                    player.UpdateEnergy();
+            }
+
+			base.Update(gameTime);  
 		}
 
 		/// <summary>
@@ -161,12 +207,23 @@ namespace AHH
 								   SamplerState.PointClamp, null, null, null,
 								   Resolution.getTransformationMatrix());
 			backdrop.Draw(spriteBatch);
-			terrain.Draw(spriteBatch);
-			grid.Draw(spriteBatch, player.SelectedBuilding);
-			architech.Draw(spriteBatch, player, grid);
-			os.Draw(spriteBatch);
-			wizard.Draw(spriteBatch);
-			light.Draw(spriteBatch);
+
+            if (player.Mode != Player_Modes.MainMenu && player.Mode != Player_Modes.Tutorial &&
+                player.Mode != Player_Modes.ES_Passive && player.Mode != Player_Modes.ES_God &&
+                player.Mode != Player_Modes.ES_Death && player.Mode != Player_Modes.End_Screen)
+            {
+                terrain.Draw(spriteBatch);
+                grid.Draw(spriteBatch, player.SelectedBuilding);
+                architech.Draw(spriteBatch, player, grid);
+                os.Draw(spriteBatch);
+                wizard.Draw(spriteBatch);
+                light.Draw(spriteBatch);
+            }
+
+            else if (player.Mode == Player_Modes.MainMenu || player.Mode == Player_Modes.Tutorial || player.Mode == Player_Modes.ES_Death ||
+                player.Mode == Player_Modes.ES_God || player.Mode == Player_Modes.ES_Passive || player.Mode == Player_Modes.End_Screen)
+                overlay_Screen.Draw(spriteBatch);
+
 			uiMaster.Draw(spriteBatch, player);
 			player.Draw(spriteBatch);
 			spriteBatch.End();

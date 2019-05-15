@@ -25,6 +25,7 @@ namespace AHH.AI
         float norm_speed;
         int waypointsReached = 0;
         bool marcher = true;
+        protected bool stuck = false;
 		public Grounded(Vector2 position, Point rectExtends, Type_Data<Ai_Type> types, Stats stats, Grid grid)
 			: base(position, rectExtends, stats.Speed, types.Animations, stats, types, grid)
 		{
@@ -39,9 +40,10 @@ namespace AHH.AI
 			Info = new InfoPanel(
 				new Dictionary<Text, Text>()
 				{
-                    { new Text(Vector2.One, "Name: ", Color.White), new Text(Vector2.One, Stats.Name, Color.White) },
+                    { new Text(Vector2.One, "", Color.White), new Text(Vector2.One, Stats.Name, Color.White) },
                     { new Text(Vector2.One, "Health: ", Color.White), new Text(Vector2.One, Stats.Health.ToString(), Color.White) },
-                    { new Text(Vector2.One, "Armour: ", Color.White), new Text(Vector2.One, Stats.ArmourType.ToString(), Color.White) }
+                    { new Text(Vector2.One, "Armour: ", Color.White), new Text(Vector2.One, Stats.ArmourType.ToString(), Color.White) },
+                    {new Text(Vector2.One, "Descr: ", Color.White), new Text(Vector2.One, Stats.Descr.ToString(), Color.White)  }
                 }, data.Texture, Vector2.Zero);
 		}
 
@@ -49,7 +51,7 @@ namespace AHH.AI
 		{
 			base.Update(ms, gt);
 			base.Update(gt);
-			base.Update();
+			base.Update(grid);
 			CalculateCorners();
 			GetFreeCorners(grid);
 
@@ -65,14 +67,18 @@ namespace AHH.AI
 					proj.Update();
 			}
 
-			if (Ai_States == Ai_States.Dead)
-				return;
-            if(Ai_States != Ai_States.Retaliating)
+            if (Ai_States == Ai_States.Dead)
+            {
+                CurrentState = "Dead";
+                return;
+            }
+            if (Ai_States != Ai_States.Retaliating && Ai_States != Ai_States.Marching && !marcher)
 			    CheckTarget(arch);
 
 			switch (Ai_States)
 			{
 				case Ai_States.Idle:
+                    CurrentState = "Think";
 					if (wait)
 						Think_Pathing(grid, rng);
 					else if (PFResult != null)
@@ -81,13 +87,17 @@ namespace AHH.AI
 				case Ai_States.Target: EasyGetTarget(arch, grid, rng); //can go to idle or move
 					break;
 				case Ai_States.Moving: Moving(arch, grid); // can go to idle or attacking
+                    CurrentState = "Move";
 					break;
-				case Ai_States.Attacking: Attacking(os, arch, gt, rng); // can go to idle or target
+				case Ai_States.Attacking:
+                    CurrentState = "Attack";
+                    Attacking(os, arch, gt, rng); // can go to idle or target
 					break;
                 case Ai_States.Retaliating:
                     Fighting(os, gt, rng);
                     break;
 				case Ai_States.Dead:
+                    CurrentState = "Dead";
 					return;
                 case Ai_States.Marching:
                     Forward(grid, arch);
@@ -126,14 +136,14 @@ namespace AHH.AI
 
 		protected void Moving()
 		{
-			bool reached = MoveTo(WayPoints[0]);
+			bool reached = MoveTo(WayPoints[0], true);
             if (reached)
             {
                 WayPoints.RemoveAt(0);
                 waypointsReached++;
             }
 
-            if (waypointsReached > 5 && marcher)
+            if (waypointsReached > 15 && marcher)
             {
                 WayPoints.Clear();
                 Ai_States = Ai_States.Target;
@@ -141,7 +151,13 @@ namespace AHH.AI
                 marcher = false;
             }
 
-            else if (waypointsReached <= 5 && WayPoints.Count >0)
+            else if (waypointsReached <= 15 && WayPoints.Count > 0)
+            {
+                Ai_States = Ai_States.Moving;
+
+            }
+
+            else if (waypointsReached <= 15 && WayPoints.Count == 0)
                 Ai_States = Ai_States.Marching;
 		}
 
@@ -185,8 +201,11 @@ namespace AHH.AI
 						break;
 				}
 
+                if (buildings.Count == 0)
+                    return;
+
 				KeyValuePair<Point, Building> building = buildings.ToList()[index];
-				var edges = building.Value.AdjacentTiles;
+				var edges = building.Value.GetAdjacent(grid);
 
 				if (edges == null || edges.Count == 0)
 				{
@@ -350,13 +369,23 @@ namespace AHH.AI
 				if (PFResult.GetType() == typeof(TileStates))
 				{
 					PFResult = null;
-					Ai_States = Ai_States.Idle;
+					Ai_States = Ai_States.Target;
 					WayPoints.Clear();
 					p_wait = true;
 					return false;
 				}
 
-				WayPoints = CalculateWayPoints(PFResult, rng);
+                if (PFResult.GetType() == typeof(bool))
+                {
+                    PFResult = null;
+                    Ai_States = Ai_States.Target;
+                    WayPoints.Clear();
+                    p_wait = true;
+                    stuck = true;
+                    return false;
+                }
+
+                WayPoints = ((List<Vector2>)(PFResult));
 
 				if (grid.CheckPositions(WayPoints).Count != WayPoints.Count) //theres a break in a waypoint
 				{
@@ -377,7 +406,7 @@ namespace AHH.AI
 			}
 			else if(freeCorners.Count > 0)
 			{
-				if (!GetPath(grid, freeCorners[0], destination))
+				if (!GetPath(grid, Center, destination, rng))
 				{
 					CheckActivity();
 					pathAttempts++;
@@ -412,8 +441,9 @@ namespace AHH.AI
 
                 }
 
-                else { Ai_States = Ai_States.Target;
-                    waypointsReached += 6;
+                else {
+                    Ai_States = Ai_States.Target;
+                    waypointsReached += 15;
                     this.Speed = norm_speed;
                 }
 			}
@@ -421,7 +451,7 @@ namespace AHH.AI
 			else
 			{
 				Ai_States = Ai_States.Target;
-                waypointsReached += 6;
+                waypointsReached += 15;
                 this.Speed = norm_speed;
 			}
 

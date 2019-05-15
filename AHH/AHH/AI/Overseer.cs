@@ -13,7 +13,7 @@ using AHH.Interactable.Building;
 using AHH.Interactable.Spells;
 using AHH.User;
 using AHH.Research;
-
+using AHH.Functions;
 namespace AHH.AI
 {
 	//sets up and manages AIs, including creation and deleting.
@@ -24,7 +24,7 @@ namespace AHH.AI
 		List<Guid> remove_queue = new List<Guid>();
         public Dictionary<Ai_Type, Stats> ai_stats;
 		Dictionary<Ai_Type, Type_Data<Ai_Type>> unit_types { get; }
-		float s_elasped = 100000;
+		float s_elasped = 200000;
 		float s_target = 0;
 
 		Texture2D[] statusBarTextures;
@@ -32,7 +32,7 @@ namespace AHH.AI
         List<Ai_Type[,]> formations = new List<Ai_Type[,]>();
         List<int> ys = new List<int>();
         bool spawning = false;
-        float spawn_target = 2000;
+        float spawn_target = 1000;
         float spawn_elasped = 0;
         int spawnY = 0;
         int spawnX = 0;
@@ -59,8 +59,9 @@ namespace AHH.AI
 
 		public void Update(GameTime gt, Cursor ms, Architech arch, UiMaster ui, Grid grid, Player p, Random rng)
 		{
+            p.Population = zombies.Count;
 
-			foreach (Ai ai in ais.Values)
+            foreach (Ai ai in ais.Values)
 			{
 				if (ai is Grounded)
 					((Grounded)ai).Update(ms, gt, arch, grid, rng, this, ui);
@@ -72,24 +73,16 @@ namespace AHH.AI
 					if (ai.GetStats().Health <= 0 && ai.Ai_States != Ai_States.Dead)
 					{
 						ai.Ai_States = Ai_States.Dead;
+                        Statistics.Kills++;
 					}
 
                     if (arch.BuildingPlaced)
                     {
                         if (ai.Ai_States != Ai_States.Attacking && ai.Ai_States != Ai_States.Dead)
                         {
-                            if (ai is Grounded)
-                            {
-                                ((Grounded)ai).WayPoints.Clear();
-                                ((Grounded)ai).Wait = false;
-                                ((Grounded)ai).PFResult = null;
-                            }
-                            ai.Ai_States = Ai_States.Target;
+                            ((Grounded)ai).CheckWaypoints = true;
                         }
                     }
-
-                    if (ais.Count > 100 && ai.Ai_States == Ai_States.Dead)
-                        remove_queue.Add(ai.AID);
                 }
 			}
 
@@ -97,14 +90,44 @@ namespace AHH.AI
 			{
 				Z.Update(ms, gt, arch, grid, rng, this, ui);
 
-				if (Z.GetStats().Health <= 0)
+                if (arch.BuildingPlaced)
+                {
+                    if (Z.Ai_States != Ai_States.Attacking && Z.Ai_States != Ai_States.Dead)
+                    {
+                        Z.WayPoints.Clear();
+                        Z.Wait = false;
+                        Z.PFResult = null;
+                        Z.Ai_States = Ai_States.Target;
+                    }
+                }
+
+                if (arch.BuilingDestroyed)
+                {
+                    if (Z.Ai_States == Ai_States.Thinking)
+                    {
+                        Z.Ai_States = Ai_States.Target;
+                    }
+
+                }
+                if (Z.Ai_States == Ai_States.Thinking && rng.Next(0, 10) == 5)
+                {
+                    Z.Ai_States = Ai_States.Target;
+                }
+
+                if (Z.GetStats().Health <= 0)
 					remove_queue.Add(Z.ID);
 			}
 
-			foreach (Guid id in remove_queue)
+            if (ais.Count > 200)
+                CleanUp();
+
+            foreach (Guid id in remove_queue)
 			{
-				if(ais.ContainsKey(id))
-					ais.Remove(id);
+                if (ais.ContainsKey(id))
+                {
+                    ais.Remove(id);
+                    p.IncreaseEnergy += 100;
+                }
 				if (zombies.ContainsKey(id))
 					zombies.Remove(id);
 			}
@@ -129,8 +152,24 @@ namespace AHH.AI
             }
 
             if(Options.GetTick)
-                p.IncreaseEnergy -= zombies.Count * 2;
+                p.IncreaseEnergy -= zombies.Count * 5;
+
+            
 		}
+
+        public void CleanUp()
+        {
+            foreach (var u in ais)
+            {
+                if (u.Value.Ai_States == Ai_States.Dead)
+                {
+                    remove_queue.Add(u.Key);
+                    return;
+                }
+
+            }
+
+        }
 
 		public void Combat<T>(AiUnit attacker, T defender, Random rng)
 		{
@@ -174,13 +213,13 @@ namespace AHH.AI
 					if (rng.Next(0, 100) <= 2) final_dmg *= 2;
 					break;
 				case Luck.Holy:
-					if (rng.Next(0, 100) <= 50) final_dmg *= 2;
-					break;
-				case Luck.Trained:
 					if (rng.Next(0, 100) <= 25) final_dmg *= 2;
 					break;
-				case Luck.Zombie:
+				case Luck.Trained:
 					if (rng.Next(0, 100) <= 10) final_dmg *= 2;
+					break;
+				case Luck.Zombie:
+					if (rng.Next(0, 100) <= 5) final_dmg *= 2;
 					break;
 			}
 
@@ -285,33 +324,62 @@ namespace AHH.AI
 
 		public bool IsInRange(Dictionary<Corner, Vector2> corners, Guid id, float range)
 		{
+            foreach (Vector2 v in corners.Values)
+            {
+                if (CheckDistanceY(ais[id].Corners[Corner.TopLeft], ais[id].Corners[Corner.BottomLeft], v, range))
+                    return true;
+                if (CheckDistanceX(ais[id].Corners[Corner.TopLeft], ais[id].Corners[Corner.TopRight], v, range))
+                    return true;
+                if (CheckDistanceY(ais[id].Corners[Corner.TopRight], ais[id].Corners[Corner.BottomRight], v, range))
+                    return true;
+                if (CheckDistanceX(ais[id].Corners[Corner.BottomLeft], ais[id].Corners[Corner.BottomRight], v, range))
+                    return true;
+            }
 
-			if (Vector2.Distance(corners[Corner.TopLeft], ais[id].Corners[Corner.TopRight]) <= range * rtile)
-				return true;
-			if (Vector2.Distance(corners[Corner.TopRight], ais[id].Corners[Corner.BottomLeft]) <= range * rtile)
-				return true;
-			if (Vector2.Distance(corners[Corner.BottomLeft], ais[id].Corners[Corner.BottomRight]) <= range * rtile)
-				return true;
-			if (Vector2.Distance(corners[Corner.BottomRight], ais[id].Corners[Corner.TopLeft]) <= range * rtile)
-				return true;
-			return false;
+            return false;
 		}
 
 		public bool ZIsInRange(Dictionary<Corner, Vector2> corners, Guid id, float range)
 		{
 
-			if (Vector2.Distance(corners[Corner.TopLeft], zombies[id].Corners[Corner.TopLeft]) <= range * rtile)
-				return true;
-			if (Vector2.Distance(corners[Corner.TopRight], zombies[id].Corners[Corner.TopRight]) <= range * rtile)
-				return true;
-			if (Vector2.Distance(corners[Corner.BottomLeft], zombies[id].Corners[Corner.BottomLeft]) <= range * rtile)
-				return true;
-			if (Vector2.Distance(corners[Corner.BottomRight], zombies[id].Corners[Corner.BottomRight]) <= range * rtile)
-				return true;
-			return false;
+            foreach (Vector2 v in corners.Values)
+            {
+                if (CheckDistanceY(zombies[id].Corners[Corner.TopLeft], zombies[id].Corners[Corner.BottomLeft], v, range))
+                    return true;
+                if (CheckDistanceX(zombies[id].Corners[Corner.TopLeft], zombies[id].Corners[Corner.TopRight], v, range))
+                    return true;
+                if (CheckDistanceY(zombies[id].Corners[Corner.TopRight], zombies[id].Corners[Corner.BottomRight], v, range))
+                    return true;
+                if (CheckDistanceX(zombies[id].Corners[Corner.BottomLeft], zombies[id].Corners[Corner.BottomRight], v, range))
+                    return true;
+            }
+            return false;
 		}
 
-		public List<Guid> GetUnitsInRange(Vector2 from, float range, bool ignoreDead = false)
+        public bool CheckDistanceY(Vector2 min, Vector2 max, Vector2 value, float range)
+        {
+            for (int y = (int)min.Y; y < max.Y; y++)
+            {
+                var temp = Vector2.Distance(value, new Vector2(min.X, y));
+                if (temp <= (range) * 32)
+                    return true;
+            }
+
+            return false;
+        }
+        public bool CheckDistanceX(Vector2 min, Vector2 max, Vector2 value, float range)
+        {
+            for (int y = (int)min.X; y < max.X; y++)
+            {
+                var temp = Vector2.Distance(value, new Vector2(y, min.Y));
+                if (temp <= (range) * 32)
+                    return true;
+            }
+
+            return false;
+        }
+
+        public List<Guid> GetUnitsInRange(Vector2 from, float range, bool ignoreDead = true)
 		{
 			List<Guid> units = new List<Guid>();
 			foreach (KeyValuePair<Guid, Ai> ai in ais)
@@ -325,31 +393,77 @@ namespace AHH.AI
 			return units;
 		}
 
-		public void SpellEffect(Spell attacker, Grid grid, Architech arch)
+        public List<Guid> GetZombsInRange(Vector2 from, float range, bool ignoreDead = false)
+        {
+            List<Guid> units = new List<Guid>();
+            foreach (KeyValuePair<Guid, Zombie> ai in zombies)
+            {
+                float dis = Vector2.Distance(from, ai.Value.Center);
+                if (dis <= range && (ai.Value.Ai_States != Ai_States.Dead || !ignoreDead))
+                    units.Add(ai.Key);
+
+            }
+
+            return units;
+        }
+
+        public void SpellEffect(Spell attacker, Grid grid, Architech arch)
 		{
-			float range = attacker.Stats.Range * 32;
+			float range = attacker.Stats.Range * 64;
 			//get all units in spell radius
 			//apply spell effect
-			var inrange = GetUnitsInRange(attacker.Center, range);
+			var inrange = GetUnitsInRange(attacker.Center, range, false);
+            var zombs = GetZombsInRange(attacker.Center, range);
+            
 			switch (attacker.Stats.Type)
 			{
 				case SpellType.Ressurect:
-
 					foreach (Guid id in inrange)
 					{
 						if (ais[id].GetStats().Health <= 0)
 						{
 							ais[id].IsZombie = true;
 							ZombieSwap(id, grid, arch);
+                            Statistics.Ressurections++;
 						}
 					}
 					break;
-			}
-			foreach (Guid id in inrange)
-			{
-				if(ais.ContainsKey(id))
-					ais[id].GetStats().Health -= attacker.Stats.Damage;
-			}
+                case SpellType.DeadAgain:
+                    foreach (Guid id in zombs)
+                    {
+                        AiSwap(id, grid, arch);
+                    }
+                    break;
+                case SpellType.RestoreEssence:
+                    foreach (Guid id in zombs)
+                    {
+                        if (zombies[id].GetStats().Health < zombies[id].RHealth)
+                        {
+                            zombies[id].GetStats().Health += attacker.Stats.Damage;
+                            zombies[id].GetStats().Health = MathHelper.Clamp(zombies[id].GetStats().Health, 0, zombies[id].RHealth);
+                         
+                        }
+                    }
+                    break;
+                case SpellType.DrainEssence:
+                    foreach (Guid id in inrange)
+                    {
+                        if (ais.ContainsKey(id))
+                            ais[id].GetStats().Health -= attacker.Stats.Damage;
+                    }
+                    break;
+                case SpellType.ClearDead:
+                    var dead = GetUnitsInRange(attacker.Center, range, false);
+                    foreach (Guid id in dead)
+                    {
+                        if (ais[id].Ai_States == Ai_States.Dead)
+                            remove_queue.Add(id);
+                    }
+                    break;
+
+
+            }
+			
 		}
 
 		public void Draw(SpriteBatch sb)
@@ -366,36 +480,31 @@ namespace AHH.AI
 
 			foreach (Ai ai in ais.Values)
 			{
-				ai.Draw(sb);
-				//ai.Draw_Debug(sb);
-				switch (ai.Ai_States)
-				{
-					case Ai_States.Moving:
-						moving++;
-						break;
-					case Ai_States.Attacking:
-						attack++;
-						break;
-					case Ai_States.Idle:
-						think++;
-						break;
-
-				}
-
-				((AiUnit)ai).Draw_Status(sb, null);
-
+                if(ai.Ai_States == Ai_States.Dead)
+				    ai.Draw(sb);
 			}
 
-			foreach (Zombie z in zombies.Values)
+            foreach (Ai ai in ais.Values)
+            {
+                if (ai.Ai_States != Ai_States.Dead)
+                {
+                    ai.Draw(sb);
+                    ((AiUnit)ai).Draw_Status(sb, null);
+
+                }
+                
+            }
+
+            foreach (Zombie z in zombies.Values)
 			{
 				((Ai)z).Draw(sb);
 				z.Draw_Status(sb, null);
 			}
 
-			sb.DrawString(DebugFont, "Total: " + ais.Count().ToString(), Position, Color.Black);
-			sb.DrawString(DebugFont, "Moving: " + moving.ToString(), Position + new Vector2(300, 0), Color.Black);
-			sb.DrawString(DebugFont, "Attacking: " + attack.ToString(), Position + new Vector2(600, 0), Color.Black);
-			sb.DrawString(DebugFont, "Thinking: " + think.ToString(), Position + new Vector2(900, 0), Color.Black);
+			//sb.DrawString(DebugFont, "Total: " + ais.Count().ToString(), Position, Color.Black);
+			//sb.DrawString(DebugFont, "Moving: " + moving.ToString(), Position + new Vector2(300, 0), Color.Black);
+			//sb.DrawString(DebugFont, "Attacking: " + attack.ToString(), Position + new Vector2(600, 0), Color.Black);
+			//sb.DrawString(DebugFont, "Thinking: " + think.ToString(), Position + new Vector2(900, 0), Color.Black);
 		}
 
 		void Spawn(Grid grid, Random rng)
@@ -405,7 +514,7 @@ namespace AHH.AI
                 s_elasped = 0;
                 spawnY = 0;
                 formations.RemoveAt(0);
-                ys.Remove(0);
+                ys.RemoveAt(0);
                 spawning = false;
                 return;
             }
@@ -430,8 +539,6 @@ namespace AHH.AI
         {
             int rank = rng.Next(1, (int)((Options.Difficulty + 3 )/ 100000) + 2); // deep
             int file = rng.Next(1, (int)((Options.Difficulty + 3 )/ 100000) + 2); //width
-
-           
 
             rank = MathHelper.Clamp(rank, 1,12);
             file = MathHelper.Clamp(file, 1,6);
@@ -488,6 +595,15 @@ namespace AHH.AI
 			ais.Remove(ai);
 		}
 
+        void AiSwap(Guid ai, Grid grid, Architech arch)  //swaps a unit to an equalivalent zombie unit
+        {
+            var old = zombies[ai];
+            var unit = new Grounded(old.Position, new Point(32, 32), unit_types[ConvertToGrounded(old.GetStats().Type)], ai_stats[ConvertToGrounded(old.GetStats().Type)], grid);
+            unit.GetStats().Health = 0;
+            ais.Add(unit.ID, unit);
+            zombies.Remove(ai);
+        }
+
         public void ChangeStats(float percent, List<Ai_Type> ai_types, Researchables stat)
         {
             foreach (Ai_Type at in ai_types)
@@ -514,6 +630,19 @@ namespace AHH.AI
                     temp_stat.BaseDamage += (int)Extensions.Extensions.PercentT(ai_stats[ai].BaseDamage, percent);
                     ai_stats[ai] += temp_stat;
                     break;
+                case Researchables.AiDamage:
+                    temp_stat.BaseDamage += (int)Extensions.Extensions.PercentT(ai_stats[ai].BaseDamage, percent);
+                    ai_stats[ai] += temp_stat;
+                    break;
+                case Researchables.AiHealth:
+                    temp_stat.Health += (int)Extensions.Extensions.PercentT(ai_stats[ai].BaseDamage, percent);
+                    ai_stats[ai] += temp_stat;
+                    break;
+                case Researchables.AiSpeed:
+                    temp_stat.Speed += (int)Extensions.Extensions.PercentT(ai_stats[ai].BaseDamage, percent);
+                    ai_stats[ai] += temp_stat;
+                    break;
+
             }
         }
 
@@ -550,5 +679,12 @@ namespace AHH.AI
 
 			return (Ai_Type)Enum.Parse(typeof(Ai_Type), "Z_" + temp);
 		}
-	}
+
+        public Ai_Type ConvertToGrounded(Ai_Type ai)
+        {
+            string temp = ai.ToString();
+
+            return (Ai_Type)Enum.Parse(typeof(Ai_Type), temp.Substring(2));
+        }
+    }
 }

@@ -112,17 +112,17 @@ namespace AHH.Base
 		public List<Vector2> CheckPositions(List<Vector2> positions) // sanitize 
 		{
 			List<Vector2> sanitized = new List<Vector2>();
-			foreach (Vector2 p in positions)
-			{
-				Point a = ToGridPosition(p, GetTileSize);
-				try
-				{
-					if (tiles[a.X, a.Y].State == TileStates.Active)
-					{
-						sanitized.Add(p);
-					}
-				}
-				catch { }
+            foreach (Vector2 p in positions)
+            {
+                Point a = ToGridPosition(p, GetTileSize);
+
+                if (a.X >= 0 && a.X < tiles.GetLength(0) && a.Y > 0 && a.Y < tiles.GetLength(1))
+                {
+                    if (tiles[a.X, a.Y].State == TileStates.Active)
+                    {
+                        sanitized.Add(p);
+                    }
+                }
 			}
 			return sanitized;
 		}
@@ -203,7 +203,91 @@ namespace AHH.Base
 			get { return new Point(tiles.GetLength(0), tiles.GetLength(1)); }
 		}
 
-		public dynamic Pathfinder(Vector2 destination, Vector2 current)
+        protected List<Vector2> CalculateWayPoints(object grid, Random rng, bool isZombie, Vector2 pos)
+        {
+            WTuple<Vector2, TileStates, int>[,] _grid = ((WTuple<Vector2, TileStates, int>[,])grid);
+            List<Vector2> points = new List<Vector2>();
+            //find start point
+            Point start = Grid.ToGridPosition(pos, Grid.GetTileSize);
+            Point current = start;
+            //find finish
+            Point finish = new Point();
+            for (int x = 0; x < _grid.GetLength(0); x++)
+            {
+                for (int y = 0; y < _grid.GetLength(1); y++)
+                {
+                    if (_grid[x, y].Item3 == 0)
+                    {
+                        finish = new Point(x, y);
+                        break;
+                    }
+                }
+            }
+
+            while (current != finish)
+            {
+                Vector2 next = new Vector2();
+                bool found = false;
+
+
+                //check all around the tile and assign a counter
+                Vector2 max = new Vector2(current.X + 1, current.Y + 1);
+                Vector2 min = new Vector2(current.X - 1, current.Y - 1);
+                int maxx = _grid.GetLength(0);
+                int maxy = _grid.GetLength(1);
+                if (current.X + 1 >= maxx)
+                    max.X = maxx - 1;
+                if (current.Y + 1 >= maxy)
+                    max.Y = maxy - 1;
+                if (current.X - 1 < 0)
+                    min.X = 0;
+                if (current.Y - 1 < 0)
+                    min.Y = 0;
+
+
+
+                int trueMaxX = MathHelper.Clamp(current.X + 1, current.X, maxx);
+
+                int trueMaxY = MathHelper.Clamp(current.Y + 1, current.Y, maxy);
+
+                List<Vector2> lfound = new List<Vector2>();
+                List<Point> pfound = new List<Point>();
+
+                for (int x = (int)min.X; x <= max.X; x++)
+                {
+                    for (int y = (int)min.Y; y <= max.Y; y++)
+                    {
+                        if (x != current.X || y != current.Y)
+                        {
+                            if (_grid[x, y].Item3 < _grid[current.X, current.Y].Item3)
+                            {
+                                next = new Vector2(_grid[x, y].Item1.X + (size.X / 2), _grid[x, y].Item1.Y + (size.Y / 2));
+                                pfound.Add(new Point(x, y));
+                                lfound.Add(next);
+                            }
+                        }
+                    }
+                }
+
+                var rnd = rng.Next(0, lfound.Count);
+
+                if (lfound.Count > 0)
+                {
+                    if (isZombie)
+                        points.Add(lfound[0]);
+                    else
+                        points.Add(lfound[rnd]);
+
+
+                    current = pfound[rnd];
+                }
+
+            }
+
+            return points;
+        }
+
+        public dynamic Pathfinder(Vector2 destination, Vector2 current, Random rng, bool isZombie)
 		{
 			Point start = ToGridPosition(destination, new Point(tiles[0, 0].Box.Width, tiles[0, 0].Box.Height));
 			Point finish = ToGridPosition(current, new Point(tiles[0, 0].Box.Width, tiles[0, 0].Box.Height));
@@ -218,19 +302,23 @@ namespace AHH.Base
 				}
 			}
 
+            start = new Point(MathHelper.Clamp(start.X, 0, 25), MathHelper.Clamp(start.Y, 0, 25));
+
 			List<Point> done = new List<Point>();
-			List<Point> check = new List<Point>();
+            List<Point> check = new List<Point>();
 
 			//if (this.GetTile(start).State == TileStates.Blocked)
-				//return TileStates.Blocked;
+				//return false;
 			if (this.GetTile(finish).State == TileStates.Blocked)
-				return TileStates.Blocked;
+				return false;
 
 			check.Add(start);
 			int counter = 0;
+
+
 			grid[check[0].X, check[0].Y].Item3 = counter;
 			counter++;
-			List<WTuple<Vector2, Point, int>> toCheck = new List<WTuple<Vector2, Point, int>>();
+			SortedSet<WTuple<Vector2, Point, int>> toCheck = new SortedSet<WTuple<Vector2, Point, int>>(new Extensions.ByScore());
 			while (check.Count > 0)
 			{
 				//check all around the tile and assign a counter
@@ -278,9 +366,9 @@ namespace AHH.Base
 
 				if (toCheck.Count > 0)
 				{
-					var v = toCheck.GetLowestValue();
+					var v = toCheck.ElementAt(0);
 					check.Add(v.Item2);
-					toCheck.RemoveAt(toCheck.FindIndex(x => x.Item2 == v.Item2));
+					toCheck.RemoveWhere(x => x.Item2 == v.Item2);
 				}
 
 
@@ -289,7 +377,7 @@ namespace AHH.Base
 				if (check[0] == finish)
 				{
 					check.Clear();
-					return grid;
+					return CalculateWayPoints(grid, rng, isZombie, current);
 				}
 				else check.RemoveAt(0);
 

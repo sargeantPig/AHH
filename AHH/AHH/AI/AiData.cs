@@ -19,6 +19,7 @@ namespace AHH.AI
 		Target,
 		Thinking,
         Marching,
+        Pathing,
 		Dead
 	}
 

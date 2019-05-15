@@ -18,11 +18,12 @@ namespace AHH.AI
 		Point home { get; set; }
 		Guid target;
 		float hitElasped = 0;
-
 		const float stuckAttempts = 100;
         int attempts = 0;
-
         float temp_speed;
+        List<Guid> destinations = new List<Guid>();
+        int currDest = 0;
+
 		public Zombie(Vector2 position, Point rectExtends, Type_Data<Ai_Type> types, Stats stats, Grid grid, Architech arch)
 			: base(position, rectExtends, types, stats, grid)
 		{
@@ -35,6 +36,15 @@ namespace AHH.AI
 
         public void Update(Cursor ms, GameTime gt, Architech arch, Grid grid, Random rng, Overseer os, UiMaster ui)
         {
+            if (stuck)
+            {
+                stuck = false;
+                var b = arch.GetBuilding(home);
+                var adj = b.GetAdjacent(grid);
+                if (adj.Count > 0)
+                    Position = adj[0];
+            }
+
             if (Ai_States == Ai_States.Marching)
             {
                 Ai_States = Ai_States.Target;
@@ -45,15 +55,17 @@ namespace AHH.AI
                     
             base.Update(ms, gt);
             base.Update(gt);
-            base.Update();
+            base.Update(grid);
             CalculateCorners();
             GetFreeCorners(grid);
-
             RefreshInfo();
 
             if (IsHighlighted)
                 ui.RecieveInfo(new KeyValuePair<Guid, InfoPanel>(this.ID, Info));
             else ui.RemoveInfo(this.ID);
+
+            if (Ai_States == Ai_States.Thinking)
+                return;
 
             foreach (var proj in projectile.Values)
             {
@@ -64,7 +76,8 @@ namespace AHH.AI
             if (Ai_States == Ai_States.Dead)
                 return;
 
-            CheckTarget(os);
+            if(Ai_States != Ai_States.Pathing)
+                CheckTarget(os);
 
             switch (Ai_States)
             {
@@ -83,12 +96,42 @@ namespace AHH.AI
                 case Ai_States.Attacking:
                     Attacking(os, arch, gt, rng, grid); // can go to idle or target
                     break;
+                case Ai_States.Pathing:
+                    CycleDestinations(grid, rng, os);
+                    break;
                 case Ai_States.Dead:
                     return;
+            }
+            prevPos = Position;
+        }
 
+        void CycleDestinations(Grid grid, Random rng, Overseer os)
+        {
+           
+
+            if (wait)
+            {
+                if (os.Ais[destinations[0]].WayPoints.Count > 0)
+                    destination = Grid.ToGridPosition(os.Ais[destinations[0]].WayPoints.Last(), Grid.GetTileSize);
+                else destination = Grid.ToGridPosition(os.Ais[destinations[0]].Position, Grid.GetTileSize);
+                target =  destinations[0];
+                Think_Pathing(grid, rng);
             }
 
-            prevPos = Position;
+            else if (PFResult != null)
+            {
+                if (PFResult.GetType() == typeof(TileStates))
+                {
+                    destinations.RemoveAt(0);
+                }
+
+                else { Think_Pathing(grid, rng); destinations.Clear(); }
+            }
+
+            if (destinations.Count == 0)
+            {
+                Ai_States = Ai_States.Thinking;
+            }
         }
 
         void EasyGetTarget(Architech arch, Overseer os, Grid grid, Random rng)
@@ -99,9 +142,11 @@ namespace AHH.AI
                 var focus = Think(rng);
                 int index = 0;
 
-                if (units.Count <= 0)
+                if (units.Count <= 0 || stuck)
                 {
+                    stuck = false;
                     GraveHover(arch, os, grid, rng);
+                    
                     return;
                 }
 
@@ -124,6 +169,14 @@ namespace AHH.AI
                 var unit = units.ToList()[index];
                 var Nunit = os.Ais[unit];
 
+                foreach (var u in units)
+                {
+                    destinations.Add(u);
+                }
+
+                if (Nunit.WayPoints.Count > 0)
+                    destination = Grid.ToGridPosition(Nunit.WayPoints.Last(), Grid.GetTileSize);
+                else destination = Grid.ToGridPosition(Nunit.Position, Grid.GetTileSize);
                 destination = Grid.ToGridPosition(Nunit.Position, Grid.GetTileSize);
                 target = unit;
             }
@@ -175,7 +228,16 @@ namespace AHH.AI
 
             var b = arch.GetBuilding(home);
             var ts = b.AdjacentTiles;
-            destination = Grid.ToGridPosition(ts[rnd.Next(0, ts.Count)], Grid.GetTileSize);
+
+            if (b.AdjacentTiles.Count == 0)
+            {
+                List<Vector2> dests = new List<Vector2>() { new Vector2(64, 0), new Vector2(-64, 0), new Vector2(64, 64),
+                new Vector2(-64, -64), new Vector2(-64, 64), new Vector2(64, -64), new Vector2(0, 64), new Vector2(0, -64)};
+
+                destination = Grid.ToGridPosition(dests[rnd.Next(0, dests.Count - 1)], Grid.GetTileSize);
+            }
+
+            else destination = Grid.ToGridPosition(ts[rnd.Next(0, ts.Count)], Grid.GetTileSize);
 
             Ai_States = Ai_States.Idle;
             Think_Pathing(grid, rnd);
@@ -198,7 +260,7 @@ namespace AHH.AI
                     return true;
                 }
                 else if (os.Ais[target].Ai_States == Ai_States.Dead )
-                { Ai_States = Ai_States.Target; keepTarget = !keepTarget; target = new Guid(); }
+                { Ai_States = Ai_States.Target; keepTarget = !keepTarget; target = new Guid(); projectile.Clear(); }
                 else if (WayPoints.Count == 0 && Ai_States != Ai_States.Moving)
                 { Ai_States = Ai_States.Target; keepTarget = !keepTarget; }
 

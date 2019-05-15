@@ -6,8 +6,8 @@ Texture	texture/buildings/wall
 H_Texture	texture/buildings/wall
 C_Texture	texture/buildings/wall
 Animation
-Production, 0, 0, 300
-Building, 1, 4, 100
+Production, 0, 6, 200
+Building, 7, 11, 200
 
 Type	NTower
 Sound	{sound_file}
@@ -15,31 +15,37 @@ Texture	texture/buildings/necromancer_tower
 H_Texture	texture/buildings/necromancer_tower
 C_Texture	texture/buildings/necromancer_tower
 Animation
-Disables, 2, 2, 100
-Production, 1, 1, 100
-Building, 0, 0, 100
+Production, 0, 2, 100
+Building, 3, 7, 100
 
 Type	Grave
 Sound	{sound_file}
-Texture	texture/buildings/necromancer_tower
-H_Texture	texture/buildings/necromancer_tower
-C_Texture	texture/buildings/necromancer_tower
+Texture	texture/buildings/grave
+H_Texture	texture/buildings/grave
+C_Texture	texture/buildings/grave
 Animation
-Disables, 2, 2, 100
-Production, 1, 1, 100
-Building, 0, 0, 100
+Production, 0, 34, 200
+Building, 35, 38, 100
 
 Type	EnergyConduit
 Sound	{sound_file}
-Texture	texture/buildings/necromancer_tower
-H_Texture	texture/buildings/necromancer_tower
-C_Texture	texture/buildings/necromancer_tower
+Texture	texture/buildings/energy_conduit
+H_Texture	texture/buildings/energy_conduit
+C_Texture	texture/buildings/energy_conduit
 Animation
-Disables, 2, 2, 100
-Production, 1, 1, 100
-Building, 0, 0, 100
+Production, 0, 2, 100
+Building, 3, 7, 100
 
 Type	NecroticOrrery
+Sound	{sound_file}
+Texture	texture/buildings/necrotic_Orrery
+H_Texture	texture/buildings/necrotic_Orrery
+C_Texture	texture/buildings/necrotic_Orrery
+Animation
+Production, 0, 6, 500
+Building, 7, 10, 200
+
+Type	Demolish
 Sound	{sound_file}
 Texture	texture/buildings/necromancer_tower
 H_Texture	texture/buildings/necromancer_tower

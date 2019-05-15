@@ -8,11 +8,14 @@ namespace AHH.UI
 	{
 		Text text;
 		bool isActive { get; set; }
-		public Button(Vector2 position, Point size, bool active, Texture2D texture, Texture2D texture_h, Texture2D texture_c, string text)
+
+        string name { get; set; }
+		public Button(Vector2 position, Point size, bool active, Texture2D texture, Texture2D texture_h, Texture2D texture_c, string text, string name)
 			: base(position, size, texture, texture_h, texture_c)
 		{
 			this.text = new Text(new Vector2(Box.X + (Box.Width / 2), Box.Y + (Box.Width / 2)), text, Color.White);
-			active = isActive;
+            this.name = name;
+			isActive = active;
 		}
 
 		new public void Draw(SpriteBatch sb)
@@ -27,6 +30,11 @@ namespace AHH.UI
 			set { isActive = value; }
 		}
 
+        public string Name
+        {
+            get { return name; }
+            set { name = value; }
+        }
         public void Manipulate(string value)
         {
             text.Value = value;

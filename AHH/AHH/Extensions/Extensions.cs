@@ -138,6 +138,14 @@ namespace AHH.Extensions
 
 	}
 
+    public class ByScore : IComparer<WTuple<Vector2, Point, int>>
+    {
+        public int Compare(WTuple<Vector2, Point, int> x, WTuple<Vector2, Point, int> y)
+        {
+            return x.Item3.CompareTo(y.Item3);
+        }
+    }
+
     public class Stager<t1, t3> : DicWTuple<t1, bool, t3>
     {
         public Stager(List<WTuple<t1, bool, t3>> dic)
@@ -230,7 +238,6 @@ namespace AHH.Extensions
             get { return items.Count; }
         }
     }
-
 
 	public class WTuple<t1, t2, t3>
 	{

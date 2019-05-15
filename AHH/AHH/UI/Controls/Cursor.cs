@@ -1,36 +1,34 @@
 ﻿using AHH.Extensions;
+using System.Collections.Generic;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+using AHH.Base;
 namespace AHH.UI
 {
-	class Cursor
+	class Cursor : AnimatedSprite
 	{
-		Texture2D texture;
 		Vector2 real_position { get; set; }
 		MouseState ms { get; set; }
 		MouseState prev_ms { get; set; }
-		public Cursor(Texture2D texture)
+		public Cursor(Texture2D texture, Dictionary<string, Vector3> states) : base(Vector2.One, new Point(16,16), texture, states, false, 32)
 		{
-			this.texture = texture;
 		}
 
-		public Point Update(MouseState ms)
+		public Point Update(MouseState ms, GameTime gt)
 		{
+            base.Update(gt);
 			this.ms = ms;
 			real_position = new Vector2(ms.Position.X, ms.Position.Y);
+            
 			Matrix mat = Resolution.getTransformationMatrix();
 
 			if (mat.Determinant() > 1f)
 				real_position = Vector2.Transform(real_position, mat);
 			else real_position = Vector2.Transform(real_position, Matrix.Invert(mat));
 
-			return real_position.ToPoint();
-		}
-
-		public void Draw(SpriteBatch sb)
-		{
-			sb.Draw(texture, new Rectangle((int)real_position.X, (int)real_position.Y, 16, 16), Color.White);
+            Position = real_position;
+            return real_position.ToPoint();
 		}
 
 		public Vector2 GetRealPosition

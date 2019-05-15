@@ -1,0 +1,17 @@
+﻿#########################################
+##Pause
+#########################################
+Type	Button
+Name	Guide
+Value	Guide
+Size	256, 128
+H_texture	texture/ui/Pause_Button_H
+Texture	texture/ui/Pause_Button
+
+Type	Button
+Name	ES_End
+Value	Surrender
+Size	256, 128
+H_texture	texture/ui/Pause_Button_H
+Texture	texture/ui/Pause_Button
+

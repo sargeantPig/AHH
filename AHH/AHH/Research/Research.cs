@@ -49,8 +49,8 @@ namespace AHH.Research
         {
             if (Options.GetTick && currentProgress < data.ResearchTime && p.Energy > arch.GetOrrery())
             {
-                p.IncreaseEnergy -= arch.GetOrrery();
-                currentProgress += arch.GetOrrery();
+                p.IncreaseEnergy -= arch.GetOrrery() * 2;
+                currentProgress += arch.GetOrrery() * 2;
             }
 
             else if (currentProgress >= data.ResearchTime)

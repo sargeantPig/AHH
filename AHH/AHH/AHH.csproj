@@ -78,6 +78,7 @@
     <Compile Include="Base\Type_Data.cs" />
     <Compile Include="Extensions\Extensions.cs" />
     <Compile Include="Extensions\Resolution.cs" />
+    <Compile Include="Functions\Statistics.cs" />
     <Compile Include="Game1.cs" />
     <Compile Include="Interactable\Building\Architech.cs" />
     <Compile Include="Interactable\Building\Building.cs" />
@@ -103,9 +104,12 @@
     <Compile Include="UI\Elements\EAlign.cs" />
     <Compile Include="UI\Elements\IElement.cs" />
     <Compile Include="UI\Elements\InfoPanel.cs" />
+    <Compile Include="UI\Elements\Messages\Message.cs" />
+    <Compile Include="UI\Elements\Messages\Messenger.cs" />
     <Compile Include="UI\Elements\StatusBar.cs" />
     <Compile Include="UI\Elements\Strip.cs" />
     <Compile Include="UI\Elements\Text.cs" />
+    <Compile Include="UI\Elements\TextBox.cs" />
     <Compile Include="UI\UiMaster.cs" />
     <Compile Include="User\Options.cs" />
     <Compile Include="User\Player.cs" />
@@ -155,10 +159,23 @@
     <Content Include="Content\UI\ui_cycle.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <Content Include="Content\UI\ui_demolish.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\UI\ui_end_screen.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\UI\ui_end_screen_button.txt" />
     <Content Include="Content\UI\ui_grid_menu.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <Content Include="Content\UI\ui_main_menu.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Include="Content\UI\ui_master.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\UI\ui_pause.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Content\UI\ui_research.txt">
@@ -179,9 +196,7 @@
     <MonoGameContentReference Include="Content\Content.mgcb" />
     <None Include="app.manifest" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Functions\" />
-  </ItemGroup>
+  <ItemGroup />
   <ItemGroup>
     <BootstrapperPackage Include="Microsoft.Net.Framework.3.5.SP1">
       <Visible>False</Visible>

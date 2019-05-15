@@ -2,15 +2,15 @@
 ##############################
 Type	Knight
 Sound	{sound_file}
-Texture	texture/unit/test_ai_swordsman
-H_Texture	texture/unit/test_ai_swordsman
-C_Texture	texture/unit/test_ai_swordsman
-Projectile	texture/unit/test_ai_swordsman
+Texture	texture/unit/swordsman
+H_Texture	texture/unit/swordsman
+C_Texture	texture/unit/swordsman
+Projectile	texture/unit/swordsman
 Animation
-Move, 1, 1, 100
-Attack, 2, 2, 100
-Think, 0, 0, 100
-Dead, 3, 3, 100
+Move, 0, 3, 300
+Attack, 4, 6, 333
+Think, 7, 10, 200
+Dead, 11, 11, 100
 
 Type	Priest
 Sound	{sound_file}
@@ -26,15 +26,15 @@ Dead, 3, 3, 100
 
 Type	Archer
 Sound	{sound_file}
-Texture	texture/unit/test_ai_archer
-H_Texture	texture/unit/test_ai_archer
-C_Texture	texture/unit/test_ai_archer
+Texture	texture/unit/ranger
+H_Texture	texture/unit/ranger
+C_Texture	texture/unit/ranger
 Projectile	texture/unit/projectile
 Animation
-Move, 1, 1, 100
-Attack, 2, 2, 100
-Think, 0, 0, 100
-Dead, 3, 3, 100
+Move, 0, 3, 300
+Attack, 4, 7, 500
+Think, 8, 11, 200
+Dead, 12, 12, 100
 
 Type	Horseman
 Sound	{sound_file}
@@ -51,10 +51,10 @@ Dead, 3, 3, 100
 #############
 Type	Z_Knight
 Sound	{sound_file}
-Texture	texture/unit/test_ai_swordsman_zombie
-H_Texture	texture/unit/test_ai_swordsman_zombie
-C_Texture	texture/unit/test_ai_swordsman_zombie
-Projectile	texture/unit/test_ai_swordsman_zombie
+Texture	texture/unit/z_swordsman
+H_Texture	texture/unit/z_swordsman
+C_Texture	texture/unit/z_swordsman
+Projectile	texture/unit/z_swordsman
 Animation
 Move, 1, 1, 100
 Attack, 2, 2, 100
@@ -75,15 +75,15 @@ Dead, 3, 3, 100
 
 Type	Z_Archer
 Sound	{sound_file}
-Texture	texture/unit/test_ai_archer_zombie
-H_Texture	texture/unit/test_ai_archer_zombie
-C_Texture	texture/unit/test_ai_archer_zombie
+Texture	texture/unit/z_ranger
+H_Texture	texture/unit/z_ranger
+C_Texture	texture/unit/z_ranger
 Projectile	texture/unit/projectile
 Animation
-Move, 1, 1, 100
-Attack, 2, 2, 100
-Think, 0, 0, 100
-Dead, 3, 3, 100
+Move, 0, 3, 300
+Attack, 4, 7, 500
+Think, 8, 11, 200
+Dead, 12, 12, 100
 
 Type	Z_Horseman
 Sound	{sound_file}

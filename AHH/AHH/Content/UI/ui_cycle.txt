@@ -5,12 +5,12 @@ Type	Button
 Name	C_Backward
 Value	D
 Size	64, 64
-H_texture	texture/ui/button_test_h
-Texture	texture/ui/button_test
+H_texture	texture/ui/Pause_Button_H
+Texture	texture/ui/Pause_Button
 
 Type	Button
 Name	C_Forward
 Value	F
 Size	64, 64
-H_texture	texture/ui/button_test_h
-Texture	texture/ui/button_test
+H_texture	texture/ui/Pause_Button_H
+Texture	texture/ui/Pause_Button

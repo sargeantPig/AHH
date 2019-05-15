@@ -1,0 +1,13 @@
+﻿Type	Button
+Name	Demolish
+Value	Demolish
+Size	256, 128
+H_texture	texture/ui/Demolish_Button_H
+Texture	texture/ui/Demolish_Button
+
+Type	Button
+Name	ClearDead
+Value	Clear Dead
+Size	256, 128
+H_texture	texture/ui/Demolish_Button_H
+Texture	texture/ui/Demolish_Button

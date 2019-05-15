@@ -5,28 +5,28 @@ Type	Button
 Name	Build_Wall
 Value	Wall
 Size	256, 128
-H_texture	texture/ui/button_test_h
-Texture	texture/ui/button_test
+H_texture	texture/ui/Build_Button_H
+Texture	texture/ui/Build_Button
 
 Type	Button
 Name	Build_NO
 Value	Necrotic Orrery
 Size	256, 128
-H_texture	texture/ui/button_test_h
-Texture	texture/ui/button_test
+H_texture	texture/ui/Build_Button_H
+Texture	texture/ui/Build_Button
 
 Type	Button
 Name	Build_EC
 Value	Energy Conduit
 Size	256, 128
-H_texture	texture/ui/button_test_h
-Texture	texture/ui/button_test
+H_texture	texture/ui/Build_Button_H
+Texture	texture/ui/Build_Button
 
 Type	Button
 Name	Build_Grave
 Value	Grave
 Size	256, 128
-H_texture	texture/ui/button_test_h
-Texture	texture/ui/button_test
+H_texture	texture/ui/Build_Button_H
+Texture	texture/ui/Build_Button
 
 
