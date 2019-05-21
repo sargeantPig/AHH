@@ -155,7 +155,7 @@ namespace AHH.Interactable.Building
                 switch (data.Type)
                 {
                     case BuildingTypes.EnergyConduit:
-                        p.IncreaseEnergy += (int)stats.Production * os.GetAliveAis();
+                        p.IncreaseEnergy += (int)stats.Production;
                         break;
                     case BuildingTypes.NTower:
                         p.IncreaseEnergy += (int)stats.Production;

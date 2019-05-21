@@ -33,6 +33,10 @@
         MM_Hiscores,
         Guide,
         ES_End,
+        Tog_EHB,
+        Settings,
+        Tog_FHB,
+        ReallySurrender,
 		Nan,
     }
 }

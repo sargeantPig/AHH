@@ -100,7 +100,7 @@ namespace AHH.AI
 		ArmourType armourType { get; set; }
 		Luck luck { get; set; }
 		Focus focus { get; set; }
-		int baseDamage { get; set; }
+		float baseDamage { get; set; }
 		double range { get; set; }
 		float hitDelay { get; set; }
 		float speed { get; set; }
@@ -187,7 +187,7 @@ namespace AHH.AI
 			set { focus = value; }
 		}
 
-		public int BaseDamage
+		public float BaseDamage
 		{
 			get { return baseDamage; }
 			set { baseDamage = value; }

@@ -116,18 +116,6 @@
 /processorParam:TextureFormat=Color
 /build:texture/buildings/wall.png
 
-#begin texture/buildings/wall.png
-/importer:TextureImporter
-/processor:TextureProcessor
-/processorParam:ColorKeyColor=255,0,255,255
-/processorParam:ColorKeyEnabled=True
-/processorParam:GenerateMipmaps=False
-/processorParam:PremultiplyAlpha=True
-/processorParam:ResizeToPowerOfTwo=False
-/processorParam:MakeSquare=False
-/processorParam:TextureFormat=Color
-/build:texture/buildings/wall.png
-
 #begin texture/cursor_sheet.png
 /importer:TextureImporter
 /processor:TextureProcessor
@@ -163,6 +151,42 @@
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
 /build:texture/menu_screen.png
+
+#begin texture/research/r_death.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:texture/research/r_death.png
+
+#begin texture/research/r_god.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:texture/research/r_god.png
+
+#begin texture/research/r_passive.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:texture/research/r_passive.png
 
 #begin texture/research/res_test.png
 /importer:TextureImporter
@@ -500,6 +524,30 @@
 /processorParam:TextureFormat=Color
 /build:texture/ui/status_bar_top.png
 
+#begin texture/unit/horseman.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:texture/unit/horseman.png
+
+#begin texture/unit/priest.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:texture/unit/priest.png
+
 #begin texture/unit/projectile.png
 /importer:TextureImporter
 /processor:TextureProcessor
@@ -511,6 +559,18 @@
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
 /build:texture/unit/projectile.png
+
+#begin texture/unit/projectile2.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:texture/unit/projectile2.png
 
 #begin texture/unit/ranger.png
 /importer:TextureImporter
@@ -643,6 +703,30 @@
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
 /build:texture/unit/test_ai_swordsman_zombie.png
+
+#begin texture/unit/z_horseman.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:texture/unit/z_horseman.png
+
+#begin texture/unit/z_priest.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:texture/unit/z_priest.png
 
 #begin texture/unit/z_ranger.png
 /importer:TextureImporter

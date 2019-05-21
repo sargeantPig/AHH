@@ -18,7 +18,7 @@ namespace AHH.UI
         Dictionary<Player_Modes, List<IElement>> elements { get; set; }
         Dictionary<ButtonFunction, string> functions { get; }
         List<ButtonFunction> action_queue { get; set; }
-        Dictionary<Guid, InfoPanel> infoPanels = new Dictionary<Guid, InfoPanel>();
+        InfoPanelManager infoManager;
         Messenger messenger { get; set; }
         ButtonFunction highlighted { get; set; }
         int selectedPanel = 0;
@@ -37,6 +37,7 @@ namespace AHH.UI
             action_queue = new List<ButtonFunction>();
             isActive = true;
             messenger = new Messenger(new Vector2(1920 / 2, 864));
+            infoManager = new InfoPanelManager(infoPosition, 100);
         }
 
         public void Update(Player p, GameTime gt)
@@ -69,48 +70,24 @@ namespace AHH.UI
                 }
             }
 
-            if (p.Input.IsPressed(Ctrls.HotKey_Cycle_Forward, true))
-                selectedPanel += 1;
-            if (p.Input.IsPressed(Ctrls.HotKey_Cycle_Backward, true))
-                selectedPanel -= 1;
-
-            switch (this.NextAction)
-            {
-                case ButtonFunction.C_Forward:
-                    selectedPanel += 1;
-                    this.Pop_Action();
-                    break;
-                case ButtonFunction.C_Backward:
-                    this.Pop_Action();
-                    selectedPanel -= 1;
-                    break;
-
-            }
+            infoManager.Update(gt, this, p);
 
             if ((elasped += gt.ElapsedGameTime.Milliseconds) >= uiActionTime)
             {
                 prev_action = ButtonFunction.Nan;
             }
 
-            selectedPanel = MathHelper.Clamp(selectedPanel, 0, infoPanels.Count - 1);
-
             messenger.Update(gt);
-            infoPanels.Clear();
         }
 
         public void RecieveInfo(KeyValuePair<Guid, InfoPanel> panel)
         {
-            if (!infoPanels.ContainsKey(panel.Key))
-                infoPanels.Add(panel.Key, panel.Value);
-
-            infoPanels[panel.Key].Position = new Vector2(infoPosition.X, infoPosition.Y);
-            infoPanels[panel.Key].Refresh();
+            infoManager.Add(panel);
         }
 
         public void RemoveInfo(Guid id)
         {
-            if (infoPanels.ContainsKey(id))
-                infoPanels.Remove(id);
+            //infoManager.RemovePanel(id);
         }
 
         public void Update(Cursor ms)
@@ -127,12 +104,7 @@ namespace AHH.UI
                 }
             }
 
-            if (infoPanels.Count > 0)
-            {
-                selectedPanel = MathHelper.Clamp(selectedPanel, 0, infoPanels.Count - 1);
-                infoPanels.ToList()[selectedPanel].Value.Draw(sb);
-                sb.DrawString(DebugFont, (selectedPanel + 1).ToString() + " / " + infoPanels.Count.ToString(), new Vector2(1110, 948), Color.White);
-            }
+            infoManager.Draw(sb);
 
             messenger.Draw(sb);
 

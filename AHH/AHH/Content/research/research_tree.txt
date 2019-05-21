@@ -17,14 +17,14 @@
 ButtonName	R1
 ResearchName	Quick Bone
 Cost	1000
-Texture	texture/research/res_test
+Texture	texture/research/r_death
 Researchables
 ZSpeed	0.10
 RE
 
 ResearchName	Necrotic Rage
 Cost	2000
-Texture	texture/research/res_test
+Texture	texture/research/r_death
 Researchables
 ZSpeed	0.05
 ZDamage	0.10
@@ -32,7 +32,7 @@ RE
 
 ResearchName	Body Maggots
 Cost	3000
-Texture	texture/research/res_test
+Texture	texture/research/r_death
 Researchables
 ZHealth	0.25
 ZDamage	0.10
@@ -40,7 +40,7 @@ RE
 
 ResearchName	Unholy Bones
 Cost	4000
-Texture	texture/research/res_test
+Texture	texture/research/r_death
 Researchables
 ZSpeed	0.10
 ZDamage	0.10
@@ -49,7 +49,7 @@ RE
 
 ResearchName	Giant Bones
 Cost	8000
-Texture	texture/research/res_test
+Texture	texture/research/r_death
 Researchables
 ZDamage	0.30
 ZHealth	0.30
@@ -57,14 +57,14 @@ RE
 
 ResearchName	Undead Adrenaline
 Cost	9000
-Texture	texture/research/res_test
+Texture	texture/research/r_death
 Researchables
 ZSpeed	0.30
 RE
 
 ResearchName	 Incartations I
 Cost	10000
-Texture	texture/research/res_test
+Texture	texture/research/r_death
 Researchables
 ZSpeed	0.05
 ZDamage	0.1
@@ -73,7 +73,7 @@ RE
 
 ResearchName	 Incartations II
 Cost	13000
-Texture	texture/research/res_test
+Texture	texture/research/r_death
 Researchables
 ZSpeed	0.1
 ZDamage	0.2
@@ -82,7 +82,7 @@ RE
 
 ResearchName	 Incartations III
 Cost	20000
-Texture	texture/research/res_test
+Texture	texture/research/r_death
 Researchables
 ZSpeed	0.2
 ZDamage	0.4
@@ -91,14 +91,14 @@ RE
 
 ResearchName	 Whispers
 Cost	25000
-Texture	texture/research/res_test
+Texture	texture/research/r_death
 Researchables
 ZHealth	0.1
 RE
 
 ResearchName	 They're Coming
 Cost	30000
-Texture	texture/research/res_test
+Texture	texture/research/r_death
 Researchables
 ZSpeed	0.05
 ZDamage	0.05
@@ -107,7 +107,7 @@ RE
 
 ResearchName	 ... Them
 Cost	30000
-Texture	texture/research/res_test
+Texture	texture/research/r_death
 Researchables
 ZSpeed	0.05
 ZDamage	0.05
@@ -116,7 +116,7 @@ RE
 
 ResearchName	 AHHHUgh
 Cost	60000
-Texture	texture/research/res_test
+Texture	texture/research/r_death
 Researchables
 ZSpeed	0.4
 ZDamage	0.4
@@ -125,7 +125,7 @@ RE
 
 ResearchName	 A Helping Hand
 Cost	100000
-Texture	texture/research/res_test
+Texture	texture/research/r_death
 Researchables
 ZSpeed	0.1
 ZDamage	2
@@ -135,21 +135,21 @@ RE
 ButtonName	R2
 ResearchName	Barricades
 Cost	1000
-Texture	texture/research/res_test
+Texture	texture/research/r_passive
 Researchables
 WHealth	0.05
 RE
 
 ResearchName	Corpse Carts
 Cost	4000
-Texture	texture/research/res_test
+Texture	texture/research/r_passive
 Researchables
 WHealth	0.05
 RE
 
 ResearchName	Reinforced Stone
 Cost	7000
-Texture	texture/research/res_test
+Texture	texture/research/r_passive
 Researchables
 WHealth	0.50
 WCost	0.10
@@ -157,7 +157,7 @@ RE
 
 ResearchName	Towers
 Cost	10000
-Texture	texture/research/res_test
+Texture	texture/research/r_passive
 Researchables
 WHealth	0.1
 WCost	0.05
@@ -165,14 +165,14 @@ RE
 
 ResearchName	Light Engravings
 Cost	20000
-Texture	texture/research/res_test
+Texture	texture/research/r_passive
 Researchables
 WHealth	0.55
 RE
 
 ResearchName	The Light...
 Cost	40000
-Texture	texture/research/res_test
+Texture	texture/research/r_passive
 Researchables
 WHealth	0.1
 WCost	0.50
@@ -180,21 +180,21 @@ RE
 
 ResearchName	Holy Aura
 Cost	80000
-Texture	texture/research/res_test
+Texture	texture/research/r_passive
 Researchables
 WHealth	1
 RE
 
 ResearchName	Come In
 Cost	120000
-Texture	texture/research/res_test
+Texture	texture/research/r_passive
 Researchables
 WHealth	0.50
 RE
 
 ResearchName	Resting Death
 Cost	130000
-Texture	texture/research/res_test
+Texture	texture/research/r_passive
 Researchables
 WHealth	0.50
 WCost	0.2
@@ -203,28 +203,28 @@ RE
 ButtonName	R3
 ResearchName	Spell Potency
 Cost	2000
-Texture	texture/research/res_test
+Texture	texture/research/r_god
 Researchables
 SPower	0.10
 RE
 
 ResearchName	Dark Energy
 Cost	10000
-Texture	texture/research/res_test
+Texture	texture/research/r_god
 Researchables
 SPower	0.05
 RE
 
 ResearchName	Efficient Casting
 Cost	15000
-Texture	texture/research/res_test
+Texture	texture/research/r_god
 Researchables
 SCost	0.15
 RE
 
 ResearchName	Ancient Scriptures
 Cost	20000
-Texture	texture/research/res_test
+Texture	texture/research/r_god
 Researchables
 SCost	0.05
 SPower	0.1
@@ -232,7 +232,7 @@ RE
 
 ResearchName	Lingering Magicks
 Cost	22000
-Texture	texture/research/res_test
+Texture	texture/research/r_god
 Researchables
 SCost	0.05
 SLength	0.3
@@ -240,7 +240,7 @@ RE
 
 ResearchName	Lost Memoirs
 Cost	25000
-Texture	texture/research/res_test
+Texture	texture/research/r_god
 Researchables
 SCost	0.3
 SLength	0.1
@@ -248,7 +248,7 @@ RE
 
 ResearchName	Book of God
 Cost	30000
-Texture	texture/research/res_test
+Texture	texture/research/r_god
 Researchables
 SPower	0.1
 SLength	0.1
@@ -256,7 +256,7 @@ RE
 
 ResearchName	Gods Teachings
 Cost	40000
-Texture	texture/research/res_test
+Texture	texture/research/r_god
 Researchables
 SCost	0.2
 SPower	0.1
@@ -264,7 +264,7 @@ RE
 
 ResearchName	Deus Vult
 Cost	50000
-Texture	texture/research/res_test
+Texture	texture/research/r_god
 Researchables
 SCost	0.15
 SLength	0.3
@@ -272,7 +272,7 @@ RE
 
 ResearchName	Hidden Enemy
 Cost	60000
-Texture	texture/research/res_test
+Texture	texture/research/r_god
 Researchables
 SCost	0.05
 SPower	0.2
@@ -280,7 +280,7 @@ RE
 
 ResearchName	Helping Hands
 Cost	70000
-Texture	texture/research/res_test
+Texture	texture/research/r_god
 Researchables
 SPower	0.2
 SLength	0.3
@@ -288,7 +288,7 @@ RE
 
 ResearchName	God Engine
 Cost	80000
-Texture	texture/research/res_test
+Texture	texture/research/r_god
 Researchables
 SCost	0.5
 SLength	0.5

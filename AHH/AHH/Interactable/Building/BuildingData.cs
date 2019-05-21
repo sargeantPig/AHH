@@ -59,6 +59,7 @@ namespace AHH.Interactable.Building
 
             items.Add(new Text(Vector2.Zero, ""), new Text(Vector2.Zero, this.name, Color.White));
             items.Add(new Text(Vector2.Zero, "Cost: ", Color.White), new Text(Vector2.Zero, this.cost.ToString() + " Upkeep: " + this.production.ToString(), Color.White));
+            items.Add(new Text(Vector2.Zero, "Health: ", Color.White), new Text(Vector2.Zero, this.health.ToString(), Color.White));
             items.Add(new Text(Vector2.Zero, "Descr: ", Color.White), new Text(Vector2.Zero, this.descr, Color.White));
 
             this.info = new InfoPanel(items, null, Vector2.Zero);

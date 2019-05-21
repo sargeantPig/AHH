@@ -30,3 +30,7 @@ MM_Quit	MM_Quit
 MM_Hiscores	MM_Hiscores
 Guide	Guide
 ES_End	ES_End
+Tog_EHB	Tog_EHB
+Tog_FHB	Tog_FHB
+Settings	Settings
+ReallySurrender	ReallySurrender

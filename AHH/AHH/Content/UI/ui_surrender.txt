@@ -1,0 +1,6 @@
+﻿Type	Button
+Name	ReallySurrender
+Value	Really surrender?
+Size	256, 128
+H_texture	texture/ui/Pause_Button_H
+Texture	texture/ui/Pause_Button

@@ -1,6 +1,6 @@
 ﻿Type	TextBox
 Name	End Info
-Position	550, 100
+Position	550, 50
 
 Type	Button
 Name	Quit

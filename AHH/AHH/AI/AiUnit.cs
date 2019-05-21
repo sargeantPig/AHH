@@ -153,14 +153,19 @@ namespace AHH.AI
 			freeCorners.Clear();
 			foreach (Vector2 v in Corners.Values)
 			{
-				if (grid.GetTile(Grid.ToGridPosition(v, Grid.GetTileSize)).State == TileStates.Blocked)
-				{
-				}
+                var temp = grid.GetTile(Grid.ToGridPosition(v, Grid.GetTileSize));
+                if (temp != null)
+                {
+                    if (temp.State == TileStates.Blocked)
+                    {
 
-				else
-				{
-					freeCorners.Add(v);
-				}
+                    }
+
+                    else
+                    {
+                        freeCorners.Add(v);
+                    }
+                }
 			}
 
 		}

@@ -32,7 +32,8 @@ namespace AHH.AI
 			home = arch.Home;
             temp_speed = stats.Speed;
             RefreshInfo();
-		}
+            this.Speed = temp_speed;
+        }
 
         public void Update(Cursor ms, GameTime gt, Architech arch, Grid grid, Random rng, Overseer os, UiMaster ui)
         {
@@ -52,6 +53,14 @@ namespace AHH.AI
             }
             if (home == arch.Home || !arch.GetBuildings.ContainsKey(home))
                 SetHome(arch, os);
+            else {
+                if (Vector2.Distance(Position, arch.GetBuilding(home).Center) > 264)
+                {
+                    Position = arch.GetBuilding(home).Center;
+                    Ai_States = Ai_States.Target;
+
+                }
+            }
                     
             base.Update(ms, gt);
             base.Update(gt);
@@ -67,10 +76,13 @@ namespace AHH.AI
             if (Ai_States == Ai_States.Thinking)
                 return;
 
-            foreach (var proj in projectile.Values)
+            if (base.data.Type == Ai_Type.Z_Archer || base.data.Type == Ai_Type.Z_Priest)
             {
-                if (os.Ais.ContainsKey(target))
-                    proj.Update();
+                foreach (var proj in projectile.Values)
+                {
+                    if (os.Ais.ContainsKey(target))
+                        proj.Update(gt);
+                }
             }
 
             if (Ai_States == Ai_States.Dead)
@@ -82,18 +94,22 @@ namespace AHH.AI
             switch (Ai_States)
             {
                 case Ai_States.Idle:
+                    CurrentState = "Think";
                     if (wait)
                         Think_Pathing(grid, rng);
                     else if (PFResult != null)
                         Think_Pathing(grid, rng);
                     return;
                 case Ai_States.Target:
+                    CurrentState = "Think";
                     EasyGetTarget(arch, os, grid, rng); //can go to idle or move
                     break;
                 case Ai_States.Moving:
-                    Moving(os, grid); // can go to idle or attacking
+                    CurrentState = "Move";
+                    Moving(os, grid, gt); // can go to idle or attacking
                     break;
                 case Ai_States.Attacking:
+                    CurrentState = "Attack";
                     Attacking(os, arch, gt, rng, grid); // can go to idle or target
                     break;
                 case Ai_States.Pathing:
@@ -107,8 +123,6 @@ namespace AHH.AI
 
         void CycleDestinations(Grid grid, Random rng, Overseer os)
         {
-           
-
             if (wait)
             {
                 if (os.Ais[destinations[0]].WayPoints.Count > 0)
@@ -138,7 +152,7 @@ namespace AHH.AI
         {
             if (!keepTarget)
             {
-                var units = os.GetUnitsInRange(arch.GetBuilding(home).Center, 264 * 2, true);
+                var units = os.GetUnitsInRange(arch.GetBuilding(home).Center, 264, true);
                 var focus = Think(rng);
                 int index = 0;
 
@@ -198,10 +212,10 @@ namespace AHH.AI
             Think_Pathing(grid, rng);
         }
 
-		protected void Moving(Overseer os, Grid grid)
+		protected void Moving(Overseer os, Grid grid, GameTime gt)
 		{
 			if (WayPoints.Count > 0)
-				Moving();
+				Moving(gt);
 			else
 				Ai_States = Ai_States.Target;
 
@@ -209,9 +223,9 @@ namespace AHH.AI
 				return;
 		}
 
-        new protected void Moving()
+        new protected void Moving(GameTime gt)
         {
-            bool reached = MoveTo(WayPoints[0]);
+            bool reached = MoveTo(WayPoints[0], gt);
             if (reached)
             {
                 WayPoints.RemoveAt(0);
@@ -280,8 +294,12 @@ namespace AHH.AI
 			{
 				hitElasped = 0;
 				os.Combat(this, (Grounded)os.Ais[target], rng);
-				var p = new Projectile(Position, new Point(16, 16), data.Projectile, 5, ((Grounded)os.Ais[target]).Center);
-				projectile.Add(p.ID, p);
+
+                if (base.data.Type == Ai_Type.Z_Archer || base.data.Type == Ai_Type.Z_Priest)
+                {
+                    var p = new Projectile(Position, new Point(16, 16), data.Projectile, 5, ((Grounded)os.Ais[target]).Center);
+                    projectile.Add(p.ID, p);
+                }
 			}
 			
 		}

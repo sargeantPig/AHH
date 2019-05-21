@@ -126,9 +126,9 @@ namespace AHH.Functions
                     "Total Energy Gained: " + totalEnergyGained.ToString() + "\r\n" +
                     "Total Energy Spent: " + totalEnergySpent.ToString() + "\r\n" +
                     "Buildings Built: " + BuildingsBuilt.ToString() + "\r\n" +
-                    "Death Endings: " + endingsReached[Endings.Death].ToString() + "\r\n" +
-                    "God Endings: " + endingsReached[Endings.God].ToString() + "\r\n" +
-                    "Passive Ending: " + endingsReached[Endings.Passive].ToString();
+                    "Death Endings: " + endingsReached[Endings.Death].ToString() + (ending == Endings.Death ? " (+1)\r\n" : "\r\n") + 
+                    "God Endings: " + endingsReached[Endings.God].ToString() + (ending == Endings.God ? " (+1)\r\n" : "\r\n") +
+                    "Passive Ending: " + endingsReached[Endings.Passive].ToString() + (ending == Endings.Passive ? " (+1)\r\n" : "\r\n");
 
                 return str;
 

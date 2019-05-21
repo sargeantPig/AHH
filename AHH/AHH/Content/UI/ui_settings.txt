@@ -1,0 +1,13 @@
+﻿Type	Button
+Name	Tog_EHB
+Value	Enemy HP
+Size	256, 128
+H_texture	texture/ui/Pause_Button_H
+Texture	texture/ui/Pause_Button
+
+Type	Button
+Name	Tog_FHB
+Value	Friendly HP
+Size	256, 128
+H_texture	texture/ui/Pause_Button_H
+Texture	texture/ui/Pause_Button

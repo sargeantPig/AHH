@@ -26,6 +26,7 @@ namespace AHH.AI
         int waypointsReached = 0;
         bool marcher = true;
         protected bool stuck = false;
+        bool noRetaliate = false;
 		public Grounded(Vector2 position, Point rectExtends, Type_Data<Ai_Type> types, Stats stats, Grid grid)
 			: base(position, rectExtends, stats.Speed, types.Animations, stats, types, grid)
 		{
@@ -41,7 +42,7 @@ namespace AHH.AI
 				new Dictionary<Text, Text>()
 				{
                     { new Text(Vector2.One, "", Color.White), new Text(Vector2.One, Stats.Name, Color.White) },
-                    { new Text(Vector2.One, "Health: ", Color.White), new Text(Vector2.One, Stats.Health.ToString(), Color.White) },
+                    { new Text(Vector2.One, "Health: ", Color.White), new Text(Vector2.One, Stats.Health.ToString() + " Damage: " + Stats.BaseDamage.ToString(), Color.White) },
                     { new Text(Vector2.One, "Armour: ", Color.White), new Text(Vector2.One, Stats.ArmourType.ToString(), Color.White) },
                     {new Text(Vector2.One, "Descr: ", Color.White), new Text(Vector2.One, Stats.Descr.ToString(), Color.White)  }
                 }, data.Texture, Vector2.Zero);
@@ -57,15 +58,21 @@ namespace AHH.AI
 
 			RefreshInfo();
 
+            if (Ai_States != Ai_States.Marching)
+                this.Speed = norm_speed;
+
 			if (IsHighlighted)
 				ui.RecieveInfo(new KeyValuePair<Guid, InfoPanel>(this.ID, Info));
 			else ui.RemoveInfo(this.ID);
 
-			foreach (var proj in projectile.Values)
-			{
-				if (arch.GetBuilding(defenderID) != null)
-					proj.Update();
-			}
+            if (base.data.Type == Ai_Type.Archer || base.data.Type == Ai_Type.Priest)
+            {
+                foreach (var proj in projectile.Values)
+                {
+                    if (arch.GetBuilding(defenderID) != null)
+                        proj.Update(gt);
+                }
+            }
 
             if (Ai_States == Ai_States.Dead)
             {
@@ -84,9 +91,11 @@ namespace AHH.AI
 					else if (PFResult != null)
 						Think_Pathing(grid, rng);
 					return;
-				case Ai_States.Target: EasyGetTarget(arch, grid, rng); //can go to idle or move
+				case Ai_States.Target:
+                    CurrentState = "Think";
+                    EasyGetTarget(arch, grid, rng); //can go to idle or move
 					break;
-				case Ai_States.Moving: Moving(arch, grid); // can go to idle or attacking
+				case Ai_States.Moving: Moving(arch, grid, gt); // can go to idle or attacking
                     CurrentState = "Move";
 					break;
 				case Ai_States.Attacking:
@@ -128,19 +137,20 @@ namespace AHH.AI
 
 		}
 
-		protected void Moving(Architech arch, Grid grid)
+		protected void Moving(Architech arch, Grid grid, GameTime gt)
 		{
 			if (WayPoints.Count > 0)
-				Moving();
+				Moving(gt);
 		}
 
-		protected void Moving()
+		protected void Moving(GameTime gt)
 		{
-			bool reached = MoveTo(WayPoints[0], true);
+			bool reached = MoveTo(WayPoints[0], gt, true);
             if (reached)
             {
                 WayPoints.RemoveAt(0);
                 waypointsReached++;
+                noRetaliate = false;
             }
 
             if (waypointsReached > 15 && marcher)
@@ -288,6 +298,7 @@ namespace AHH.AI
 			{
 				if (arch.IsInRange(Corners, defenderID, (float)Stats.Range))
 				{
+                    noRetaliate = false;
 					Ai_States = Ai_States.Attacking;
 					return true;
 				}
@@ -322,24 +333,30 @@ namespace AHH.AI
 							hitElasped = 0;
 							os.Combat<Grounded>(this, (Grounded)os.Zombies[attackerID], rng);
 
-							var p = new Projectile(Position, new Point(16, 16), data.Projectile, 5, os.Zombies[attackerID].Center);
-							projectile.Add(p.ID, p);
+                            if (base.data.Type == Ai_Type.Archer || base.data.Type == Ai_Type.Priest)
+                            {
+                                var p = new Projectile(Position, new Point(16, 16), data.Projectile, 5, os.Zombies[attackerID].Center);
+                                projectile.Add(p.ID, p);
+                            }
 						}
 					}
 
 				}
-				else { Ai_States = Ai_States.Idle; }
+				else { Ai_States = Ai_States.Target; noRetaliate = true; }
 
 			}
-			else { Ai_States = Ai_States.Idle; }
+			else { Ai_States = Ai_States.Target; noRetaliate = true; }
 
 
 		}
 
 		public void Retaliate(Guid atkid)
         {
-			this.attackerID = atkid;
-			Ai_States = Ai_States.Retaliating;
+            if (!noRetaliate)
+            {
+                this.attackerID = atkid;
+                Ai_States = Ai_States.Retaliating;
+            }
         }
 
 		protected Focus Think(Random rng)

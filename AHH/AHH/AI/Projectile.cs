@@ -28,9 +28,9 @@ namespace AHH.AI
             origin = new Vector2(texture.Width / 2, texture.Height / 2);
         }
 
-		public void Update()
+		public void Update(GameTime gt)
 		{
-			if (MoveTo(destination))
+			if (MoveTo(destination, gt))
 				alive = false;
 
 			

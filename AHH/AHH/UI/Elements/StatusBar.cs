@@ -36,7 +36,7 @@ namespace AHH.UI.Elements
 
 		public void Update(float value)
 		{
-			MathHelper.Clamp(value, 0, maxValue);
+			value = MathHelper.Clamp(value, 0, maxValue);
 
 			currentValue = (int)value.PercentAofB(maxValue);
 

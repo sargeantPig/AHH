@@ -54,7 +54,7 @@ namespace AHH.Interactable.Building
                 {
                     var building = new BuildingData(building_data[bt]);
                     var empty = BuildingData.Empty();
-                    empty.Cost = building_data[bt].OriginalCost + (float)((GetConduits() * (building_data[bt].OriginalCost * 0.20)));
+                    empty.Cost = building_data[bt].OriginalCost + (float)((GetCountByType(BuildingTypes.EnergyConduit) * (building_data[bt].OriginalCost * 0.20)));
                     building = BuildingData.SetCost(building, empty);
                     building_data[bt] = new BuildingData(building);
                     building_data[bt].Info.Picture = building_types[bt].Texture;
@@ -64,7 +64,7 @@ namespace AHH.Interactable.Building
                 {
                     var building = new BuildingData(building_data[bt]);
                     var empty = BuildingData.Empty();
-                    empty.Cost = building_data[bt].OriginalCost + (float)((GetConduits() * (building_data[bt].OriginalCost * 0.10)));
+                    empty.Cost = building_data[bt].OriginalCost + (float)((GetCountByType(BuildingTypes.Grave) * (building_data[bt].OriginalCost * 0.10)));
                     building = BuildingData.SetCost(building, empty);
                     building_data[bt] = new BuildingData(building);
                     building_data[bt].Info.Picture = building_types[bt].Texture;
@@ -74,7 +74,7 @@ namespace AHH.Interactable.Building
                 {
                     var building = new BuildingData(building_data[bt]);
                     var empty = BuildingData.Empty();
-                    empty.Cost = building_data[bt].OriginalCost + (float)((GetConduits() * (building_data[bt].OriginalCost * 0.05)));
+                    empty.Cost = building_data[bt].OriginalCost + (float)((GetCountByType(BuildingTypes.Wall) * (building_data[bt].OriginalCost * 0.05)));
                     building = BuildingData.SetCost(building, empty);
                     building_data[bt] = new BuildingData(building);
                     building_data[bt].Info.Picture = building_types[bt].Texture;
@@ -84,7 +84,7 @@ namespace AHH.Interactable.Building
                 {
                     var building = new BuildingData(building_data[bt]);
                     var empty = BuildingData.Empty();
-                    empty.Cost = building_data[bt].OriginalCost + (float)((GetConduits() * (building_data[bt].OriginalCost * 0.10)));
+                    empty.Cost = building_data[bt].OriginalCost + (float)((GetCountByType(BuildingTypes.NecroticOrrery) * (building_data[bt].OriginalCost * 0.10)));
                     building = BuildingData.SetCost(building, empty);
                     building_data[bt] = new BuildingData(building);
                     building_data[bt].Info.Picture = building_types[bt].Texture;
@@ -374,12 +374,15 @@ namespace AHH.Interactable.Building
                     building_data[ai] += temp_stat;
                     break;
                 case Researchables.WCost:
-                    temp_stat.Cost += Extensions.Extensions.PercentT(building_data[ai].Cost, percent);
+                    temp_stat.OriginalCost += Extensions.Extensions.PercentT(building_data[ai].Cost, percent);
                     building_data[ai] += temp_stat;
                     break;
                 case Researchables.WProduct:
-                    temp_stat.Production += (int)Extensions.Extensions.PercentT(building_data[ai].Production, percent);
-                    building_data[ai] += temp_stat;
+                    if (ai == BuildingTypes.EnergyConduit)
+                    {
+                        temp_stat.Production += (int)Extensions.Extensions.PercentT(building_data[ai].Production, percent);
+                        building_data[ai] += temp_stat;
+                    }
                     break;
             }
         }
@@ -511,7 +514,9 @@ namespace AHH.Interactable.Building
 			foreach (Building b in buildings.Values)
 			{
 				b.Draw(sb);
-				b.Draw_Status(sb);
+
+                if(player.SubMode.HasFlag(Sub_Player_Modes.Display_FHB))
+				    b.Draw_Status(sb);
 				//b.Draw_Debug(sb);
 			}
 			//draw ghost of building if in buildmode 
@@ -547,17 +552,6 @@ namespace AHH.Interactable.Building
             foreach (var b in buildings)
             {
                 if (b.Value.GetBuildingData().Type == type)
-                    count++;
-            }
-            return count;
-        }
-
-        public int GetConduits()
-        {
-            int count = 0;
-            foreach (var b in buildings)
-            {
-                if (b.Value.GetBuildingData().Type == BuildingTypes.EnergyConduit)
                     count++;
             }
             return count;

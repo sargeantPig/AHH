@@ -18,7 +18,7 @@ namespace AHH.Base
 			this.Velocity = new Vector2(1, 1);
 		}
 
-		public bool MoveTo(Vector2 destination, bool ret = false)
+		public bool MoveTo(Vector2 destination, GameTime gt, bool ret = false )
 		{
 			float distance = Vector2.Distance(Position, destination);
 			Vector2 direction = Extensions.Extensions.DirectionTo(Position, destination);
@@ -28,12 +28,12 @@ namespace AHH.Base
 				temp = new Vector2((float)Math.Round(temp.X), (float)Math.Round(temp.Y));
 				Position += temp;
 
-				if (distance < 2)
-				{
-					Position = destination;
+                if (distance < speed)
+                {
+                    Position = destination;
                     if (ret)
                         return true;
-				}
+                }
 
 				UpdateBox = Position;
 				return false;

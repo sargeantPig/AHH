@@ -12,16 +12,16 @@ Descr	Used to protect	your assets.
 Name	Necromancer Tower
 Type	NTower
 Stats	10000, 1, Reinforced, 100, 10, 128, 128
-Descr	TBD
+Descr	This tower must survive!
 
 Name	Grave
 Type	Grave
-Stats	1000, -5, Reinforced, 100, 400, 64, 64
+Stats	1000, -10, Reinforced, 100, 400, 64, 64
 Descr	Zombies gather around	and protect graves.
 
 Name	Energy Conduit
 Type	EnergyConduit
-Stats	500, 5, Reinforced, 100, 600, 64, 64
+Stats	500, 20, Reinforced, 100, 600, 64, 64
 Descr	Produces energy, production	times enemies alive. 
 
 Name	Necrotic Orrery

@@ -28,7 +28,37 @@ namespace AHH.Research
 
             foreach (var a in rd.Modifiers)
             {
-                temp.Add(new Text(Vector2.Zero, "Increase ", Color.White), new Text(Vector2.Zero, a.Key.ToString() + " by " + (a.Value * 100).ToString() + "%", Color.Green));
+                switch (a.Key)
+                {
+                    case Researchables.ZHealth:
+                        temp.Add(new Text(Vector2.Zero, "Increase ", Color.White), new Text(Vector2.Zero, "Zombie health" + " by " + (a.Value * 100).ToString() + "%", Color.Green));
+                        break;
+                    case Researchables.ZDamage:
+                        temp.Add(new Text(Vector2.Zero, "Increase ", Color.White), new Text(Vector2.Zero, "Zombie damage" + " by " + (a.Value * 100).ToString() + "%", Color.Green));
+                        break;
+                    case Researchables.ZSpeed:
+                        temp.Add(new Text(Vector2.Zero, "Increase ", Color.White), new Text(Vector2.Zero, "Zombie speed" + " by " + (a.Value * 100).ToString() + "%", Color.Green));
+                        break;
+                    case Researchables.WCost:
+                        temp.Add(new Text(Vector2.Zero, "Decrease ", Color.White), new Text(Vector2.Zero, "Building cost" + " by " + (a.Value * 100).ToString() + "%", Color.Green));
+                        break;
+                    case Researchables.WHealth:
+                        temp.Add(new Text(Vector2.Zero, "Increase ", Color.White), new Text(Vector2.Zero, "Building health" + " by " + (a.Value * 100).ToString() + "%", Color.Green));
+                        break;
+                    case Researchables.WProduct:
+                        temp.Add(new Text(Vector2.Zero, "Increase ", Color.White), new Text(Vector2.Zero, "Energy production" + " by " + (a.Value * 100).ToString() + "%", Color.Green));
+                        break;
+                    case Researchables.SCost:
+                        temp.Add(new Text(Vector2.Zero, "Decrease ", Color.White), new Text(Vector2.Zero, "Spell cost " + " by " + (a.Value * 100).ToString() + "%", Color.Green));
+                        break;
+                    case Researchables.SLength:
+                        temp.Add(new Text(Vector2.Zero, "Increase ", Color.White), new Text(Vector2.Zero, "Spell length " + " by " + (a.Value * 100).ToString() + "%", Color.Green));
+                        break;
+                    case Researchables.SPower:
+                        temp.Add(new Text(Vector2.Zero, "Increase ", Color.White), new Text(Vector2.Zero, "Spell damage " + " by " + (a.Value * 100).ToString() + "%", Color.Green));
+                        break;
+                }
+                
             }
             
 

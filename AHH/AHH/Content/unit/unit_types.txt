@@ -14,15 +14,15 @@ Dead, 11, 11, 100
 
 Type	Priest
 Sound	{sound_file}
-Texture	texture/unit/test_ai_priest
-H_Texture	texture/unit/test_ai_priest
-C_Texture	texture/unit/test_ai_priest
-Projectile	texture/unit/test_ai_priest
+Texture	texture/unit/priest
+H_Texture	texture/unit/priest
+C_Texture	texture/unit/priest
+Projectile	texture/unit/projectile2
 Animation
-Move, 1, 1, 100
-Attack, 2, 2, 100
-Think, 0, 0, 100
-Dead, 3, 3, 100
+Move, 0, 3, 300
+Attack, 4, 5, 400
+Think, 6, 9, 200
+Dead, 10, 10, 100
 
 Type	Archer
 Sound	{sound_file}
@@ -38,15 +38,15 @@ Dead, 12, 12, 100
 
 Type	Horseman
 Sound	{sound_file}
-Texture	texture/unit/test_ai_horse
-H_Texture	texture/unit/test_ai_horse
-C_Texture	texture/unit/test_ai_horse
-Projectile	texture/unit/test_ai_horse
+Texture	texture/unit/horseman
+H_Texture	texture/unit/horseman
+C_Texture	texture/unit/horseman
+Projectile	texture/unit/horseman
 Animation
-Move, 1, 1, 100
-Attack, 2, 2, 100
-Think, 0, 0, 100
-Dead, 3, 3, 100
+Move, 0, 3, 100
+Attack, 4, 9, 200
+Think, 10, 13, 200
+Dead, 14, 14, 100
 
 #############
 Type	Z_Knight
@@ -56,22 +56,22 @@ H_Texture	texture/unit/z_swordsman
 C_Texture	texture/unit/z_swordsman
 Projectile	texture/unit/z_swordsman
 Animation
-Move, 1, 1, 100
-Attack, 2, 2, 100
-Think, 0, 0, 100
-Dead, 3, 3, 100
+Move, 0, 3, 300
+Attack, 4, 6, 333
+Think, 7, 10, 200
+Dead, 11, 11, 100
 
 Type	Z_Priest
 Sound	{sound_file}
-Texture	texture/unit/test_ai_priest_zombie
-H_Texture	texture/unit/test_ai_priest_zombie
-C_Texture	texture/unit/test_ai_priest_zombie
-Projectile	texture/unit/test_ai_priest_zombie
+Texture	texture/unit/z_priest
+H_Texture	texture/unit/z_priest
+C_Texture	texture/unit/z_priest
+Projectile	texture/unit/projectile2
 Animation
-Move, 1, 1, 100
-Attack, 2, 2, 100
-Think, 0, 0, 100
-Dead, 3, 3, 100
+Move, 0, 3, 300
+Attack, 4, 5, 400
+Think, 6, 9, 200
+Dead, 10, 10, 100
 
 Type	Z_Archer
 Sound	{sound_file}
@@ -87,12 +87,12 @@ Dead, 12, 12, 100
 
 Type	Z_Horseman
 Sound	{sound_file}
-Texture	texture/unit/test_ai_horse_zombie
-H_Texture	texture/unit/test_ai_horse_zombie
-C_Texture	texture/unit/test_ai_horse_zombie
-Projectile	texture/unit/test_ai_horse_zombie
+Texture	texture/unit/z_horseman
+H_Texture	texture/unit/z_horseman
+C_Texture	texture/unit/z_horseman
+Projectile	texture/unit/z_horseman
 Animation
-Move, 1, 1, 100
-Attack, 2, 2, 100
-Think, 0, 0, 100
-Dead, 3, 3, 100
+Move, 0, 3, 100
+Attack, 4, 9, 200
+Think, 10, 13, 200
+Dead, 14, 14, 100

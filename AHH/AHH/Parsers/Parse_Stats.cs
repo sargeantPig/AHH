@@ -81,7 +81,7 @@ namespace AHH.Parsers
                     if (typeof(Y) == typeof(Stats))
                     {
                         temp_stats.WeaponType = (WeaponType)Enum.Parse(typeof(WeaponType), split[2]);
-                        temp_stats.BaseDamage = Convert.ToInt32(split[4]);
+                        temp_stats.BaseDamage = (float)Convert.ToInt32(split[4]);
                         temp_stats.Range = Convert.ToDouble(split[5]);
                         temp_stats.HitDelay = (float)Convert.ToDouble(split[6]);
                         temp_stats.Luck = (Luck)Enum.Parse(typeof(Luck), split[7]);

@@ -17,6 +17,8 @@ namespace AHH.User
     public enum Player_Modes
     {
         Building,
+        Settings,
+        Surrender,
         Research,
         Spells,
         Tools,
@@ -30,10 +32,13 @@ namespace AHH.User
         All
     }
 
+    [Flags]
     public enum Sub_Player_Modes
     {
-        Demolish,
-        none
+        None = 0,
+        Display_EHB = 2,
+        Display_FHB = 4,
+
     }
 
 
@@ -44,7 +49,6 @@ namespace AHH.User
 		Player_Modes mode { get; set; }
 		Cursor cursor { get; set; }
 		int energy { get; set; }
-		
 		int max_energy;
 		StatusBar status_bar;
 		float energyIncrease { get; set; }
@@ -61,13 +65,18 @@ namespace AHH.User
         bool pop_changed { get; set; }
 
         bool finished = false;
+
+        
+        Sub_Player_Modes sub_m { get; set; }
         public Player(Texture2D cursor, Point size, Texture2D[] statusBar, ContentManager cm)
             : base()
         {
 #if DEBUG
             buildingID = "Nan";
 #endif
-            persistance = (float)(Statistics.TotalEnergyGained * 0.01);
+            sub_m = Sub_Player_Modes.Display_FHB;
+            persistance = (float)(Statistics.TotalEnergyGained / 1000000);
+            persistance = persistance * 0.03f;
             mode = Player_Modes.MainMenu;
             controls = new ControlMapper("Content/settings/controls.txt");
 			this.cursor = new Cursor(cm.Load<Texture2D>("texture/cursor_sheet"), new Dictionary<string, Vector3>() {
@@ -165,7 +174,27 @@ namespace AHH.User
                     break;
                 case ButtonFunction.ES_End:
                     master.Pop_Action();
+                    mode = Player_Modes.Surrender;
+                    break;
+                case ButtonFunction.ReallySurrender:
+                    master.Pop_Action();
                     mode = Player_Modes.End_Screen;
+                    break;
+                case ButtonFunction.Settings:
+                    master.Pop_Action();
+                    mode = Player_Modes.Settings;
+                    break;
+                case ButtonFunction.Tog_EHB:
+                    master.Pop_Action();
+                    if (sub_m.HasFlag(Sub_Player_Modes.Display_EHB))
+                        sub_m &= ~Sub_Player_Modes.Display_EHB;
+                    else sub_m |= Sub_Player_Modes.Display_EHB;
+                    break;
+                case ButtonFunction.Tog_FHB:
+                    master.Pop_Action();
+                    if (sub_m.HasFlag(Sub_Player_Modes.Display_FHB))
+                        sub_m &= ~Sub_Player_Modes.Display_FHB;
+                    else sub_m |= Sub_Player_Modes.Display_FHB;
                     break;
             }
 
@@ -289,6 +318,11 @@ namespace AHH.User
         {
             get { return pop_changed; }
 
+        }
+
+        public Sub_Player_Modes SubMode
+        {
+            get { return sub_m; }
         }
 
         public bool IsPopFull

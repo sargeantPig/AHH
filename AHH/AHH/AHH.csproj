@@ -104,6 +104,7 @@
     <Compile Include="UI\Elements\EAlign.cs" />
     <Compile Include="UI\Elements\IElement.cs" />
     <Compile Include="UI\Elements\InfoPanel.cs" />
+    <Compile Include="UI\Elements\InfoPanelManager.cs" />
     <Compile Include="UI\Elements\Messages\Message.cs" />
     <Compile Include="UI\Elements\Messages\Messenger.cs" />
     <Compile Include="UI\Elements\StatusBar.cs" />
@@ -181,7 +182,13 @@
     <Content Include="Content\UI\ui_research.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <Content Include="Content\UI\ui_settings.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Include="Content\UI\ui_spells.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\UI\ui_surrender.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Content\unit\unit_descr.txt">

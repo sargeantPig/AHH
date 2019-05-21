@@ -120,11 +120,15 @@ namespace AHH.Research
 
             elasped += gt.ElapsedGameTime.Milliseconds;
 
-            if (elasped >= aiResearchTimer)
+            if (elasped >= aiResearchTimer && airesearch.Count > 0)
             {
                 var r = new ResearchData();
                 r.Modifiers = new List<KeyValuePair<Researchables, float>>();
-                r.Modifiers.Add(new KeyValuePair<Researchables, float>( airesearch.First(), rnd.Next(1, 5)/ 100));
+                float percent = (float)rnd.NextDouble();
+                if (percent == 0)
+                    percent = 0.1f / 10f;
+                else percent = percent / 10f;
+                r.Modifiers.Add(new KeyValuePair<Researchables, float>( airesearch.First(), percent));
                 ApplyResearch(r, os, arch, wiz, master);
                 elasped = 0;
             }

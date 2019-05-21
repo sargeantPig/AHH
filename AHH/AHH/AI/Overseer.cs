@@ -118,7 +118,7 @@ namespace AHH.AI
 					remove_queue.Add(Z.ID);
 			}
 
-            if (ais.Count > 200)
+            if (ais.Count > 100)
                 CleanUp();
 
             foreach (Guid id in remove_queue)
@@ -136,8 +136,9 @@ namespace AHH.AI
 			if (s_elasped > s_target && !spawning)
 			{
                 CreateNewFormation(rng, grid);
+                s_target = formations[0].LongLength * 500;
                 spawning = true;
-                CalcTarget();
+                //CalcTarget();
 				s_elasped = 0;
 			}
 
@@ -151,8 +152,7 @@ namespace AHH.AI
                 }
             }
 
-            if(Options.GetTick)
-                p.IncreaseEnergy -= zombies.Count * 5;
+            
 
             
 		}
@@ -361,7 +361,7 @@ namespace AHH.AI
             for (int y = (int)min.Y; y < max.Y; y++)
             {
                 var temp = Vector2.Distance(value, new Vector2(min.X, y));
-                if (temp <= (range) * 32)
+                if (temp <= (range) * 16)
                     return true;
             }
 
@@ -372,7 +372,7 @@ namespace AHH.AI
             for (int y = (int)min.X; y < max.X; y++)
             {
                 var temp = Vector2.Distance(value, new Vector2(y, min.Y));
-                if (temp <= (range) * 32)
+                if (temp <= (range) * 16)
                     return true;
             }
 
@@ -466,7 +466,7 @@ namespace AHH.AI
 			
 		}
 
-		public void Draw(SpriteBatch sb)
+		public void Draw(SpriteBatch sb, Player p)
 		{
 			int think = 0;
 			int attack = 0;
@@ -489,7 +489,9 @@ namespace AHH.AI
                 if (ai.Ai_States != Ai_States.Dead)
                 {
                     ai.Draw(sb);
-                    ((AiUnit)ai).Draw_Status(sb, null);
+
+                    if(p.SubMode.HasFlag(Sub_Player_Modes.Display_EHB))
+                        ((AiUnit)ai).Draw_Status(sb, null);
 
                 }
                 
@@ -498,7 +500,9 @@ namespace AHH.AI
             foreach (Zombie z in zombies.Values)
 			{
 				((Ai)z).Draw(sb);
-				z.Draw_Status(sb, null);
+
+                if (p.SubMode.HasFlag(Sub_Player_Modes.Display_FHB))
+                    z.Draw_Status(sb, null);
 			}
 
 			//sb.DrawString(DebugFont, "Total: " + ais.Count().ToString(), Position, Color.Black);
@@ -631,15 +635,15 @@ namespace AHH.AI
                     ai_stats[ai] += temp_stat;
                     break;
                 case Researchables.AiDamage:
-                    temp_stat.BaseDamage += (int)Extensions.Extensions.PercentT(ai_stats[ai].BaseDamage, percent);
+                    temp_stat.BaseDamage += Extensions.Extensions.PercentT(ai_stats[ai].BaseDamage, percent);
                     ai_stats[ai] += temp_stat;
                     break;
                 case Researchables.AiHealth:
-                    temp_stat.Health += (int)Extensions.Extensions.PercentT(ai_stats[ai].BaseDamage, percent);
+                    temp_stat.Health += Extensions.Extensions.PercentT(ai_stats[ai].BaseDamage, percent);
                     ai_stats[ai] += temp_stat;
                     break;
                 case Researchables.AiSpeed:
-                    temp_stat.Speed += (int)Extensions.Extensions.PercentT(ai_stats[ai].BaseDamage, percent);
+                    temp_stat.Speed += Extensions.Extensions.PercentT(ai_stats[ai].BaseDamage, percent);
                     ai_stats[ai] += temp_stat;
                     break;
 

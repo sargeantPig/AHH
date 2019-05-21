@@ -10,7 +10,7 @@ Texture	texture/ui/Spells_Button
 
 Type	Button
 Name	DrainEssence
-Value	Drain Essence
+Value	Steal Soul
 Size	256, 128
 H_texture	texture/ui/Spells_Button_H
 Texture	texture/ui/Spells_Button

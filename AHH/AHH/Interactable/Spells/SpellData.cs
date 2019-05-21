@@ -53,7 +53,8 @@ namespace AHH.Interactable.Spells
             items.Add(new Text(Vector2.Zero, "", Color.White), 
                 new Text(Vector2.Zero, this.name.ToString(), Color.White));
             items.Add(new Text(Vector2.Zero, "Cost per Tick: ", Color.White), 
-                new Text(Vector2.Zero, this.cost.ToString() + " (" + ((this.duration/ this.tick) * cost).ToString() + " total)", Color.White));
+                new Text(Vector2.Zero, this.cost.ToString() + " (" + ((this.duration/ this.tick) * cost).ToString() + " total)" , Color.White));
+            items.Add(new Text(Vector2.Zero, "Damage: ", Color.White), new Text(Vector2.Zero, this.damage.ToString(), Color.White));
             items.Add(new Text(Vector2.Zero, "Descr: ", Color.White), new Text(Vector2.Zero, this.descr, Color.White));
          
             this.info = new InfoPanel(items, null, Vector2.Zero);

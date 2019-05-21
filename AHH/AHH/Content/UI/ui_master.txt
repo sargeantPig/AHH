@@ -40,6 +40,20 @@ Size	256, 128
 Align	Horizontal
 File	Content/UI/ui_demolish.txt
 
+Mode	Surrender
+ParseType	multi
+Location	10, 948
+Size	256, 128
+Align	Horizontal
+File	Content/UI/ui_surrender.txt
+
+Mode	Settings
+ParseType	multi
+Location	10, 948
+Size	256, 128
+Align	Horizontal
+File	Content/UI/ui_settings.txt
+
 Mode	All
 ParseType	multi
 Location	10, 907

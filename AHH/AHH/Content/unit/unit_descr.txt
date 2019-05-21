@@ -10,7 +10,7 @@ Descr	A Holy Swordsman of	unquestionable honour.
 
 Name	Holy Man
 Type	Priest
-Stats	50, Voice, None, 1, 3, 2000, Holy, Focused, 1
+Stats	50, Voice, None, 6, 3, 2000, Holy, Focused, 1
 Descr	A Holy priest of	radiant light.
 
 Name	Bowman
@@ -30,7 +30,7 @@ Descr	Ahh
 
 Name	Necrolyt
 Type	Z_Priest
-Stats	50, Voice, None, 1, 20, 2000, Zombie, Focused, 1
+Stats	50, Voice, None, 5, 20, 2000, Zombie, Focused, 1
 Descr	Ugh
 
 Name	Undead Bowman

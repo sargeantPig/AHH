@@ -51,10 +51,12 @@ namespace AHH.UI.Elements
 			fullString.Draw(sb, fullString.Position);
 
             int i = 0;
+            Text prevkey;
             foreach (var deets in details)
             {
-                deets.Key.Draw(sb, fullString.Position + new Vector2(0, (i * DebugFont.MeasureString(deets.Key.Value).Y)));
-                deets.Value.Draw(sb, fullString.Position + new Vector2(DebugFont.MeasureString(deets.Key.Value).X, (i * DebugFont.MeasureString(deets.Key.Value).Y)));
+                prevkey = deets.Key;
+                deets.Key.Draw(sb, fullString.Position + new Vector2(0, (i * DebugFont.MeasureString(prevkey.Value).Y)));
+                deets.Value.Draw(sb, fullString.Position + new Vector2(DebugFont.MeasureString(deets.Key.Value).X, (i * DebugFont.MeasureString(prevkey.Value).Y)));
                 i++;
             }
 

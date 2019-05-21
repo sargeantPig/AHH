@@ -42,7 +42,12 @@ namespace AHH
 		StaticSprite light;
         StaticSprite overlay_Screen;
         Texture2D[] screens;
-		public Game1()
+
+        public const int UPS = 45; // Updates per second
+        public const int FPS = 60;
+
+        TimeSpan update;
+        public Game1()
 		{
 			graphics = new GraphicsDeviceManager(this);
 			Content.RootDirectory = "Content";
@@ -62,7 +67,9 @@ namespace AHH
 			Resolution.SetVirtualResolution(1920, 1080);
 			Resolution.SetResolution(1920, 1080, graphics.IsFullScreen);
 
-			base.Initialize();
+            IsFixedTimeStep = true;
+            TargetElapsedTime = TimeSpan.FromSeconds(1.0 / FPS);
+            base.Initialize();
 		}
 
 		protected override void LoadContent()
@@ -115,7 +122,7 @@ namespace AHH
             screens[2] = Content.Load<Texture2D>(@"texture/end_screen");
             overlay_Screen = new StaticSprite(Vector2.Zero, screens[0], new Point(1920, 1080));
 
-           
+            update = new TimeSpan();
         }
 
 		/// <summary>
@@ -140,8 +147,10 @@ namespace AHH
                 Statistics.Save(@"Content/settings/save.dat");
                 Exit();
             }
-			// TODO: Add your update logic here
-			Options.Update(gameTime);
+
+            update += gameTime.ElapsedGameTime;
+            // TODO: Add your update logic here
+            Options.Update(gameTime);
             player.Input.KB = Keyboard.GetState();
 			player.Update(uiMaster, Mouse.GetState(), architech, gameTime);
             uiMaster.Update(player, gameTime);
@@ -179,7 +188,11 @@ namespace AHH
             {
                 grid.Update(player, architech, os);
                 architech.Update(grid, uiMaster, os, player, gameTime, os.GetUnitRects());
-                os.Update(gameTime, player.Cursor, architech, uiMaster, grid, player, rng);
+                if (update.TotalMilliseconds > 1000f / UPS)
+                {
+                    update = new TimeSpan();
+                    os.Update(gameTime, player.Cursor, architech, uiMaster, grid, player, rng);
+                }
                 wizard.Update(gameTime, architech, os, uiMaster, grid, player);
                 researcher.Update(gameTime, os, architech, uiMaster, player, wizard, rng);
                 player.Input.KBP = player.Input.KB;
@@ -215,7 +228,7 @@ namespace AHH
                 terrain.Draw(spriteBatch);
                 grid.Draw(spriteBatch, player.SelectedBuilding);
                 architech.Draw(spriteBatch, player, grid);
-                os.Draw(spriteBatch);
+                os.Draw(spriteBatch, player);
                 wizard.Draw(spriteBatch);
                 light.Draw(spriteBatch);
             }
