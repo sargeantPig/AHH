@@ -1,0 +1,29 @@
+﻿//change to single buttons that then cycle through a sub mode for building selection
+
+Type	Button
+Name	S_Economy
+Value	Economic
+Size	164, 42
+H_texture	texture/ui/Build_Button_H
+Texture	texture/ui/Build_Button
+
+Type	Button
+Name	S_Defensive
+Value	Defensive
+Size	164, 42
+H_texture	texture/ui/Build_Button_H
+Texture	texture/ui/Build_Button
+
+Type	Button
+Name	S_Research
+Value	Knowledge
+Size	164, 42
+H_texture	texture/ui/Build_Button_H
+Texture	texture/ui/Build_Button
+
+Type	Button
+Name	S_Aggressive
+Value	Aggression
+Size	164, 42
+H_texture	texture/ui/Build_Button_H
+Texture	texture/ui/Build_Button

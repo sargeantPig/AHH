@@ -8,9 +8,9 @@
 Mode	Building
 ParseType	multi
 Location	10, 948
-Size	256, 128
+Size	164, 42
 Align	Horizontal
-File	Content/UI/ui_buildings.txt
+File	Content/UI/Buildings/ui_subBuildings00.txt
 
 Mode	Research
 ParseType	multi
@@ -74,6 +74,7 @@ Location	832, 518
 Size	256, 128
 Align	Vertical
 File	Content/UI/ui_main_menu.txt
+
 
 Mode	End_Screen
 ParseType	single

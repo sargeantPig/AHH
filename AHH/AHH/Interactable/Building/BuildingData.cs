@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using AHH.AI;
 using AHH.UI;
 using AHH.UI.Elements;
+using AHH.UI.Elements.Buttons;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 namespace AHH.Interactable.Building
@@ -42,6 +43,9 @@ namespace AHH.Interactable.Building
         string descr { get; set; }
         InfoPanel info { get; set; }
 
+        Prerequisites tier { get; set; }
+
+        Prerequisites requiredTier { get; set; }
         public BuildingData(BuildingData bd)
         {
             this.type = bd.type;
@@ -55,6 +59,8 @@ namespace AHH.Interactable.Building
             this.id = Guid.NewGuid();
             this.descr = bd.descr;
             this.orig_cost = bd.orig_cost;
+            this.tier = bd.tier;
+            this.requiredTier = bd.requiredTier;
             Dictionary<Text, Text> items = new Dictionary<Text, Text>();
 
             items.Add(new Text(Vector2.Zero, ""), new Text(Vector2.Zero, this.name, Color.White));
@@ -166,6 +172,17 @@ namespace AHH.Interactable.Building
             get { return descr; }
             set { descr = value; }
 
+        }
+
+        public Prerequisites Tier
+        {
+            get { return tier; }
+            set { tier = value; }
+        }
+        public Prerequisites RequiredTier
+        {
+            get { return requiredTier; }
+            set { requiredTier = value; }
         }
     }
 

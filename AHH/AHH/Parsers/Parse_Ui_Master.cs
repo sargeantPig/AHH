@@ -17,7 +17,10 @@ namespace AHH.Parsers
 		public static Dictionary<Player_Modes, List<IElement>> Parse_Ui_Master(string filepath, ContentManager cm)
 		{
 			if (!File.Exists(filepath))
-				return null;
+            {
+                throw new Exception("Cannot locate file at: " + filepath);
+                return null;
+            }
 
 			StreamReader sr = new StreamReader(filepath);
 			string line = "";
@@ -85,7 +88,27 @@ namespace AHH.Parsers
 					if (line.StartsWith("File"))
 					{
 						string[] split = line.Split('\t');
-						var data = Parse_UiElements(split[1], cm);
+                        Dictionary<string, IElement> data;
+                        if (!split[1].Contains("Nest"))
+                            data = Parse_UiElements(split[1], cm);
+                        else
+                        {
+                            var temp = Parse_Ui_Master(split[1], cm);
+
+                            Dictionary<string, IElement> correction = new Dictionary<string, IElement>();
+
+                            foreach (var e in temp.Values)
+                            {
+                                foreach (var b in e)
+                                {
+                                    correction.Add(Guid.NewGuid().ToString(), b);
+                                }
+                            }
+                            data = correction;
+                        };
+
+                        
+
 						ndic[mode].Add(new Strip(loc, true, size, align, data));
 					}
 				}

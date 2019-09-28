@@ -1,0 +1,6 @@
+﻿Type	Button
+Name	Build_NO
+Value	Necrotic Orrery
+Size	256, 80
+H_texture	texture/ui/Build_Button_H
+Texture	texture/ui/Build_Button

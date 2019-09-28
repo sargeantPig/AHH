@@ -3,14 +3,15 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Microsoft.Xna.Framework.Content;
+using Microsoft.Xna.Framework.Graphics;
+using Microsoft.Xna.Framework;
+using AHH.UI.Elements.Buttons;
+using AHH.Interactable.Building;
+using AHH.User;
 using AHH.Base;
 using AHH.UI.Elements;
 using AHH.UI.Elements.Messages;
-using Microsoft.Xna.Framework.Content;
-using Microsoft.Xna.Framework.Graphics;
-using AHH.User;
-using Microsoft.Xna.Framework;
-
 namespace AHH.UI
 {
     class UiMaster : BaseObject, IElement
@@ -40,7 +41,7 @@ namespace AHH.UI
             infoManager = new InfoPanelManager(infoPosition, 100);
         }
 
-        public void Update(Player p, GameTime gt)
+        public void Update(Player p, GameTime gt, Architech arch)
         {
             foreach (KeyValuePair<Player_Modes, List<IElement>> kv in elements)
             {
@@ -58,6 +59,32 @@ namespace AHH.UI
                             string highlight = ((Strip)ie).GetHighlighted();
                             if (highlight != null)
                                 ParseHighlight(highlight);
+
+                            if (p.Mode == Player_Modes.Building)
+                            {
+                                foreach (var e in ((Strip)ie).Elements)
+                                {
+                                    if (e.Value is Strip)
+                                    {
+                                        foreach (var ele in ((Strip)e.Value).Elements)
+                                        {
+                                            ButtonFunction bf = RetrieveAction(ele.Key);
+
+                                            foreach (BuildingTypes a in Enum.GetValues(typeof(BuildingTypes)))
+                                            {
+
+                                                if (a.ToString() == bf.ToString())
+                                                    if (!CheckPR(p.Prerequisites, arch.GetRequiredTier(a)))
+                                                    {
+                                                        e.Value.IsActive = false;
+
+                                                    }
+                                                    else e.Value.IsActive = true;
+                                            }
+                                        }
+                                    }
+                                }
+                            }
                         }
 
                         if (ie is Button)
@@ -68,6 +95,7 @@ namespace AHH.UI
                         }
                     }
                 }
+
             }
 
             infoManager.Update(gt, this, p);
@@ -93,13 +121,13 @@ namespace AHH.UI
         public void Update(Cursor ms)
         { }
 
-        public void Draw(SpriteBatch sb, Player p)
+        public void Draw(SpriteBatch sb, Player p, Architech arch)
         {
             foreach (KeyValuePair<Player_Modes, List<IElement>> kv in elements)
             {
-                foreach (IElement ie in kv.Value)
+                foreach (var ie in kv.Value)
                 {
-                    if (ie.IsActive && p.Mode == kv.Key || (kv.Key == Player_Modes.All && p.Mode != Player_Modes.MainMenu && p.Mode != Player_Modes.End_Screen))
+                    if (ie.IsActive &&  p.Mode == kv.Key || (kv.Key == Player_Modes.All && p.Mode != Player_Modes.MainMenu && p.Mode != Player_Modes.End_Screen))
                         ie.Draw(sb);
                 }
             }
@@ -113,6 +141,13 @@ namespace AHH.UI
         public void Draw(SpriteBatch sb)
         { }
 
+        public bool CheckPR(Prerequisites playerReq, Prerequisites buildingPreqs)
+        {
+            if ((playerReq & buildingPreqs) != 0)
+                return true;
+            else return false;
+        }
+      
         void ParseAction(string action, GameTime gt)
         {
             ButtonFunction func = ButtonFunction.Examine;
@@ -131,6 +166,26 @@ namespace AHH.UI
                 return;
 
             action_queue.Add(func);
+        }
+
+        ButtonFunction RetrieveAction(string action)
+        {
+            ButtonFunction func = ButtonFunction.Examine;
+            bool match = false;
+            foreach (KeyValuePair<ButtonFunction, string> kv in functions)
+            {
+                if (kv.Value == action)
+                {
+                    func = kv.Key;
+                    match = true;
+                    break;
+                }
+            }
+
+            if (!match)
+                return ButtonFunction.Nan;
+
+            return func;
         }
 
         void ParseHighlight(string action)

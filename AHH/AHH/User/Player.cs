@@ -12,6 +12,8 @@ using Microsoft.Xna.Framework.Content;
 using AHH.UI.Elements;
 using AHH.Interactable.Building;
 using AHH.Functions;
+using AHH.UI.Elements.Buttons;
+
 namespace AHH.User
 {
     public enum Player_Modes
@@ -41,19 +43,20 @@ namespace AHH.User
 
     }
 
-
     class Player : BaseObject
     {
+        Prerequisites prerequisites = Prerequisites.None;
+
         ControlMapper controls { get; }
         string buildingID { get; set; } //currently selected building to place
-		Player_Modes mode { get; set; }
-		Cursor cursor { get; set; }
-		int energy { get; set; }
-		int max_energy;
-		StatusBar status_bar;
-		float energyIncrease { get; set; }
+        Player_Modes mode { get; set; }
+        Cursor cursor { get; set; }
+        int energy { get; set; }
+        int max_energy;
+        StatusBar status_bar;
+        float energyIncrease { get; set; }
 
-		Text text;
+        Text text;
         float persistance;
         KeyValuePair<Text, Text> populationDisplay;
         int population { get; set; }
@@ -63,10 +66,8 @@ namespace AHH.User
         Vector2 rect_dimensions = new Vector2(10, 10);
 #endif
         bool pop_changed { get; set; }
-
         bool finished = false;
 
-        
         Sub_Player_Modes sub_m { get; set; }
         public Player(Texture2D cursor, Point size, Texture2D[] statusBar, ContentManager cm)
             : base()
@@ -79,7 +80,7 @@ namespace AHH.User
             persistance = persistance * 0.03f;
             mode = Player_Modes.MainMenu;
             controls = new ControlMapper("Content/settings/controls.txt");
-			this.cursor = new Cursor(cm.Load<Texture2D>("texture/cursor_sheet"), new Dictionary<string, Vector3>() {
+            this.cursor = new Cursor(cm.Load<Texture2D>("texture/cursor_sheet"), new Dictionary<string, Vector3>() {
                 {"M_Build", new Vector3(0, 1, 500) },
                 {"M_Research", new Vector3(2, 7, 100)},
                 {"M_Spells", new Vector3(8, 13, 200) },
@@ -87,24 +88,24 @@ namespace AHH.User
                 {"M_Pause", new Vector3(18, 26, 300) }
 
             });
-			this.energy = 2000;
-			max_energy = this.energy;
-			status_bar = new StatusBar(size, energy, statusBar, new Text(Vector2.One, "", Color.White));
-			status_bar.UpdatePosition(new Vector2(10, 850));
-			text = new Text( status_bar.Position + status_bar.GetText.Position + new Vector2(128, -22), "", Color.White);
+            this.energy = 2000;
+            max_energy = this.energy;
+            status_bar = new StatusBar(size, energy, statusBar, new Text(Vector2.One, "", Color.White));
+            status_bar.UpdatePosition(new Vector2(10, 850));
+            text = new Text(status_bar.Position + status_bar.GetText.Position + new Vector2(128, -22), "", Color.White);
             status_bar.GetText.Colour = Color.DarkSlateGray;
             populationDisplay = new KeyValuePair<Text, Text>(new Text(Vector2.Zero, "Zombies: ", Color.DarkKhaki), new Text(Vector2.Zero, "", Color.White));
             pop_changed = false;
         }
 
-        public void Update(UiMaster master, MouseState ms, Architech arch, GameTime gt )
+        public void Update(UiMaster master, MouseState ms, Architech arch, GameTime gt)
         {
-			cursor.Update(ms, gt);
-			status_bar.Update(energy);
+            cursor.Update(ms, gt);
+            status_bar.Update(energy);
             UpdatePopulation();
             pop_changed = false;
             pop_cap = arch.GetCountByType(BuildingTypes.Grave) * 5;
-
+            prerequisites = arch.GetCurrentBuiltTiers();
             if (!arch.IsHomeAlive)
                 mode = Player_Modes.End_Screen;
 
@@ -131,12 +132,12 @@ namespace AHH.User
                 }
             }
 
-			if (controls.IsPressed(Ctrls.HotKey_Build))
-				mode = Player_Modes.Building;
-			if (controls.IsPressed(Ctrls.HotKey_Research))
-				mode = Player_Modes.Research;
-			if (controls.IsPressed(Ctrls.HotKey_Spells))
-				mode = Player_Modes.Spells;
+            if (controls.IsPressed(Ctrls.HotKey_Build))
+                mode = Player_Modes.Building;
+            if (controls.IsPressed(Ctrls.HotKey_Research))
+                mode = Player_Modes.Research;
+            if (controls.IsPressed(Ctrls.HotKey_Spells))
+                mode = Player_Modes.Spells;
             if (controls.IsPressed(Ctrls.HotKey_Pause))
                 mode = Player_Modes.Pause;
             switch (master.NextAction)
@@ -220,7 +221,7 @@ namespace AHH.User
 
             }
 
-		}
+        }
 
         void UpdatePopulation()
         {
@@ -233,16 +234,16 @@ namespace AHH.User
                 populationDisplay.Value.Colour = Color.DarkOrange;
         }
 
-		public void UpdateEnergy()
-		{
+        public void UpdateEnergy()
+        {
             energyIncrease += persistance;
-			energy += (int)energyIncrease;
+            energy += (int)energyIncrease;
             if (energyIncrease >= 0)
                 Statistics.TotalEnergyGained += (int)energyIncrease;
             if (energyIncrease < 0)
                 Statistics.TotalEnergySpent += (int)energyIncrease;
-			energy = MathHelper.Clamp(energy, 0, max_energy);
-			text.Value = "(" + energyIncrease.ToString() + ")";
+            energy = MathHelper.Clamp(energy, 0, max_energy);
+            text.Value = "(" + energyIncrease.ToString() + ")";
 
             if (energyIncrease < 0)
                 text.Colour = Color.PaleVioletRed;
@@ -253,12 +254,12 @@ namespace AHH.User
 
             energyIncrease = 0;
 
-       
-		}
 
-		public void Draw(SpriteBatch sb)
-		{
-			cursor.Draw(sb);
+        }
+
+        public void Draw(SpriteBatch sb)
+        {
+            cursor.Draw(sb);
 
             if (mode != Player_Modes.MainMenu && mode != Player_Modes.ES_Death &&
                 mode != Player_Modes.ES_God && mode != Player_Modes.ES_Passive && mode != Player_Modes.End_Screen)
@@ -279,6 +280,11 @@ namespace AHH.User
         {
             get { return buildingID; }
             set { buildingID = value; }
+        }
+
+        public Prerequisites Prerequisites
+        {
+            get { return prerequisites; }
         }
 
 		public Player_Modes Mode

@@ -6,6 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using AHH.Research;
 using AHH.UI;
+using AHH.UI.Elements.Buttons;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 
@@ -16,7 +17,11 @@ namespace AHH.Parsers
         public static Dictionary<ButtonFunction, Dictionary<string, Research.Research>> ParseResearch(string filepath, ContentManager cm)
         {
             if (!File.Exists(filepath))
+            {
+                throw new Exception("Cannot locate file at: " + filepath);
                 return null;
+            }
+
 
             Dictionary<ButtonFunction, Dictionary<string, Research.Research>> dic = new Dictionary<ButtonFunction, Dictionary<string, Research.Research>>();
             

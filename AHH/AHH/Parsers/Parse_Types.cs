@@ -15,10 +15,14 @@ namespace AHH.Parsers
 	{
 		public static Dictionary<T, Y> Parse_Types<T, Y>(string filepath, ContentManager cm)
 		{
-			if (!File.Exists(filepath))
-				return null;
+            if (!File.Exists(filepath))
+            {
+                throw new Exception("Cannot locate file at: " + filepath);
+                return null;
+            }
 
-			Dictionary<T, Y> types = new Dictionary<T, Y>();
+
+            Dictionary<T, Y> types = new Dictionary<T, Y>();
 			StreamReader sr = new StreamReader(filepath);
 			string line = "";
 

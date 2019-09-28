@@ -15,6 +15,7 @@ using AHH.AI;
 using AHH.Research;
 using AHH.UI.Elements;
 using AHH.Functions;
+using AHH.UI.Elements.Buttons;
 
 namespace AHH.Interactable.Building
 {
@@ -555,6 +556,30 @@ namespace AHH.Interactable.Building
                     count++;
             }
             return count;
+        }
+
+        public Prerequisites GetCurrentBuiltTiers()
+        {
+            Prerequisites prerequisites = Prerequisites.None;
+            
+            foreach (var b in buildings)
+            {
+                foreach(Prerequisites pr in Enum.GetValues(typeof(Prerequisites)))
+                {
+                    if (b.Value.GetBuildingData().Tier.HasFlag(pr) && !prerequisites.HasFlag(pr))
+                    {
+                        prerequisites |= pr;
+                    }
+                }
+            }
+
+            return prerequisites;
+        }
+
+        public Prerequisites GetRequiredTier(BuildingTypes key)
+        {
+
+            return building_data[key].RequiredTier;
         }
 
 		public bool BuildingPlaced

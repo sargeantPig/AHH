@@ -7,16 +7,21 @@ using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using AHH.UI;
 using AHH.AI;
+using AHH.UI.Elements.Buttons;
+
 namespace AHH.Parsers
 {
 	partial class Parsers
 	{
 		public static Dictionary<ButtonFunction, string> Parse_InternalGridMenu(string filepath)
 		{
-			if (!File.Exists(filepath))
-				return null;
+            if (!File.Exists(filepath))
+            {
+                throw new Exception("Cannot locate file at: " + filepath);
+                return null;
+            }
 
-			Dictionary<ButtonFunction, string> actions = new Dictionary<ButtonFunction, string>();
+            Dictionary<ButtonFunction, string> actions = new Dictionary<ButtonFunction, string>();
 			StreamReader sr = new StreamReader(filepath);
 			string line = "";
 

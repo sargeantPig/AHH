@@ -97,9 +97,10 @@
     <Compile Include="Research\ResearchData.cs" />
     <Compile Include="Research\Researcher.cs" />
     <Compile Include="UI\BaseElement.cs" />
-    <Compile Include="UI\Elements\Button\Button.cs" />
-    <Compile Include="UI\Elements\Button\ButtonFunctions.cs" />
+    <Compile Include="UI\Elements\Buttons\Button.cs" />
+    <Compile Include="UI\Elements\Buttons\ButtonFunctions.cs" />
     <Compile Include="UI\Controls\Cursor.cs" />
+    <Compile Include="UI\Elements\Buttons\EPrerequisites.cs" />
     <Compile Include="UI\Elements\DropMenu.cs" />
     <Compile Include="UI\Elements\EAlign.cs" />
     <Compile Include="UI\Elements\IElement.cs" />
@@ -148,13 +149,25 @@
     <Content Include="Content\Spells\spell_types.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <Content Include="Content\UI\Buildings\Aggression\ui_aggression.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\UI\Buildings\Defensive\ui_defense.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\UI\Buildings\Economy\ui_economic.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\UI\Buildings\Research\ui_necro.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Include="Content\UI\internal_ui.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Content\UI\ui_all.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Content\UI\ui_buildings.txt">
+    <Content Include="Content\UI\Buildings\ui_buildings.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Content\UI\ui_cycle.txt">
@@ -166,7 +179,9 @@
     <Content Include="Content\UI\ui_end_screen.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Content\UI\ui_end_screen_button.txt" />
+    <Content Include="Content\UI\ui_end_screen_button.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Include="Content\UI\ui_grid_menu.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
@@ -186,6 +201,9 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Content\UI\ui_spells.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\UI\Buildings\ui_subBuildings.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Content\UI\ui_surrender.txt">

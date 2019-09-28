@@ -34,3 +34,7 @@ Tog_EHB	Tog_EHB
 Tog_FHB	Tog_FHB
 Settings	Settings
 ReallySurrender	ReallySurrender
+S_Defensive	S_Defensive
+S_Research	S_Research
+S_Aggressive	S_Aggressive
+S_Economy	S_Economy

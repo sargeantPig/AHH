@@ -8,6 +8,8 @@ using Microsoft.Xna.Framework.Graphics;
 using AHH.UI;
 using AHH.AI;
 using AHH.Interactable.Spells;
+using AHH.UI.Elements.Buttons;
+
 namespace AHH.Parsers
 {
 
@@ -15,10 +17,14 @@ namespace AHH.Parsers
 	{
 		public static Dictionary<T, Y> Parse_Stats<T, Y>(string filepath)
 		{
-			if (!File.Exists(filepath))
-				return null;
+            if (!File.Exists(filepath))
+            {
+                throw new Exception("Cannot locate file at: " + filepath);
+                return null;
+            }
 
-			Dictionary<T, Y> stats = new Dictionary<T, Y>();
+
+            Dictionary<T, Y> stats = new Dictionary<T, Y>();
 			StreamReader sr = new StreamReader(filepath);
 			string line = "";
 
@@ -108,10 +114,22 @@ namespace AHH.Parsers
                         stats.Add(temp_stats.Type, temp_stats);
                     }
                     else stats[temp_stats.Type] = temp_stats;
-
                 }
 
-			}
+                if (line.StartsWith("Tier"))
+                {
+                    string[] split = line.Split('\t');
+
+                    temp_stats.Tier = (Prerequisites)Enum.Parse(typeof(Prerequisites), split[1]);
+                }
+
+                if (line.StartsWith("ReqTier"))
+                {
+                    string[] split = line.Split('\t');
+
+                    temp_stats.RequiredTier = (Prerequisites)Enum.Parse(typeof(Prerequisites), split[1]);
+                }
+            }
 			return stats;
 		}
 	}

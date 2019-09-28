@@ -8,6 +8,7 @@ using Microsoft.Xna.Framework.Graphics;
 using AHH.UI;
 using AHH.AI;
 using AHH.UI.Elements;
+using AHH.UI.Elements.Buttons;
 
 namespace AHH.Parsers
 {
@@ -16,10 +17,13 @@ namespace AHH.Parsers
 	{
 		public static Dictionary<string, IElement> Parse_UiElements(string filepath, ContentManager cm)
 		{
-			if (!File.Exists(filepath))
-				return null;
+            if (!File.Exists(filepath))
+            {
+                throw new Exception("Cannot locate file at: " + filepath);
+                return null;
+            }
 
-			StreamReader sr = new StreamReader(filepath);
+            StreamReader sr = new StreamReader(filepath);
 			string line = "";
 			Dictionary<string, IElement> elements = new Dictionary<string, IElement>();
 

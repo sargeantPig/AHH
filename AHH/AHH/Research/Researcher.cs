@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using AHH.UI;
-using AHH.UI.Elements;
+using AHH.UI.Elements.Buttons;
 using AHH.User;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
@@ -13,6 +13,7 @@ using AHH.Interactable.Building;
 using AHH.Extensions;
 using AHH.Interactable.Spells;
 using AHH.Functions;
+using AHH.UI.Elements;
 
 namespace AHH.Research
 {

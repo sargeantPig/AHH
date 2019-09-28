@@ -1,4 +1,4 @@
-﻿namespace AHH.UI
+﻿namespace AHH.UI.Elements.Buttons
 {
 	enum ButtonFunction
 	{
@@ -37,6 +37,10 @@
         Settings,
         Tog_FHB,
         ReallySurrender,
+        S_Defensive,
+        S_Aggressive,
+        S_Economy,
+        S_Research,
 		Nan,
     }
 }

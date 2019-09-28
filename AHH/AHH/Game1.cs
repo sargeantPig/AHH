@@ -16,6 +16,8 @@ using AHH.Interactable.Spells;
 using AHH.Research;
 using AHH.UI.Elements.Messages;
 using AHH.Functions;
+using AHH.UI.Elements.Buttons;
+
 namespace AHH
 {
 	/// <summary>
@@ -153,7 +155,7 @@ namespace AHH
             Options.Update(gameTime);
             player.Input.KB = Keyboard.GetState();
 			player.Update(uiMaster, Mouse.GetState(), architech, gameTime);
-            uiMaster.Update(player, gameTime);
+            uiMaster.Update(player, gameTime, architech);
 
             switch (player.Mode)
             {
@@ -237,7 +239,7 @@ namespace AHH
                 player.Mode == Player_Modes.ES_God || player.Mode == Player_Modes.ES_Passive || player.Mode == Player_Modes.End_Screen)
                 overlay_Screen.Draw(spriteBatch);
 
-			uiMaster.Draw(spriteBatch, player);
+			uiMaster.Draw(spriteBatch, player, architech);
 			player.Draw(spriteBatch);
 			spriteBatch.End();
 

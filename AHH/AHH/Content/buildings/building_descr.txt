@@ -3,33 +3,48 @@
 #Name	Wall
 #Type	Wall
 #Stats	{health, production, armourType, buildTime, cost, sx, sy}
+#Tier the building tier
 
 Name	Wall
 Type	Wall
 Stats	3000, -1, Reinforced, 100, 250, 64, 64
+Tier	Tier2
+ReqTier	Tier1
 Descr	Used to protect	your assets.
+
 
 Name	Necromancer Tower
 Type	NTower
 Stats	10000, 1, Reinforced, 100, 10, 128, 128
+Tier	None
+ReqTier	Tier4
 Descr	This tower must survive!
 
 Name	Grave
 Type	Grave
 Stats	1000, -10, Reinforced, 100, 400, 64, 64
+Tier	Tier2
+ReqTier	Tier1
 Descr	Zombies gather around	and protect graves.
+
 
 Name	Energy Conduit
 Type	EnergyConduit
 Stats	500, 20, Reinforced, 100, 600, 64, 64
+Tier	Tier1
+ReqTier	None
 Descr	Produces energy, production	times enemies alive. 
 
 Name	Necrotic Orrery
 Type	NecroticOrrery
 Stats	2000, -10, Reinforced, 100, 1000, 128, 128
+Tier	Tier3
+ReqTier	Tier2
 Descr	Allows Research, multiple	increase research speed.
 
 Name	Demolish
 Type	Demolish
 Stats	0, 0, Reinforced, 0, 0, 128, 128
+Tier	None
+ReqTier	None
 Descr	Demolish a building,	gain +100 energy per building.
